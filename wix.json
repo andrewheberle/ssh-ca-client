@@ -1,7 +1,7 @@
 {
   "product": "Serverless SSH CA Client",
   "company": "Andrew Heberle",
-  "license": "..\\LICENSE",
+  "license": "LICENSE",
   "upgrade-code": "75b8e17f-138e-447e-bf35-c093ab5293e8",
   "files": {
     "guid": "66807fd7-177d-4462-822a-24211b9fb0f1",
