@@ -4,7 +4,7 @@ import (
 	"golang.zx2c4.com/wireguard/windows/conf/dpapi"
 )
 
-type DpapiProtector struct {}
+type DpapiProtector struct{}
 
 // Decrypt will decrypt the secret called "name" using the Windows DPAPI
 func (p *DpapiProtector) Decrypt(data []byte, name string) ([]byte, error) {

@@ -16,7 +16,7 @@ func TestKeyringProtector_MockedEncryptDecrypt(t *testing.T) {
 	}{
 		{"data should match", []byte("somedata"), "secret"},
 	}
-    p := &KeyringProtector{}
+	p := &KeyringProtector{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ciphertext, err := p.Encrypt(tt.data, tt.secretname)
@@ -50,7 +50,7 @@ func TestKeyringProtector_MockedDecrypt(t *testing.T) {
 	}{
 		{"expected to fail as no key exists", []byte("here is some content"), nil, true},
 	}
-    p := &KeyringProtector{}
+	p := &KeyringProtector{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, gotErr := p.Decrypt(tt.data, tt.name)
