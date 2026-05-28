@@ -20,7 +20,7 @@ builds:
     main: ./cmd/ssh-ca-client-cli
     mod_timestamp: "{{ .CommitTimestamp }}"
     ldflags:
-      - -s -w -X github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/version.version={{ .Version }} -X main.Date={{ .CommitDate }}
+      - -s -w -X github.com/andrewheberle/ssh-ca-client/internal/pkg/version.version={{ .Version }} -X main.Date={{ .CommitDate }}
   - id: gui
     binary: ssh-ca-client
     env:
@@ -36,7 +36,7 @@ builds:
     main: ./cmd/ssh-ca-client
     mod_timestamp: "{{ .CommitTimestamp }}"
     ldflags:
-      - -s -w -X github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/version.version={{ .Version }} -X main.Date={{ .CommitDate }}
+      - -s -w -X github.com/andrewheberle/ssh-ca-client/internal/pkg/version.version={{ .Version }} -X main.Date={{ .CommitDate }}
       - '{{ if eq .Os "windows" }}-H=windowsgui{{ end }}'
   - id: snap
     binary: ssh-ca-client
@@ -54,7 +54,7 @@ builds:
     main: ./cmd/ssh-ca-client
     mod_timestamp: "{{ .CommitTimestamp }}"
     ldflags:
-      - -s -w -X github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/version.version={{ .Version }} -X main.Date={{ .CommitDate }}
+      - -s -w -X github.com/andrewheberle/ssh-ca-client/internal/pkg/version.version={{ .Version }} -X main.Date={{ .CommitDate }}
 
 archives:
   - ids:

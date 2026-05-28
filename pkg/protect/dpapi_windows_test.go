@@ -17,7 +17,7 @@ func TestDpapiProtector_Encrypt(t *testing.T) {
 		{"same name", []byte("input"), "data", "data", false, true},
 		{"different name", []byte("input"), "data", "other", false, false},
 	}
-    p := &DpapiProtector{}
+	p := &DpapiProtector{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			protected, err := p.Encrypt(tt.data, tt.in)
