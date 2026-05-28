@@ -1,10 +1,10 @@
 # ssh-ca-client
 
-[![codecov](https://codecov.io/gh/andrewheberle/serverless-ssh-ca/graph/badge.svg?flag=client&token=AZLFIBTTFK)](https://codecov.io/gh/andrewheberle/serverless-ssh-ca)
-[![Go Report Card](https://goreportcard.com/badge/github.com/andrewheberle/serverless-ssh-ca/client)](https://goreportcard.com/report/github.com/andrewheberle/serverless-ssh-ca/client)
+[![codecov](https://codecov.io/gh/andrewheberle/ssh-ca-client/graph/badge.svg?flag=client&token=AZLFIBTTFK)](https://codecov.io/gh/andrewheberle/ssh-ca-client)
+[![Go Report Card](https://goreportcard.com/badge/github.com/andrewheberle/ssh-ca-client)](https://goreportcard.com/report/github.com/andrewheberle/ssh-ca-client)
 
-This provides the client-side service to interact with the Serverless
-Certificate Authority in this repository.
+This provides the client-side service to interact with the (Serverless
+Certificate Authority)[https://github.com/andrewheberle/serverless-ssh-ca].
 
 ## Installing
 
@@ -37,10 +37,10 @@ available from the GitHub Releases page or you may add the APT repository to
 your system as follows:
 
 ```sh
-curl -fsSL https://packages.hebs.net.au/serverless-ssh-ca/pubkey.gpg | sudo gpg --dearmor -o /usr/share/keyrings/serverless-ssh-ca.gpg
-echo "deb [signed-by=/usr/share/keyrings/serverless-ssh-ca.gpg] https://packages.hebs.net.au/serverless-ssh-ca stable main" | sudo tee /etc/apt/sources.list.d/serverless-ssh-ca.list
+curl -fsSL https://packages.hebs.net.au/ssh-ca-client/pubkey.gpg | sudo gpg --dearmor -o /usr/share/keyrings/ssh-ca-client.gpg
+echo "deb [signed-by=/usr/share/keyrings/ssh-ca-client.gpg] https://packages.hebs.net.au/ssh-ca-client stable main" | sudo tee /etc/apt/sources.list.d/ssh-ca-client.list
 sudo apt-get update
-sudo apt-get install serverless-ssh-ca
+sudo apt-get install ssh-ca-client
 ```
 
 On Windows there is an MSI build that includes both the GUI and CLI versions
@@ -51,13 +51,13 @@ and is the recommended option for Windows users.
 #### CLI
 
 ```sh
-go install github.com/andrewheberle/serverless-ssh-ca/client/cmd/ssh-ca-client-cli@latest
+go install github.com/andrewheberle/ssh-ca-client/cmd/ssh-ca-client-cli@latest
 ```
 
 #### GUI
 
 ```sh
-go install github.com/andrewheberle/serverless-ssh-ca/client/cmd/ssh-ca-client@latest
+go install github.com/andrewheberle/ssh-ca-client/cmd/ssh-ca-client@latest
 ```
 
 ## Configuration
