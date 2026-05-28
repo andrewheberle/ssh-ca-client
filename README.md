@@ -17,7 +17,7 @@ On Linux the client is available from the Snapcraft store, however at this time
 there are additional steps required to allow the snap version access to the SSH
 authentication agent socket due to it's strict confinement.
 
-An example wrapper script is located under `scripts/wrapper.sh` that uses
+An example wrapper script is located under `snap/scripts/wrapper.sh` that uses
 `socat` to listen on a socket in your home directory and proxies any access to
 the "real" SSH authentication agent socket.
 
