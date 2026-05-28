@@ -5,7 +5,7 @@ package version_test
 import (
 	"testing"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/version"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/version"
 )
 
 func TestVersion(t *testing.T) {

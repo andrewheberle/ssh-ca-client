@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/api"
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/client"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/client"
 	sshkrl "github.com/forfuncsake/krl"
 	"github.com/hiddeco/sshsig"
 	"golang.org/x/crypto/ssh"

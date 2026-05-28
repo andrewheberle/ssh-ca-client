@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/gui"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/gui"
 )
 
 func main() {

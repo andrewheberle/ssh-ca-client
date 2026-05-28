@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/config"
 	"github.com/andrewheberle/simplecommand"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
 	"github.com/bep/simplecobra"
 )
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/cli"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cli"
 )
 
 func TestExecute(t *testing.T) {

@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/api"
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/krl"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
 	"golang.org/x/crypto/ssh"
 )
 

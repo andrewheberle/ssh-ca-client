@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/pkg/protect"
-	"github.com/andrewheberle/serverless-ssh-ca/client/pkg/sshcert"
+	"github.com/andrewheberle/ssh-ca-client/pkg/protect"
+	"github.com/andrewheberle/ssh-ca-client/pkg/sshcert"
 	"golang.org/x/crypto/ssh"
 	"sigs.k8s.io/yaml"
 )

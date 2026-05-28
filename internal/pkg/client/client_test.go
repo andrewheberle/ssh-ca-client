@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/version"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/version"
 )
 
 func Test_GenerateUserAgent(t *testing.T) {

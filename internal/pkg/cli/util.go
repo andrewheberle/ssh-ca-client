@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/config"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
 	"github.com/bep/simplecobra"
 )
 

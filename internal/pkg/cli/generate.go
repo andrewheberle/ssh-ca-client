@@ -6,9 +6,9 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/config"
-	"github.com/andrewheberle/serverless-ssh-ca/client/pkg/sshkey"
 	"github.com/andrewheberle/simplecommand"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
+	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
 	"github.com/bep/simplecobra"
 )
 

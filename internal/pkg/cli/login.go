@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/client"
 	"github.com/andrewheberle/simplecommand"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/client"
 	"github.com/bep/simplecobra"
 )
 

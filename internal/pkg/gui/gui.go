@@ -13,9 +13,9 @@ import (
 	"time"
 
 	"github.com/allan-simon/go-singleinstance"
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/client"
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/config"
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/tray"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/client"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/tray"
 	"github.com/spf13/pflag"
 )
 

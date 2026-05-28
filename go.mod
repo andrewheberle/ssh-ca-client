@@ -1,4 +1,4 @@
-module github.com/andrewheberle/serverless-ssh-ca/client
+module github.com/andrewheberle/ssh-ca-client
 
 go 1.25.0
 

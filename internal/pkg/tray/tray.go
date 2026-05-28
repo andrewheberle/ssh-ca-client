@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"fyne.io/systray"
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/client"
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/version"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/client"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/version"
 	"github.com/gen2brain/beeep"
 )
 

@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/version"
 	"github.com/andrewheberle/simplecommand"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/version"
 	"github.com/bep/simplecobra"
 )
 

@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/pkg/protect"
-	"github.com/andrewheberle/serverless-ssh-ca/client/pkg/sshkey"
+	"github.com/andrewheberle/ssh-ca-client/pkg/protect"
+	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
 	"golang.org/x/crypto/ssh"
 )
 

@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/cli"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cli"
 )
 
 func main() {
