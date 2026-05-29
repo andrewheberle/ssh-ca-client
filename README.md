@@ -1,10 +1,10 @@
 # ssh-ca-client
 
-[![codecov](https://codecov.io/gh/andrewheberle/ssh-ca-client/graph/badge.svg?flag=client&token=AZLFIBTTFK)](https://codecov.io/gh/andrewheberle/ssh-ca-client)
+[![codecov](https://codecov.io/gh/andrewheberle/ssh-ca-client/graph/badge.svg?token=dH7xSBu8eE)](https://codecov.io/gh/andrewheberle/ssh-ca-client)
 [![Go Report Card](https://goreportcard.com/badge/github.com/andrewheberle/ssh-ca-client)](https://goreportcard.com/report/github.com/andrewheberle/ssh-ca-client)
 
-This provides the client-side service to interact with the (Serverless
-Certificate Authority)[https://github.com/andrewheberle/serverless-ssh-ca].
+This provides the client-side service to interact with the [Serverless
+Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 
 ## Installing
 
