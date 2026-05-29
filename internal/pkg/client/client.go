@@ -658,8 +658,8 @@ func (lh *LoginHandler) CertificateValid() bool {
 	return lh.config.CertificateValid()
 }
 
-func (lh *LoginHandler) CerificateExpiry() time.Time {
-	return lh.config.CerificateExpiry()
+func (lh *LoginHandler) CertificateExpiry() time.Time {
+	return lh.config.CertificateExpiry()
 }
 
 // SetLogger sets the [*slog.Logger] used after the [*LoginHandler] has been

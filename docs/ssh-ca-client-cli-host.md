@@ -95,7 +95,7 @@ A certificate will only be renewed once it has less validity than the
 fraction set by the `--renewat` option or if the `--force` option is set.
 
 `--renewat <percent>`
-This sets the fraction of the cerificates lifetime that renewal should be
+This sets the fraction of the certificates lifetime that renewal should be
 attempted.
 
 This option is a value from zero (0) to (1) and accepts a floating point

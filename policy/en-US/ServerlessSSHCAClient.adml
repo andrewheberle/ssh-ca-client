@@ -21,7 +21,7 @@
             <string id="CertificateAuthorityURL">Certificate Authority URL</string>
             <string id="CertificateAuthorityURL_Explain">The URL of the SSH Certificate Authority (CA)</string>
             <string id="TrustedCertificateAuthority">Trusted Certificate Authority</string>
-            <string id="TrustedCertificateAuthority_Explain">The public key of the SSH Cerificate Authority (CA). This is optional but recommended to validate CA response.</string>
+            <string id="TrustedCertificateAuthority_Explain">The public key of the SSH Certificate Authority (CA). This is optional but recommended to validate CA response.</string>
         </stringTable>
         <presentationTable>
             <presentation id="ClientID">

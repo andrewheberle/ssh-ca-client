@@ -178,13 +178,13 @@ func (app *Application) setState() {
 					if err := app.refresh(); err == nil {
 						app.state = stateCertificateOK
 						app.logger.Info("refresh of certificate succeeded")
-						app.notify("Cerificate Refreshed", "The current certificate was successfully refreshed", okIcon)
+						app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
 						app.setState()
 						break
 					} else {
 						app.state = stateCertificateExpired
 						app.logger.Info("refresh of certificate failed", "error", err)
-						app.notify("Cerificate Expired", "The current certificate has expired and must be manually renewed", warningIcon)
+						app.notify("Certificate Expired", "The current certificate has expired and must be manually renewed", warningIcon)
 						app.setState()
 						break
 					}
@@ -263,7 +263,7 @@ func (app *Application) setState() {
 			if err := app.refreshWithBackoff(); err == nil {
 				app.logger.Info("refresh of certificate succeeded")
 				// send notification
-				app.notify("Cerificate Refreshed", "The current certificate was successfully refreshed", okIcon)
+				app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
 				// re-run to handle change
 				app.setState()
 				// finish now
@@ -283,7 +283,7 @@ func (app *Application) setState() {
 
 			app.state = stateCertificateExpired
 			// send notification
-			app.notify("Cerificate Expired", "The current certificate has expired and must be manually renewed", warningIcon)
+			app.notify("Certificate Expired", "The current certificate has expired and must be manually renewed", warningIcon)
 			// re-run to handle change
 			app.setState()
 			// finish now
@@ -291,14 +291,14 @@ func (app *Application) setState() {
 		}
 
 		// check if the renewAt threshold has been reached
-		if time.Until(app.client.CerificateExpiry()) < app.renewAt {
+		if time.Until(app.client.CertificateExpiry()) < app.renewAt {
 			app.logger.Info("current certificate close to expiry")
 
 			// try to refresh
 			if err := app.refreshWithBackoff(); err == nil {
 				app.logger.Info("refresh of certificate succeeded")
 				// send notification
-				app.notify("Cerificate Refreshed", "The current certificate was successfully refreshed", okIcon)
+				app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
 				// re-run to handle change
 				app.setState()
 				// finish now
@@ -320,7 +320,7 @@ func (app *Application) setState() {
 
 		app.mRenew.SetTitle("Renew")
 		app.mRenew.Enable()
-		app.mExpiry.SetTitle(fmt.Sprintf("%s left", timeLeft(app.client.CerificateExpiry())))
+		app.mExpiry.SetTitle(fmt.Sprintf("%s left", timeLeft(app.client.CertificateExpiry())))
 		app.setTooltip("Current certificate valid")
 		systray.SetIcon(app.trayIcons[okIcon])
 	}

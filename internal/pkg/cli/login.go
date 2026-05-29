@@ -89,7 +89,7 @@ func (c *loginCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args
 	}
 
 	// check life is not more than 50% done
-	if time.Now().Add(c.lifetime / 2).Before(c.client.CerificateExpiry()) {
+	if time.Now().Add(c.lifetime / 2).Before(c.client.CertificateExpiry()) {
 		if !c.force {
 			c.logger.Info("skipping renewal as current certificate has more than 50% of its lifetime left")
 
