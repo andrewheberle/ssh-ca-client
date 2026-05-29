@@ -231,10 +231,10 @@ func (c *Config) HasCertificate() bool {
 }
 
 func (c *Config) CertificateValid() bool {
-	return c.CerificateExpiry().After(time.Now())
+	return c.CertificateExpiry().After(time.Now())
 }
 
-func (c *Config) CerificateExpiry() time.Time {
+func (c *Config) CertificateExpiry() time.Time {
 	certBytes, err := c.GetCertificateBytes()
 	if err != nil {
 		return time.Time{}

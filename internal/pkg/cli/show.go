@@ -119,7 +119,7 @@ func (c *showCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args 
 		if !c.config.CertificateValid() {
 			status = "expired"
 		}
-		expiry := c.config.CerificateExpiry()
+		expiry := c.config.CertificateExpiry()
 
 		if c.json {
 			return json.NewEncoder(os.Stdout).Encode(showStatusJson{
