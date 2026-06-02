@@ -52,7 +52,7 @@ func TestYamlPersistence_Save(t *testing.T) {
 				t.Fatalf("Could not parse file from Save(): %v", err)
 			}
 
-			if !reflect.DeepEqual(got, tt.c) {
+			if !reflect.DeepEqual(&got, tt.c) {
 				t.Errorf("Save() = %v, want %v", got, tt.c)
 			}
 		})
