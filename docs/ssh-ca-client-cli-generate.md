@@ -42,6 +42,12 @@ Show what would occur but make no changes.
   ssh-ca-client-cli generate --force --dryrun
   ```
 
+* Generate a new private key on a system without using the users keyring:
+
+  ```sh
+  ssh-ca-client-cli --keyfile ~/.config/serverless-ssh-ca/keyfile generate
+  ```
+
 ## ssh-ca-client-cli
 
 Part of the [ssh-ca-client-cli](ssh-ca-client-cli.md)

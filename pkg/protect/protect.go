@@ -49,7 +49,7 @@ func getOrCreateKey(name string, create bool) ([]byte, error) {
 
 func createKey(name, user string) ([]byte, error) {
 	// generate key
-	key, err := generateKey()
+	key, err := GenerateKey()
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func createKey(name, user string) ([]byte, error) {
 	return key, nil
 }
 
-func generateKey() ([]byte, error) {
+func GenerateKey() ([]byte, error) {
 	key := make([]byte, 32)
 	if _, err := rand.Read(key); err != nil {
 		return nil, fmt.Errorf("error generating key: %w", err)
@@ -75,7 +75,7 @@ func generateKey() ([]byte, error) {
 	return key, nil
 }
 
-func decrypt(key, ciphertext []byte) ([]byte, error) {
+func Decrypt(key, ciphertext []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func decrypt(key, ciphertext []byte) ([]byte, error) {
 	return aesGCM.Open(nil, nonce, ciphertext, nil)
 }
 
-func encrypt(key, plaintext []byte) ([]byte, error) {
+func Encrypt(key, plaintext []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err

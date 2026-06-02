@@ -87,6 +87,12 @@ Passing `--skip-agent` disables this.
   ssh-ca-client-cli login --life 1h
   ```
 
+* Request/renew a certificate on a system without using the users keyring:
+
+  ```sh
+  ssh-ca-client-cli --keyfile ~/.config/serverless-ssh-ca/keyfile login
+  ```
+
 ## Configuration
 
 The following configuration options, specified by the `--config` flag, must be set.

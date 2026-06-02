@@ -1,4 +1,4 @@
-package protect
+package keyfile
 
 import (
 	"bytes"
@@ -7,9 +7,11 @@ import (
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/andrewheberle/ssh-ca-client/pkg/protect"
 )
 
-func TestNewKeyfileProtector_existing(t *testing.T) {
+func TestNewProtector_existing(t *testing.T) {
 	keyfile := "testdata/keyfile_existing"
 	key := fmt.Append(nil, "0123456789abcdef0123456789abcdef")
 	if err := os.WriteFile(keyfile, key, 0600); err != nil {
@@ -19,17 +21,17 @@ func TestNewKeyfileProtector_existing(t *testing.T) {
 		_ = os.Remove(keyfile)
 	}()
 
-	p, err := NewKeyfileProtector(keyfile)
+	p, err := NewProtector(keyfile)
 	if err != nil {
 		t.Fatalf("could not load existing keyfile: %v", err)
 	}
 
 	if !bytes.Equal(key, p.key) {
-		t.Errorf("NewKeyfileProtector() did not match. Got = %v, Want = %v", p.key, key)
+		t.Errorf("NewProtector() did not match. Got = %v, Want = %v", p.key, key)
 	}
 }
 
-func TestNewKeyfileProtector_new(t *testing.T) {
+func TestNewProtector_new(t *testing.T) {
 	keyfile := "testdata/keyfile_new"
 	if err := os.Remove(keyfile); err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
@@ -40,7 +42,7 @@ func TestNewKeyfileProtector_new(t *testing.T) {
 		_ = os.Remove(keyfile)
 	}()
 
-	p, err := NewKeyfileProtector(keyfile)
+	p, err := NewProtector(keyfile)
 	if err != nil {
 		t.Fatalf("could not create new keyfile: %v", err)
 	}
@@ -51,11 +53,11 @@ func TestNewKeyfileProtector_new(t *testing.T) {
 	}
 
 	if !bytes.Equal(key, p.key) {
-		t.Errorf("NewKeyfileProtector() did not match. Got = %s, Want = %s", p.key, key)
+		t.Errorf("NewProtector() did not match. Got = %s, Want = %s", p.key, key)
 	}
 }
 
-func TestKeyfileProtector_Encrypt(t *testing.T) {
+func TestProtector_Encrypt(t *testing.T) {
 	keyfile, err := tempKeyfileName()
 	defer func() {
 		_ = os.Remove(keyfile)
@@ -64,7 +66,7 @@ func TestKeyfileProtector_Encrypt(t *testing.T) {
 		panic(err)
 	}
 
-	p, err := NewKeyfileProtector(keyfile)
+	p, err := NewProtector(keyfile)
 	if err != nil {
 		t.Fatalf("could not create keyfile protector: %v", err)
 	}
@@ -76,7 +78,7 @@ func TestKeyfileProtector_Encrypt(t *testing.T) {
 		t.Fatalf("Encrypt() failed unexpectedly: %v", err)
 	}
 
-	got, err := decrypt(p.key, ciphertext)
+	got, err := protect.Decrypt(p.key, ciphertext)
 	if err != nil {
 		t.Fatalf("decrypt() failed unexpectedly: %v", err)
 	}
@@ -86,7 +88,7 @@ func TestKeyfileProtector_Encrypt(t *testing.T) {
 	}
 }
 
-func TestKeyfileProtector_Decrypt(t *testing.T) {
+func TestProtector_Decrypt(t *testing.T) {
 	keyfile, err := tempKeyfileName()
 	defer func() {
 		_ = os.Remove(keyfile)
@@ -95,13 +97,13 @@ func TestKeyfileProtector_Decrypt(t *testing.T) {
 		panic(err)
 	}
 
-	p, err := NewKeyfileProtector(keyfile)
+	p, err := NewProtector(keyfile)
 	if err != nil {
 		t.Fatalf("could not create keyfile protector: %v", err)
 	}
 
 	plaintext := fmt.Append(nil, "somedata")
-	ciphertext, err := encrypt(p.key, plaintext)
+	ciphertext, err := protect.Encrypt(p.key, plaintext)
 	if err != nil {
 		panic(err)
 	}

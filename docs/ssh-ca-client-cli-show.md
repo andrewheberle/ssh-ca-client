@@ -17,7 +17,7 @@ This sub-command can be used to display any exsiting private key, public key or
 certificate in Open SSH format based on the contents of the configuration
 specified by the `--user` global option.
 
-In addition general status can be displayed showing the existince of any of the
+In addition general status can be displayed showing the existence of any of the
 above and the certificate expiry (if one exists).
 
 ## Global Options
@@ -61,6 +61,13 @@ This option is only valid with the `--status` option.
 
   ```sh
   ssh-ca-client-cli show --status --json
+  ```
+
+* Show the current OpenSSH public key on a system without using the users
+  keyring:
+
+  ```sh
+  ssh-ca-client-cli --keyfile ~/.config/serverless-ssh-ca/keyfile show
   ```
 
 ## ssh-ca-client-cli

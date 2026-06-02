@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
+	"github.com/andrewheberle/ssh-ca-client/pkg/protect/keyfile"
 	"github.com/bep/simplecobra"
 )
 
@@ -29,8 +30,18 @@ func loadconfig(this *simplecobra.Commandeer) (*config.Config, error) {
 		return nil, err
 	}
 
+	// check if keyfile flag is set and if so use it for config protection
+	opts := make([]config.ConfigOption, 0)
+	if k, err := this.CobraCommand.Flags().GetString("keyfile"); err == nil && k != "" {
+		p, err := keyfile.NewProtector(k)
+		if err != nil {
+			return nil, fmt.Errorf("problem setting up keyfile protector: %w", err)
+		}
+		opts = append(opts, config.WithProtector(p))
+	}
+
 	// load config (do not error here on not found)
-	config, err := config.LoadConfig(systemConfigFile, userConfigFile)
+	config, err := config.LoadConfig(systemConfigFile, userConfigFile, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +62,17 @@ func loaduserconfig(this *simplecobra.Commandeer) (*config.Config, error) {
 		return nil, err
 	}
 
-	config, err := config.LoadUserConfigOnly(userConfigFile)
+	// check if keyfile flag is set and if so use it for config protection
+	opts := make([]config.ConfigOption, 0)
+	if k, err := this.CobraCommand.Flags().GetString("keyfile"); err == nil && k != "" {
+		p, err := keyfile.NewProtector(k)
+		if err != nil {
+			return nil, fmt.Errorf("problem setting up keyfile protector: %w", err)
+		}
+		opts = append(opts, config.WithProtector(p))
+	}
+
+	config, err := config.LoadUserConfigOnly(userConfigFile, opts...)
 	if err != nil {
 		return nil, err
 	}

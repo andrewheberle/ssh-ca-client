@@ -53,36 +53,54 @@ var (
 	ErrNoRefreshToken = errors.New("no refresh token found")
 )
 
-func LoadConfig(system, user string) (*Config, error) {
+func LoadConfig(system, user string, opts ...ConfigOption) (*Config, error) {
 	s, err := loadSystemConfig(system)
 	if err != nil {
 		return nil, err
 	}
 
-	p, err := yamlpersistence.New(user)
-	if err != nil {
-		return nil, fmt.Errorf("problem initializing persistence: %w", err)
+	c := &Config{
+		system:    &s,
+		protector: protect.NewDefaultProtector(),
 	}
 
-	return &Config{
-		system:      &s,
-		user:        p.Get(),
-		protector:   protect.NewDefaultProtector(),
-		persistence: p,
-	}, nil
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	// if no persistence option was provided, default to yaml file persistence
+	if c.persistence == nil {
+		p, err := yamlpersistence.New(user)
+		if err != nil {
+			return nil, fmt.Errorf("problem initializing persistence: %w", err)
+		}
+		c.persistence = p
+	}
+	c.user = c.persistence.Get()
+
+	return c, nil
 }
 
-func LoadUserConfigOnly(name string) (*Config, error) {
-	p, err := yamlpersistence.New(name)
-	if err != nil {
-		return nil, fmt.Errorf("problem initializing persistence: %w", err)
+func LoadUserConfigOnly(name string, opts ...ConfigOption) (*Config, error) {
+	c := &Config{
+		protector: protect.NewDefaultProtector(),
 	}
 
-	return &Config{
-		protector:   protect.NewDefaultProtector(),
-		persistence: p,
-		user:        p.Get(),
-	}, nil
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	// if no persistence option was provided, default to yaml file persistence
+	if c.persistence == nil {
+		p, err := yamlpersistence.New(name)
+		if err != nil {
+			return nil, fmt.Errorf("problem initializing persistence: %w", err)
+		}
+		c.persistence = p
+	}
+	c.user = c.persistence.Get()
+
+	return c, nil
 }
 
 func (c *Config) Save() error {
