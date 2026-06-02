@@ -15,6 +15,7 @@ import (
 	"github.com/allan-simon/go-singleinstance"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/client"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/tray"
 	"github.com/spf13/pflag"
 )
@@ -124,7 +125,7 @@ func Execute(ctx context.Context, args []string) error {
 	}
 
 	// set up tray app
-	app, err := tray.New(config.FriendlyAppName, listenAddr, resources, lh, renewAt)
+	app, err := tray.New(names.FriendlyAppName, listenAddr, resources, lh, renewAt)
 	if err != nil {
 		return err
 	}

@@ -5,6 +5,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/persistence"
+	yamlpersistence "github.com/andrewheberle/ssh-ca-client/internal/pkg/persistence/yaml"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/userconfig"
 	"github.com/andrewheberle/ssh-ca-client/pkg/protect"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
 	"golang.org/x/crypto/ssh"
@@ -23,19 +26,37 @@ func (p *mockProtector) Decrypt(data []byte, name string) ([]byte, error) {
 	return bytes.Clone(data), nil
 }
 
-var _ Persistence = &mockPersistence{}
+var _ persistence.Persistence = &mockPersistence{}
 
 type mockPersistence struct {
-	data UserConfig
+	data *userconfig.UserConfig
 }
 
-func (p *mockPersistence) Save(c UserConfig) error {
-	p.data = c
+func (p *mockPersistence) Get() *userconfig.UserConfig {
+	return p.data
+}
+
+func (p *mockPersistence) Save() error {
+	return nil
+}
+
+func (p *mockPersistence) Set(config *userconfig.UserConfig) error {
+	p.data = config
 	return nil
 }
 
 func TestLoadConfig(t *testing.T) {
 	ca, _, _, _, err := ssh.ParseAuthorizedKey([]byte("ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMgJTsYW+tHl0lz/rnO8djbwq0B3uZ5sGugXU6Ha5S2rTdzMDgit2DO+hoivdT4I07rMrRtmFI179wUY06gIf00="))
+	if err != nil {
+		panic(err)
+	}
+
+	missing, err := yamlpersistence.New("testdata/missing.yml")
+	if err != nil {
+		panic(err)
+	}
+
+	validuser, err := yamlpersistence.New("testdata/validuser.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -49,22 +70,22 @@ func TestLoadConfig(t *testing.T) {
 	}{
 		{"missing", "missing.yml", "missing.yml", nil, true},
 		{"system missing", "missing.yml", "testdata/validuser.yml", nil, true},
-		{"user missing", "testdata/validsystem.yml", "missing.yml",
+		{"user missing", "testdata/validsystem.yml", "testdata/missing.yml",
 			&Config{
-				system: SystemConfig{
+				system: &SystemConfig{
 					Issuer:                  "OIDC Issuer",
 					ClientID:                "OIDC Client ID",
 					Scopes:                  []string{"openid", "email", "profile"},
 					RedirectURL:             "http://localhost:3000/auth/callback",
 					CertificateAuthorityURL: "https://ssh-ca.example.com/",
 				},
-				user:        UserConfig{},
-				persistence: &YamlPersistence{name: "missing.yml"},
+				user:        &userconfig.UserConfig{},
+				persistence: missing,
 				protector:   protect.NewDefaultProtector(),
 			}, false},
-		{"system only with ca", "testdata/validsystem_withca.yml", "missing.yml",
+		{"system only with ca", "testdata/validsystem_withca.yml", "testdata/missing.yml",
 			&Config{
-				system: SystemConfig{
+				system: &SystemConfig{
 					Issuer:                      "OIDC Issuer",
 					ClientID:                    "OIDC Client ID",
 					Scopes:                      []string{"openid", "email", "profile"},
@@ -73,26 +94,26 @@ func TestLoadConfig(t *testing.T) {
 					TrustedCertificateAuthority: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMgJTsYW+tHl0lz/rnO8djbwq0B3uZ5sGugXU6Ha5S2rTdzMDgit2DO+hoivdT4I07rMrRtmFI179wUY06gIf00=",
 					ca:                          ca,
 				},
-				user:        UserConfig{},
-				persistence: &YamlPersistence{name: "missing.yml"},
+				user:        &userconfig.UserConfig{},
+				persistence: missing,
 				protector:   protect.NewDefaultProtector(),
 			}, false},
-		{"system only with invalid ca", "testdata/validsystem_withbadca.yml", "missing.yml", nil, true},
+		{"system only with invalid ca", "testdata/validsystem_withbadca.yml", "testdata/missing.yml", nil, true},
 		{"invalid system", "testdata/invalidsystem.yml", "testdata/validuser.yml", nil, true},
 		{"invalid user", "testdata/validsystem.yml", "testdata/invaliduser.yml", nil, true},
 		{"both valid", "testdata/validsystem.yml", "testdata/validuser.yml",
 			&Config{
-				system: SystemConfig{
+				system: &SystemConfig{
 					Issuer:                  "OIDC Issuer",
 					ClientID:                "OIDC Client ID",
 					Scopes:                  []string{"openid", "email", "profile"},
 					RedirectURL:             "http://localhost:3000/auth/callback",
 					CertificateAuthorityURL: "https://ssh-ca.example.com/",
 				},
-				user: UserConfig{
+				user: &userconfig.UserConfig{
 					PrivateKey: []byte("somedataencodedasbase64"),
 				},
-				persistence: &YamlPersistence{name: "testdata/validuser.yml"},
+				persistence: validuser,
 				protector:   protect.NewDefaultProtector(),
 			}, false},
 	}
@@ -108,14 +129,27 @@ func TestLoadConfig(t *testing.T) {
 			if tt.wantErr {
 				t.Fatal("LoadConfig() succeeded unexpectedly")
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("LoadConfig() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got.system, tt.want.system) {
+				t.Errorf("LoadConfig() (system) = %v, want %v", got.system, tt.want.system)
+			}
+			if !reflect.DeepEqual(got.user, tt.want.user) {
+				t.Errorf("LoadConfig() (user) = %v, want %v", got.user, tt.want.user)
 			}
 		})
 	}
 }
 
 func TestLoadUserConfigOnly(t *testing.T) {
+	missing, err := yamlpersistence.New("testdata/missing.yml")
+	if err != nil {
+		panic(err)
+	}
+
+	validuser, err := yamlpersistence.New("testdata/validuser.yml")
+	if err != nil {
+		panic(err)
+	}
+
 	tests := []struct {
 		name    string
 		config  string
@@ -123,16 +157,16 @@ func TestLoadUserConfigOnly(t *testing.T) {
 		wantErr bool
 	}{
 		{"missing", "missing.yml", &Config{
-			user:        UserConfig{},
-			persistence: &YamlPersistence{name: "missing.yml"},
+			user:        &userconfig.UserConfig{},
+			persistence: missing,
 			protector:   protect.NewDefaultProtector(),
 		}, false},
 		{"valid config", "testdata/validuser.yml",
 			&Config{
-				user: UserConfig{
+				user: &userconfig.UserConfig{
 					PrivateKey: []byte("somedataencodedasbase64"),
 				},
-				persistence: &YamlPersistence{name: "testdata/validuser.yml"},
+				persistence: validuser,
 				protector:   protect.NewDefaultProtector(),
 			}, false},
 		{"invalid config", "testdata/invaliduser.yml", nil, true},
@@ -149,8 +183,11 @@ func TestLoadUserConfigOnly(t *testing.T) {
 			if tt.wantErr {
 				t.Fatal("LoadUserConfigOnly() succeeded unexpectedly")
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("LoadUserConfigOnly() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got.system, tt.want.system) {
+				t.Errorf("LoadUserConfigOnly() (system)= %v, want %v", got.system, tt.want.system)
+			}
+			if !reflect.DeepEqual(got.user, tt.want.user) {
+				t.Errorf("LoadUserConfigOnly() (user)= %v, want %v", got.user, tt.want.user)
 			}
 		})
 	}
@@ -159,7 +196,7 @@ func TestLoadUserConfigOnly(t *testing.T) {
 func TestConfig_Oidc(t *testing.T) {
 	// minimal test config
 	testconfig := &Config{
-		system: SystemConfig{
+		system: &SystemConfig{
 			Issuer:      "OIDC Issuer",
 			ClientID:    "OIDC Client ID",
 			Scopes:      []string{"openid", "email", "profile"},
@@ -192,7 +229,7 @@ func TestConfig_Oidc(t *testing.T) {
 func TestConfig_CertificateAuthorityURL(t *testing.T) {
 	// minimal test config
 	testconfig := &Config{
-		system: SystemConfig{
+		system: &SystemConfig{
 			CertificateAuthorityURL: "https://ssh-ca.example.com/",
 		},
 	}
@@ -217,7 +254,7 @@ func TestConfig_CertificateAuthorityURL(t *testing.T) {
 func TestConfig_getPrivateKeyBytes(t *testing.T) {
 	// minimal test config
 	testconfig := &Config{
-		user: UserConfig{
+		user: &userconfig.UserConfig{
 			PrivateKey: []byte("somedata"),
 		},
 		protector: &mockProtector{},
@@ -231,7 +268,7 @@ func TestConfig_getPrivateKeyBytes(t *testing.T) {
 	}{
 		{"valid config", testconfig, []byte("somedata"), false},
 		{"no key", &Config{
-			user: UserConfig{
+			user: &userconfig.UserConfig{
 				PrivateKey: nil,
 			},
 		}, nil, true},
@@ -258,7 +295,7 @@ func TestConfig_getPrivateKeyBytes(t *testing.T) {
 func TestConfig_GetRefreshToken(t *testing.T) {
 	// minimal test config
 	testconfig := &Config{
-		user: UserConfig{
+		user: &userconfig.UserConfig{
 			RefreshToken: []byte("somedata"),
 		},
 		protector: &mockProtector{},
@@ -272,7 +309,7 @@ func TestConfig_GetRefreshToken(t *testing.T) {
 	}{
 		{"valid config", testconfig, "somedata", false},
 		{"missing token", &Config{
-			user: UserConfig{
+			user: &userconfig.UserConfig{
 				PrivateKey: nil,
 			},
 		}, "", true},
@@ -310,13 +347,13 @@ func TestConfig_HasPrivateKey(t *testing.T) {
 	}{
 		{"no key", &Config{}, false},
 		{"invalid key", &Config{
-			user: UserConfig{
+			user: &userconfig.UserConfig{
 				PrivateKey: []byte("somedatathatisntavalidprivatekey"),
 			},
 			protector: &mockProtector{},
 		}, false},
 		{"valid key", &Config{
-			user: UserConfig{
+			user: &userconfig.UserConfig{
 				PrivateKey: key,
 			},
 			protector: &mockProtector{},
@@ -356,13 +393,13 @@ func TestConfig_getPublicKeyBytes(t *testing.T) {
 	}{
 		{"no key", &Config{}, nil, true},
 		{"invalid key", &Config{
-			user: UserConfig{
+			user: &userconfig.UserConfig{
 				PrivateKey: []byte("somedatathatisntavalidprivatekey"),
 			},
 			protector: &mockProtector{},
 		}, nil, true},
 		{"valid key", &Config{
-			user: UserConfig{
+			user: &userconfig.UserConfig{
 				PrivateKey: pemBytes,
 			},
 			protector: &mockProtector{},

@@ -27,6 +27,21 @@ sub-command.
 The default is `$HOME/.config/serverless-ssh-ca/user.yaml` (Linux/BSD/Darwin)
 or `%APPDATA%\Serverless SSH CA Client\config.yml` (Windows).
 
+`--keyfile <path>`
+This option changes the behaviour of reads/writes to the user configuration
+file so that instead of using DPAPI on Windows for protection of sensitive
+data and storing the encryption key in the users login keyring on other
+platforms, instead a random key is generated and written to the path
+specified.
+
+This `keyfile` is then used for encryption/decryption operations of this data.
+
+It is important that this file is protected and if this file is lost any
+encrypted data in the user configuration will also be lost.
+
+This option is primarily targted for systems that do not have secret service
+available, such as servers.
+
 ## Sub-Commands
 
 `generate`

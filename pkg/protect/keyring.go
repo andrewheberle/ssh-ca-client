@@ -19,7 +19,7 @@ func (p *KeyringProtector) Decrypt(data []byte, name string) ([]byte, error) {
 		p.key = key
 	}
 
-	return decrypt(p.key, data)
+	return Decrypt(p.key, data)
 }
 
 // Encrypt will encrypt provided data using the secret reference in "name"
@@ -33,5 +33,5 @@ func (p *KeyringProtector) Encrypt(data []byte, name string) ([]byte, error) {
 		p.key = key
 	}
 
-	return encrypt(p.key, data)
+	return Encrypt(p.key, data)
 }

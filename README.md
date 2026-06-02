@@ -120,9 +120,22 @@ token are encrypted using the Windows Data Protection API (DPAPI), while on Linu
 a random key is generated and saved in the users `login` keyring which is then
 used to encrypt this data using AES-GCM.
 
-If this random key is lost or deleted this data cannot be recovered so the user must
-regenerate their private key by either deleting the user data
-manually or using the CLI and request a new certificate.
+If this random key is lost or deleted this data cannot be recovered so the user
+must regenerate their private key by either deleting the user data manually or
+using the CLI and request a new certificate.
+
+Alternatively for systems that do no run a secret service like
+`gnome-keyring-daemon` it is possible to provide the `--keyfile <path>` option
+to the CLI which will store the random key in the specified path.
+
+**Note:** There is no migration process included between the default
+DPAPI/keyring protection options and the `--keyfile` option. In this case you
+must regenerate your private key and request a new certificate.
+
+On systems that use both the GUI and CLI, this will introduce a situation where
+neither coexist with each other as the GUI does **not** support the `--keyfile`
+option as this feature is primarily for CLI based systems.
+
 
 ## Requirements
 

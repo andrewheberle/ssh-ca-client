@@ -4,24 +4,30 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"os"
 	"sync"
 	"time"
 
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/persistence"
+	yamlpersistence "github.com/andrewheberle/ssh-ca-client/internal/pkg/persistence/yaml"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/userconfig"
 	"github.com/andrewheberle/ssh-ca-client/pkg/protect"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshcert"
 	"golang.org/x/crypto/ssh"
-	"sigs.k8s.io/yaml"
 )
 
-const FriendlyAppName = "Serverless SSH CA Client"
+const (
+	keySecretName   = names.AppName
+	tokenSecretName = names.AppName
+)
 
 type Config struct {
-	mu          sync.RWMutex
-	system      SystemConfig
-	user        UserConfig
+	mu     sync.RWMutex
+	user   *userconfig.UserConfig
+	system *SystemConfig
+
 	protector   protect.Protector
-	persistence Persistence
+	persistence persistence.Persistence
 }
 
 type ClientOIDCConfig struct {
@@ -41,76 +47,64 @@ type SystemConfig struct {
 	ca                          ssh.PublicKey
 }
 
-type UserConfig struct {
-	Certificate  []byte `json:"certificate,omitempty"`
-	RefreshToken []byte `json:"refresh_token,omitempty"`
-	PrivateKey   []byte `json:"private_key,omitempty"`
-}
-
-type Persistence interface {
-	Save(config UserConfig) error
-}
-
 var (
 	ErrNoPrivateKey   = errors.New("no private key found")
 	ErrNoCertificate  = errors.New("no certificate found")
 	ErrNoRefreshToken = errors.New("no refresh token found")
 )
 
-func LoadConfig(system, user string) (*Config, error) {
+func LoadConfig(system, user string, opts ...ConfigOption) (*Config, error) {
 	s, err := loadSystemConfig(system)
 	if err != nil {
 		return nil, err
 	}
 
-	u, err := loadUserConfig(user)
-	if err != nil {
-		return nil, err
+	c := &Config{
+		system:    &s,
+		protector: protect.NewDefaultProtector(),
 	}
 
-	return &Config{
-		system:      s,
-		user:        u,
-		protector:   protect.NewDefaultProtector(),
-		persistence: &YamlPersistence{name: user},
-	}, nil
-}
-
-func LoadUserConfigOnly(name string) (*Config, error) {
-	u, err := loadUserConfig(name)
-	if err != nil {
-		return nil, err
+	for _, opt := range opts {
+		opt(c)
 	}
 
-	return &Config{
-		user:        u,
-		protector:   protect.NewDefaultProtector(),
-		persistence: &YamlPersistence{name: name},
-	}, nil
-}
-
-func loadUserConfig(name string) (UserConfig, error) {
-	y, err := os.ReadFile(name)
-	if err != nil {
-		// the user config missing is not fatal
-		if errors.Is(err, os.ErrNotExist) {
-			return UserConfig{}, nil
+	// if no persistence option was provided, default to yaml file persistence
+	if c.persistence == nil {
+		p, err := yamlpersistence.New(user)
+		if err != nil {
+			return nil, fmt.Errorf("problem initializing persistence: %w", err)
 		}
+		c.persistence = p
+	}
+	c.user = c.persistence.Get()
 
-		// otherwise return the error
-		return UserConfig{}, err
+	return c, nil
+}
+
+func LoadUserConfigOnly(name string, opts ...ConfigOption) (*Config, error) {
+	c := &Config{
+		protector: protect.NewDefaultProtector(),
 	}
 
-	var config UserConfig
-	if err := yaml.UnmarshalStrict(y, &config); err != nil {
-		return UserConfig{}, fmt.Errorf("problem parsing user config: %w", err)
+	for _, opt := range opts {
+		opt(c)
 	}
 
-	return config, nil
+	// if no persistence option was provided, default to yaml file persistence
+	if c.persistence == nil {
+		p, err := yamlpersistence.New(name)
+		if err != nil {
+			return nil, fmt.Errorf("problem initializing persistence: %w", err)
+		}
+		c.persistence = p
+	}
+	c.user = c.persistence.Get()
+
+	return c, nil
 }
 
 func (c *Config) Save() error {
-	return c.persistence.Save(c.user)
+	return c.persistence.Set(c.user)
 }
 
 func (c *Config) Oidc() ClientOIDCConfig {
@@ -152,8 +146,8 @@ func (c *Config) GetPrivateKeyBytes() ([]byte, error) {
 }
 
 func (c *Config) getPrivateKeyBytes() ([]byte, error) {
-	// error if not private key exists
-	if c.user.PrivateKey == nil {
+	// error if no user config exists or no private key exists
+	if c.user == nil || c.user.PrivateKey == nil {
 		return nil, ErrNoPrivateKey
 	}
 
@@ -178,11 +172,17 @@ func (c *Config) SetPrivateKeyBytes(pemBytes []byte) error {
 	}
 
 	// set key and also clear certificate
-	c.user.PrivateKey = protected
+	if c.user == nil {
+		c.user = &userconfig.UserConfig{
+			PrivateKey: protected,
+		}
+	} else {
+		c.user.PrivateKey = protected
+	}
 	c.user.Certificate = nil
 
 	// save config
-	if err := c.persistence.Save(c.user); err != nil {
+	if err := c.persistence.Set(c.user); err != nil {
 		return err
 	}
 
@@ -218,7 +218,7 @@ func (c *Config) GetCertificateBytes() ([]byte, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	if c.user.Certificate == nil {
+	if c.user == nil || c.user.Certificate == nil {
 		return nil, ErrNoCertificate
 	}
 
@@ -253,10 +253,13 @@ func (c *Config) SetCertificateBytes(pemBytes []byte) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.user == nil {
+		panic("attempt to set certificate when user config was nil")
+	}
 	c.user.Certificate = pemBytes
 
 	// save config
-	if err := c.persistence.Save(c.user); err != nil {
+	if err := c.persistence.Set(c.user); err != nil {
 		return err
 	}
 
@@ -267,7 +270,7 @@ func (c *Config) GetRefreshToken() (string, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	if c.user.RefreshToken == nil {
+	if c.user == nil || c.user.RefreshToken == nil {
 		return "", ErrNoRefreshToken
 	}
 
@@ -290,10 +293,14 @@ func (c *Config) SetRefreshToken(token string) error {
 		return err
 	}
 
+	if c.user == nil {
+		panic("attempt to set refresh_token when user config was nil")
+	}
+
 	c.user.RefreshToken = protected
 
 	// save config
-	if err := c.persistence.Save(c.user); err != nil {
+	if err := c.persistence.Set(c.user); err != nil {
 		return err
 	}
 
@@ -321,7 +328,7 @@ func (c *Config) System() *SystemConfig {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	return &c.system
+	return c.system
 }
 
 func (c *Config) signer() (ssh.Signer, error) {
