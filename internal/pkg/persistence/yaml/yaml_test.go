@@ -1,4 +1,4 @@
-package persistence
+package yamlpersistence
 
 import (
 	"os"
@@ -54,6 +54,36 @@ func TestYamlPersistence_Save(t *testing.T) {
 
 			if !reflect.DeepEqual(&got, tt.c) {
 				t.Errorf("Save() = %v, want %v", got, tt.c)
+			}
+		})
+	}
+}
+
+func TestNew(t *testing.T) {
+	tests := []struct {
+		name string // description of this test case
+		// Named input parameters for target function.
+		config  string
+		want    *YamlPersistence
+		wantErr bool
+	}{
+		{"missing config", "testdata/missing.yml", &YamlPersistence{name: "testdata/missing.yml", config: &userconfig.UserConfig{}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, gotErr := New(tt.config)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("NewYaml() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("NewYaml() succeeded unexpectedly")
+			}
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewYaml() = %v, want %v", got, tt.want)
 			}
 		})
 	}

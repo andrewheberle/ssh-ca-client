@@ -1,17 +1,19 @@
-package persistence
+package keyringpersistence
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os/user"
 	"sync"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/persistence"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/userconfig"
 	"github.com/zalando/go-keyring"
 )
 
-var _ Persistence = &KeyringPersistence{}
+var _ persistence.Persistence = &KeyringPersistence{}
 
 const keyringService = names.AppName + " User Config"
 
@@ -56,7 +58,7 @@ func (p *KeyringPersistence) Set(config *userconfig.UserConfig) error {
 	return p.save()
 }
 
-func NewKeyring() (Persistence, error) {
+func New() (*KeyringPersistence, error) {
 	// get user details
 	u, err := user.Current()
 	if err != nil {
@@ -65,6 +67,11 @@ func NewKeyring() (Persistence, error) {
 
 	v, err := keyring.Get(keyringService, u.Username)
 	if err != nil {
+		// If the keyring entry doesn't exist, return an empty config instead of an error
+		if errors.Is(err, keyring.ErrNotFound) {
+			return &KeyringPersistence{user: u.Username, config: &userconfig.UserConfig{}}, nil
+		}
+
 		return nil, fmt.Errorf("problem loading user config: %w", err)
 	}
 

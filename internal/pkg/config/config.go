@@ -9,6 +9,7 @@ import (
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/persistence"
+	yamlpersistence "github.com/andrewheberle/ssh-ca-client/internal/pkg/persistence/yaml"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/userconfig"
 	"github.com/andrewheberle/ssh-ca-client/pkg/protect"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshcert"
@@ -58,7 +59,7 @@ func LoadConfig(system, user string) (*Config, error) {
 		return nil, err
 	}
 
-	p, err := persistence.NewYaml(user)
+	p, err := yamlpersistence.New(user)
 	if err != nil {
 		return nil, fmt.Errorf("problem initializing persistence: %w", err)
 	}
@@ -72,7 +73,7 @@ func LoadConfig(system, user string) (*Config, error) {
 }
 
 func LoadUserConfigOnly(name string) (*Config, error) {
-	p, err := persistence.NewYaml(name)
+	p, err := yamlpersistence.New(name)
 	if err != nil {
 		return nil, fmt.Errorf("problem initializing persistence: %w", err)
 	}

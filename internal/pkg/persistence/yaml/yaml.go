@@ -1,4 +1,4 @@
-package persistence
+package yamlpersistence
 
 import (
 	"bytes"
@@ -8,11 +8,12 @@ import (
 	"sync"
 
 	"codeberg.org/sdassow/atomic"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/persistence"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/userconfig"
 	"sigs.k8s.io/yaml"
 )
 
-var _ Persistence = &YamlPersistence{}
+var _ persistence.Persistence = &YamlPersistence{}
 
 // YamlPersistence handles persisting user config to disk as a YAML file
 type YamlPersistence struct {
@@ -55,7 +56,7 @@ func (p *YamlPersistence) Set(config *userconfig.UserConfig) error {
 	return p.save()
 }
 
-func NewYaml(name string) (Persistence, error) {
+func New(name string) (*YamlPersistence, error) {
 	config, err := loadUserConfig(name)
 	if err != nil {
 		return nil, fmt.Errorf("problem loading user config: %w", err)
@@ -73,12 +74,12 @@ func loadUserConfig(name string) (*userconfig.UserConfig, error) {
 		}
 
 		// otherwise return the error
-		return &userconfig.UserConfig{}, err
+		return nil, err
 	}
 
 	var c userconfig.UserConfig
 	if err := yaml.UnmarshalStrict(y, &c); err != nil {
-		return &userconfig.UserConfig{}, fmt.Errorf("problem parsing user config: %w", err)
+		return nil, fmt.Errorf("problem parsing user config: %w", err)
 	}
 
 	return &c, nil

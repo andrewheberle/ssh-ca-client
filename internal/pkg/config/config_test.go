@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/persistence"
+	yamlpersistence "github.com/andrewheberle/ssh-ca-client/internal/pkg/persistence/yaml"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/userconfig"
 	"github.com/andrewheberle/ssh-ca-client/pkg/protect"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
@@ -50,12 +51,12 @@ func TestLoadConfig(t *testing.T) {
 		panic(err)
 	}
 
-	missing, err := persistence.NewYaml("testdata/missing.yml")
+	missing, err := yamlpersistence.New("testdata/missing.yml")
 	if err != nil {
 		panic(err)
 	}
 
-	validuser, err := persistence.NewYaml("testdata/validuser.yml")
+	validuser, err := yamlpersistence.New("testdata/validuser.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -139,12 +140,12 @@ func TestLoadConfig(t *testing.T) {
 }
 
 func TestLoadUserConfigOnly(t *testing.T) {
-	missing, err := persistence.NewYaml("testdata/missing.yml")
+	missing, err := yamlpersistence.New("testdata/missing.yml")
 	if err != nil {
 		panic(err)
 	}
 
-	validuser, err := persistence.NewYaml("testdata/validuser.yml")
+	validuser, err := yamlpersistence.New("testdata/validuser.yml")
 	if err != nil {
 		panic(err)
 	}

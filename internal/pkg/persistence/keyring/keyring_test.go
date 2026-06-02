@@ -1,4 +1,4 @@
-package persistence
+package keyringpersistence
 
 import (
 	"encoding/json"
@@ -60,5 +60,21 @@ func TestKeyringPersistence_Set(t *testing.T) {
 				t.Errorf("Save() = %s, want %s", &got, tt.c)
 			}
 		})
+	}
+}
+
+func TestNew(t *testing.T) {
+	keyring.MockInit()
+
+	p, err := New()
+	if err != nil {
+		t.Fatalf("New() failed: %v", err)
+	}
+
+	got := p.Get()
+	want := &userconfig.UserConfig{}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("New() = %v, want %v", got, want)
 	}
 }
