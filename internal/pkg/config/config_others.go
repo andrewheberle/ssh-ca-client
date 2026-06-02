@@ -7,15 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
 	"golang.org/x/crypto/ssh"
 	"sigs.k8s.io/yaml"
-)
-
-const AppName = "serverless-ssh-ca"
-
-const (
-	keySecretName   = AppName
-	tokenSecretName = AppName
 )
 
 func LogDir() (string, error) {
@@ -32,15 +26,15 @@ func LogDir() (string, error) {
 func ConfigDirs() (user, system string, err error) {
 	// are we running as a snap?
 	if os.Getenv("SNAP_USER_DATA") != "" && os.Getenv("IGNORE_SNAP_DURING_TEST") == "" {
-		return os.Getenv("SNAP_USER_DATA"), filepath.Join("/etc", AppName), nil
+		return os.Getenv("SNAP_USER_DATA"), filepath.Join("/etc", names.AppName), nil
 	}
 
 	dir, err := os.UserConfigDir()
 	if err != nil {
-		return "/dev/null/nonexistent", filepath.Join("/etc", AppName), nil
+		return "/dev/null/nonexistent", filepath.Join("/etc", names.AppName), nil
 	}
 
-	return filepath.Join(dir, AppName), filepath.Join("/etc", AppName), nil
+	return filepath.Join(dir, names.AppName), filepath.Join("/etc", names.AppName), nil
 }
 
 func loadSystemConfig(name string) (SystemConfig, error) {

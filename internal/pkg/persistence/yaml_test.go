@@ -1,23 +1,24 @@
-package config
+package persistence
 
 import (
 	"os"
 	"reflect"
 	"testing"
 
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/userconfig"
 	"sigs.k8s.io/yaml"
 )
 
 func TestYamlPersistence_Save(t *testing.T) {
 	tests := []struct {
 		name    string
-		c       UserConfig
+		c       *userconfig.UserConfig
 		p       *YamlPersistence
 		wantErr bool
 	}{
 		{
 			"test save",
-			UserConfig{
+			&userconfig.UserConfig{
 				Certificate:  []byte("cert"),
 				PrivateKey:   []byte("key"),
 				RefreshToken: []byte("token"),
@@ -30,7 +31,7 @@ func TestYamlPersistence_Save(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotErr := tt.p.Save(tt.c)
+			gotErr := tt.p.Set(tt.c)
 			if gotErr != nil {
 				if !tt.wantErr {
 					t.Errorf("Save() failed: %v", gotErr)
@@ -41,7 +42,7 @@ func TestYamlPersistence_Save(t *testing.T) {
 				t.Fatal("Save() succeeded unexpectedly")
 			}
 
-			var got UserConfig
+			var got userconfig.UserConfig
 			b, err := os.ReadFile(tt.p.name)
 			if err != nil {
 				t.Fatalf("Could not read file from Save(): %v", err)

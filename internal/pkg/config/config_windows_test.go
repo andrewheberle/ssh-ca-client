@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
 )
 
 func TestConfigDirs(t *testing.T) {
@@ -18,7 +20,7 @@ func TestConfigDirs(t *testing.T) {
 		want2   string
 		wantErr bool
 	}{
-		{"test results", filepath.Join("C:\\Users\\testuser\\AppData", AppName), filepath.Join("C:\\ProgramData", AppName), false},
+		{"test results", filepath.Join("C:\\Users\\testuser\\AppData", names.AppName), filepath.Join("C:\\ProgramData", names.AppName), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -48,7 +50,7 @@ func TestLogDir(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		{"test results", filepath.Join("C:\\Users\\testuser\\AppData", AppName), false},
+		{"test results", filepath.Join("C:\\Users\\testuser\\AppData", names.AppName), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

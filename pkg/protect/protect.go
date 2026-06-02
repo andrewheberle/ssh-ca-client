@@ -49,9 +49,9 @@ func getOrCreateKey(name string, create bool) ([]byte, error) {
 
 func createKey(name, user string) ([]byte, error) {
 	// generate key
-	key := make([]byte, 32)
-	if _, err := rand.Read(key); err != nil {
-		return nil, fmt.Errorf("error generating key: %w", err)
+	key, err := generateKey()
+	if err != nil {
+		return nil, err
 	}
 
 	// encode key to base64 string
@@ -63,6 +63,15 @@ func createKey(name, user string) ([]byte, error) {
 	}
 
 	// return generated key once saved
+	return key, nil
+}
+
+func generateKey() ([]byte, error) {
+	key := make([]byte, 32)
+	if _, err := rand.Read(key); err != nil {
+		return nil, fmt.Errorf("error generating key: %w", err)
+	}
+
 	return key, nil
 }
 

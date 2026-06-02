@@ -5,19 +5,13 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
 	"golang.org/x/sys/windows/registry"
 	"sigs.k8s.io/yaml"
 )
 
 var (
 	ErrConfigIncomplete = errors.New("config was incomplete")
-)
-
-const AppName = "Serverless SSH CA Client"
-
-const (
-	keySecretName   = "key"
-	tokenSecretName = "token"
 )
 
 func LogDir() (string, error) {
@@ -32,7 +26,7 @@ func ConfigDirs() (user, system string, err error) {
 		return "", "", err
 	}
 
-	return filepath.Join(dir, AppName), filepath.Join(os.Getenv("ProgramData"), AppName), nil
+	return filepath.Join(dir, names.AppName), filepath.Join(os.Getenv("ProgramData"), names.AppName), nil
 }
 
 func loadPolicy() SystemConfig {
