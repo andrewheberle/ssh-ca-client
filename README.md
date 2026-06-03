@@ -124,7 +124,7 @@ If this random key is lost or deleted this data cannot be recovered so the user
 must regenerate their private key by either deleting the user data manually or
 using the CLI and request a new certificate.
 
-Alternatively for systems that do no run a secret service like
+Alternatively for systems that do not run a secret service like
 `gnome-keyring-daemon` it is possible to provide the `--keyfile <path>` option
 to the CLI which will store the random key in the specified path.
 
