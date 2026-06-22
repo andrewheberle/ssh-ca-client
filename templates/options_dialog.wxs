@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Fragment>
 
     <!--
       InstallOptionsDlg: presented after InstallDirDlg on fresh installs.
 
       Exposes two options, both ticked by default:
-        START_ON_LOGIN    - adds ssh-ca-client.exe to HKCU\...\Run
-        ENABLE_SSH_AGENT  - sets the ssh-agent service to Automatic and starts it
+        START_ON_LOGIN   - adds ssh-ca-client.exe to HKCU Run key
+        ENABLE_SSH_AGENT - sets the ssh-agent service to Automatic and starts it
 
-      Silent install overrides (default is enabled for both):
+      Silent install overrides:
         msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0
         msiexec /i ssh-ca-client.msi /qn ENABLE_SSH_AGENT=0
         msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0 ENABLE_SSH_AGENT=0
@@ -32,11 +32,6 @@
                  Transparent="yes" NoPrefix="yes"
                  Text="Configure additional installation options." />
 
-        <!-- Divider between banner and body -->
-        <Control Id="BodyLine" Type="Line"
-                 X="0" Y="44" Width="370" Height="0" />
-
-        <!-- Option 1: Start on login -->
         <Control Id="StartOnLoginCheckBox" Type="CheckBox"
                  X="20" Y="70" Width="330" Height="18"
                  CheckBoxValue="1" Property="START_ON_LOGIN"
@@ -44,9 +39,8 @@
         <Control Id="StartOnLoginDescription" Type="Text"
                  X="34" Y="90" Width="316" Height="24"
                  Transparent="yes"
-                 Text="Adds the client to the current user&#39;s startup entries so it launches automatically at login." />
+                 Text="Adds the client to the current user&apos;s startup entries so it launches automatically at login." />
 
-        <!-- Option 2: Enable OpenSSH Agent -->
         <Control Id="EnableSSHAgentCheckBox" Type="CheckBox"
                  X="20" Y="126" Width="330" Height="18"
                  CheckBoxValue="1" Property="ENABLE_SSH_AGENT"

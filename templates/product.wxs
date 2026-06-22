@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
-     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<?if $(sys.BUILDARCH)="x86"?>
+    <?define Program_Files="ProgramFilesFolder"?>
+<?elseif $(sys.BUILDARCH)="x64"?>
+    <?define Program_Files="ProgramFiles64Folder"?>
+<?else?>
+    <?error Unsupported value of sys.BUILDARCH=$(sys.BUILDARCH)?>
+<?endif?>
 
-  <Package Name="Serverless SSH CA Client"
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <Product Id="*"
+           Name="Serverless SSH CA Client"
            Manufacturer="Andrew Heberle"
            Version="$(env.INSTALLER_VERSION)"
            UpgradeCode="75b8e17f-138e-447e-bf35-c093ab5293e8"
-           Language="1033"
-           Codepage="1252"
-           InstallerVersion="500"
-           Scope="perMachine">
+           Language="1033">
 
-    <SummaryInformation Description="Serverless SSH CA Client Installer" />
+    <Package InstallerVersion="200"
+             Compressed="yes"
+             Comments="Windows Installer Package"
+             InstallScope="perMachine" />
 
     <Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
 
-    <!-- Detect newer versions already installed -->
     <Upgrade Id="75b8e17f-138e-447e-bf35-c093ab5293e8">
       <UpgradeVersion Minimum="$(env.INSTALLER_VERSION)"
                       OnlyDetect="yes"
@@ -27,135 +33,142 @@
                       IncludeMaximum="no"
                       Property="OLDERVERSIONBEINGUPGRADED" />
     </Upgrade>
-    <Launch Condition="NOT NEWERVERSIONDETECTED"
-            Message="A newer version of this software is already installed." />
+    <Condition Message="A newer version of this software is already installed.">
+      NOT NEWERVERSIONDETECTED
+    </Condition>
 
     <!--
       Properties for install options.
-      Both default to enabled (1). Can be overridden on the command line:
+      Both default to enabled (1). Can be overridden on the msiexec command line:
         msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0 ENABLE_SSH_AGENT=0
     -->
     <Property Id="START_ON_LOGIN" Value="1" Secure="yes" />
     <Property Id="ENABLE_SSH_AGENT" Value="1" Secure="yes" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
 
-    <!-- Install directory layout -->
-    <StandardDirectory Id="ProgramFiles64Folder">
-      <Directory Id="INSTALLDIR" Name="Serverless SSH CA Client" />
-    </StandardDirectory>
+    <Directory Id="TARGETDIR" Name="SourceDir">
 
-    <StandardDirectory Id="ProgramMenuFolder">
-      <Directory Id="ProgramMenuSubfolder" Name="Serverless SSH CA Client" />
-    </StandardDirectory>
+      <Directory Id="$(var.Program_Files)">
+        <Directory Id="INSTALLDIR" Name="Serverless SSH CA Client">
 
-    <!--
-      Component: application binaries.
-      Both exes land in INSTALLDIR; ssh-ca-client.exe is the KeyPath.
-    -->
-    <ComponentGroup Id="CG.ApplicationFiles" Directory="INSTALLDIR">
-      <Component Id="C.ApplicationFiles" Guid="66807fd7-177d-4462-822a-24211b9fb0f1">
-        <File Id="SshCaClientExe"
-              Source="dist\gui_windows_amd64_v1\ssh-ca-client.exe"
-              KeyPath="yes" />
-        <File Id="SshCaClientCliExe"
-              Source="dist\cli_windows_amd64_v1\ssh-ca-client-cli.exe" />
-      </Component>
-    </ComponentGroup>
+          <!--
+            Component: application binaries.
+            Both exes land in INSTALLDIR; ssh-ca-client.exe is the KeyPath.
+          -->
+          <Component Id="C.ApplicationFiles" Guid="66807fd7-177d-4462-822a-24211b9fb0f1">
+            <File Id="SshCaClientExe"
+                  Name="ssh-ca-client.exe"
+                  Source="dist\gui_windows_amd64_v1\ssh-ca-client.exe"
+                  KeyPath="yes" />
+            <File Id="SshCaClientCliExe"
+                  Name="ssh-ca-client-cli.exe"
+                  Source="dist\cli_windows_amd64_v1\ssh-ca-client-cli.exe" />
+          </Component>
 
-    <!--
-      Component: Event Log source registration.
-    -->
-    <ComponentGroup Id="CG.EventLog" Directory="INSTALLDIR">
-      <Component Id="C.EventLog" Guid="6ccdcec5-b549-4ed1-8f60-65c9e78b05e7">
-        <RegistryValue Root="HKLM"
-                       Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
-                       Name="EventMessageFile"
-                       Type="expandable"
-                       Value="[INSTALLDIR]ssh-ca-client.exe"
-                       KeyPath="yes" />
-        <RegistryValue Root="HKLM"
-                       Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
-                       Name="TypesSupported"
-                       Type="integer"
-                       Value="7" />
-      </Component>
-    </ComponentGroup>
+          <!--
+            Component: Event Log source registration.
+          -->
+          <Component Id="C.EventLog" Guid="6ccdcec5-b549-4ed1-8f60-65c9e78b05e7">
+            <RegistryValue Root="HKLM"
+                           Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
+                           Name="EventMessageFile"
+                           Type="expandable"
+                           Value="[INSTALLDIR]ssh-ca-client.exe"
+                           KeyPath="yes" />
+            <RegistryValue Root="HKLM"
+                           Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
+                           Name="TypesSupported"
+                           Type="integer"
+                           Value="7" />
+          </Component>
 
-    <!--
-      Component: Start Menu shortcut.
-      RegistryValue provides the KeyPath as required by WiX for shortcut components.
-    -->
-    <ComponentGroup Id="CG.Shortcuts" Directory="ProgramMenuSubfolder">
-      <Component Id="C.Shortcuts" Guid="4d117172-5c8f-4389-ba93-58c9f35e6a0f">
-        <Shortcut Id="StartMenuShortcut"
-                  Name="Serverless SSH CA Client"
-                  Description="Serverless SSH CA Client"
-                  Target="[INSTALLDIR]ssh-ca-client.exe"
-                  WorkingDirectory="INSTALLDIR" />
-        <RemoveFolder Id="RemoveProgramMenuSubfolder"
-                      Directory="ProgramMenuSubfolder"
-                      On="uninstall" />
-        <RegistryValue Root="HKCU"
-                       Key="Software\Andrew Heberle\Serverless SSH CA Client"
-                       Name="installed"
-                       Type="integer"
-                       Value="1"
-                       KeyPath="yes" />
-      </Component>
-    </ComponentGroup>
+          <!--
+            Component: Run on login (HKCU).
+            Condition restricts installation to when START_ON_LOGIN=1.
+            MSI handles removal of the registry value on uninstall automatically.
+          -->
+          <Component Id="C.RunOnLogin" Guid="d4e5f6a7-b8c9-0123-defa-456789012345">
+            <Condition>START_ON_LOGIN = 1</Condition>
+            <RegistryValue Root="HKCU"
+                           Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                           Name="Serverless SSH CA Client"
+                           Type="string"
+                           Value="[INSTALLDIR]ssh-ca-client.exe"
+                           KeyPath="yes" />
+          </Component>
 
-    <!--
-      Component: Run on login (HKCU).
-      Only installed when START_ON_LOGIN=1.
-    -->
-    <ComponentGroup Id="CG.RunOnLogin" Directory="INSTALLDIR">
-      <Component Id="C.RunOnLogin" Guid="d4e5f6a7-b8c9-0123-defa-456789012345">
-        <Condition>START_ON_LOGIN = 1</Condition>
-        <RegistryValue Root="HKCU"
-                       Key="Software\Microsoft\Windows\CurrentVersion\Run"
-                       Name="Serverless SSH CA Client"
-                       Type="string"
-                       Value="[INSTALLDIR]ssh-ca-client.exe"
-                       KeyPath="yes" />
-      </Component>
-    </ComponentGroup>
+          <!--
+            Component: Enable OpenSSH Agent service.
+            Condition restricts installation to when ENABLE_SSH_AGENT=1.
+            Sets the ssh-agent service startup type to Automatic (DWORD 2) via
+            registry, then starts the service. ServiceControl stops it on uninstall.
 
-    <!--
-      Component: Enable OpenSSH Agent service.
-      Only activated when ENABLE_SSH_AGENT=1.
-      Sets the service start type to Automatic and starts it.
-    -->
-    <ComponentGroup Id="CG.SSHAgent" Directory="INSTALLDIR">
-      <Component Id="C.SSHAgent" Guid="e5f6a7b8-c9d0-1234-efab-567890123456">
-        <Condition>ENABLE_SSH_AGENT = 1</Condition>
-        <util:ServiceConfig ServiceName="ssh-agent"
-                            OnInstall="yes"
-                            OnReinstall="yes"
-                            StartType="auto" />
-        <ServiceControl Id="StartSSHAgent"
-                        Name="ssh-agent"
-                        Start="install"
-                        Stop="uninstall"
-                        Wait="yes" />
-      </Component>
-    </ComponentGroup>
+            Registry Start type values:
+              0 = Boot, 1 = System, 2 = Automatic, 3 = Manual, 4 = Disabled
+          -->
+          <Component Id="C.SSHAgent" Guid="e5f6a7b8-c9d0-1234-efab-567890123456">
+            <Condition>ENABLE_SSH_AGENT = 1</Condition>
+            <RegistryValue Root="HKLM"
+                           Key="SYSTEM\CurrentControlSet\Services\ssh-agent"
+                           Name="Start"
+                           Type="integer"
+                           Value="2"
+                           KeyPath="yes" />
+            <ServiceControl Id="StartSSHAgent"
+                            Name="ssh-agent"
+                            Start="install"
+                            Stop="uninstall"
+                            Wait="yes" />
+          </Component>
+
+        </Directory>
+      </Directory>
+
+      <!--
+        Component: Start Menu shortcut.
+        RegistryValue provides the KeyPath as required by WiX for shortcut components.
+      -->
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ProgramMenuSubfolder" Name="Serverless SSH CA Client">
+          <Component Id="C.Shortcuts" Guid="4d117172-5c8f-4389-ba93-58c9f35e6a0f">
+            <Shortcut Id="StartMenuShortcut"
+                      Name="Serverless SSH CA Client"
+                      Description="Serverless SSH CA Client"
+                      Target="[INSTALLDIR]ssh-ca-client.exe"
+                      WorkingDirectory="INSTALLDIR" />
+            <RemoveFolder Id="RemoveProgramMenuSubfolder"
+                          On="uninstall" />
+            <RegistryValue Root="HKCU"
+                           Key="Software\Andrew Heberle\Serverless SSH CA Client"
+                           Name="installed"
+                           Type="integer"
+                           Value="1"
+                           KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+
+    </Directory>
 
     <Feature Id="DefaultFeature" Level="1">
-      <ComponentGroupRef Id="CG.ApplicationFiles" />
-      <ComponentGroupRef Id="CG.EventLog" />
-      <ComponentGroupRef Id="CG.Shortcuts" />
-      <ComponentGroupRef Id="CG.RunOnLogin" />
-      <ComponentGroupRef Id="CG.SSHAgent" />
+      <ComponentRef Id="C.ApplicationFiles" />
+      <ComponentRef Id="C.EventLog" />
+      <ComponentRef Id="C.Shortcuts" />
+      <ComponentRef Id="C.RunOnLogin" />
+      <ComponentRef Id="C.SSHAgent" />
     </Feature>
 
     <InstallExecuteSequence>
       <RemoveExistingProducts After="InstallValidate" />
     </InstallExecuteSequence>
 
-    <!-- UI -->
-    <ui:WixUI Id="WixUI_HK" InstallDirectory="INSTALLDIR" />
+    <UI>
+      <UIRef Id="WixUI_HK" />
+    </UI>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
 
-  </Package>
+  </Product>
 
 </Wix>
