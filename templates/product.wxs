@@ -89,7 +89,7 @@
           -->
           <Component Id="C.RunOnLogin" Guid="d4e5f6a7-b8c9-0123-defa-456789012345">
             <Condition>START_ON_LOGIN = 1</Condition>
-            <RegistryValue Root="HKCU"
+            <RegistryValue Root="HKLM"
                            Key="Software\Microsoft\Windows\CurrentVersion\Run"
                            Name="Serverless SSH CA Client"
                            Type="string"
@@ -100,11 +100,8 @@
           <!--
             Component: Enable OpenSSH Agent service.
             Condition restricts installation to when ENABLE_SSH_AGENT=1.
-            Sets the ssh-agent service startup type to Automatic (DWORD 2) via
-            registry, then starts the service. ServiceControl stops it on uninstall.
-
-            Registry Start type values:
-              0 = Boot, 1 = System, 2 = Automatic, 3 = Manual, 4 = Disabled
+            Sets the ssh-agent service startup type to Manual (DWORD 3) via
+            registry and sets ssh-agent.exe to run on login
           -->
           <Component Id="C.SSHAgent" Guid="e5f6a7b8-c9d0-1234-efab-567890123456">
             <Condition>ENABLE_SSH_AGENT = 1</Condition>
@@ -112,13 +109,14 @@
                            Key="SYSTEM\CurrentControlSet\Services\ssh-agent"
                            Name="Start"
                            Type="integer"
-                           Value="2"
+                           Value="3"
                            KeyPath="yes" />
-            <ServiceControl Id="StartSSHAgent"
-                            Name="ssh-agent"
-                            Start="install"
-                            Stop="uninstall"
-                            Wait="yes" />
+						<RegistryValue Root="HKLM"
+                           Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                           Name="OpenSSH Authentication Agent"
+                           Type="string"
+                           Value="[WINDIR]System32\OpenSSH\ssh-agent.exe"
+                           KeyPath="yes" />
           </Component>
 
         </Directory>
