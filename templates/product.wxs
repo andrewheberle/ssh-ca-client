@@ -166,7 +166,6 @@
       <UIRef Id="WixUI_HK" />
     </UI>
 
-    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
 
   </Product>
