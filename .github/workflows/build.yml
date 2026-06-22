@@ -80,6 +80,16 @@ jobs:
           path: dist
       - name: Add WiX Toolset to path
         run: Write-Output $env:WIX | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Convert LICENSE to RTF
+        run: |
+          $text = Get-Content -Path "LICENSE" -Raw
+          $escaped = $text `
+            -replace '\\', '\\\\' `
+            -replace '\{', '\{' `
+            -replace '\}', '\}' `
+            -replace '\r\n|\r|\n', '\line '
+          $rtf = "{\rtf1\ansi\deff0 {\fonttbl {\f0 Courier New;}} \f0\fs18 " + $escaped + "}"
+          [System.IO.File]::WriteAllText("LICENSE.rtf", $rtf, [System.Text.Encoding]::ASCII)
       - name: Build MSI
         run: |
           $env:INSTALLER_VERSION = "$(git describe --tags)"
