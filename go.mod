@@ -4,9 +4,10 @@ go 1.25.0
 
 require (
 	codeberg.org/sdassow/atomic v1.2.1
-	fyne.io/systray v1.12.0
+	fyne.io/systray v1.12.1
 	github.com/allan-simon/go-singleinstance v0.0.0-20210120080615-d0997106ab37
 	github.com/andrewheberle/opener v1.0.2
+	github.com/andrewheberle/serverless-ssh-ca/client v0.0.0-20260517132014-c2bd7a8a32b6
 	github.com/andrewheberle/simplecommand v0.5.1
 	github.com/andrewheberle/sshagent v1.0.0
 	github.com/bep/simplecobra v0.7.0
@@ -22,7 +23,7 @@ require (
 	github.com/zalando/go-keyring v0.2.8
 	golang.org/x/crypto v0.50.0
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/sys v0.43.0
+	golang.org/x/sys v0.44.0
 	golang.zx2c4.com/wireguard/windows v1.0.1
 	sigs.k8s.io/yaml v1.6.0
 )

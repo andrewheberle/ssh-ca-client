@@ -1,139 +1,161 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
-<?if $(sys.BUILDARCH)="x86"?>
-    <?define Program_Files="ProgramFilesFolder"?>
-<?elseif $(sys.BUILDARCH)="x64"?>
-    <?define Program_Files="ProgramFiles64Folder"?>
-<?else?>
-    <?error Unsupported value of sys.BUILDARCH=$(sys.BUILDARCH)?>
-<?endif?>
+  <Package Name="Serverless SSH CA Client"
+           Manufacturer="Andrew Heberle"
+           Version="$(env.INSTALLER_VERSION)"
+           UpgradeCode="75b8e17f-138e-447e-bf35-c093ab5293e8"
+           Language="1033"
+           Codepage="1252"
+           InstallerVersion="500"
+           Scope="perMachine">
 
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <SummaryInformation Description="Serverless SSH CA Client Installer" />
 
-   <Product Id="*" UpgradeCode="{{.UpgradeCode}}"
-            Name="{{.Product}}"
-            Version="{{.VersionOk}}"
-            Manufacturer="{{.Company}}"
-            Language="1033">
+    <Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
 
-      <Package InstallerVersion="200" Compressed="yes" Comments="Windows Installer Package" InstallScope="perMachine"/>
+    <!-- Detect newer versions already installed -->
+    <Upgrade Id="75b8e17f-138e-447e-bf35-c093ab5293e8">
+      <UpgradeVersion Minimum="$(env.INSTALLER_VERSION)"
+                      OnlyDetect="yes"
+                      Property="NEWERVERSIONDETECTED" />
+      <UpgradeVersion Minimum="0.0.0"
+                      Maximum="$(env.INSTALLER_VERSION)"
+                      IncludeMinimum="yes"
+                      IncludeMaximum="no"
+                      Property="OLDERVERSIONBEINGUPGRADED" />
+    </Upgrade>
+    <Launch Condition="NOT NEWERVERSIONDETECTED"
+            Message="A newer version of this software is already installed." />
 
-      <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
+    <!--
+      Properties for install options.
+      Both default to enabled (1). Can be overridden on the command line:
+        msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0 ENABLE_SSH_AGENT=0
+    -->
+    <Property Id="START_ON_LOGIN" Value="1" Secure="yes" />
+    <Property Id="ENABLE_SSH_AGENT" Value="1" Secure="yes" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
 
-      <Upgrade Id="{{.UpgradeCode}}">
-         <UpgradeVersion Minimum="{{.VersionOk}}" OnlyDetect="yes" Property="NEWERVERSIONDETECTED"/>
-         <UpgradeVersion Minimum="0.0.0" Maximum="{{.VersionOk}}" IncludeMinimum="yes" IncludeMaximum="no"
-                         Property="OLDERVERSIONBEINGUPGRADED"/>
-      </Upgrade>
-      <Condition Message="A newer version of this software is already installed.">NOT NEWERVERSIONDETECTED</Condition>
+    <!-- Install directory layout -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLDIR" Name="Serverless SSH CA Client" />
+    </StandardDirectory>
 
-      <Directory Id="TARGETDIR" Name="SourceDir">
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ProgramMenuSubfolder" Name="Serverless SSH CA Client" />
+    </StandardDirectory>
 
-         <Directory Id="$(var.Program_Files)">
-            <Directory Id="INSTALLDIR" Name="{{.Product}}">
-               {{if gt (.Files.Items | len) 0}}
-               <Component Id="ApplicationFiles" Guid="{{.Files.GUID}}">
-                  {{range $i, $e := .Files.Items}}
-                    <File Id="ApplicationFile{{$i}}" Source="{{$e}}"/>
-                  {{end}}
-               </Component>
-               {{end}}
-               {{if gt (.Directories | len) 0}}
-               {{range $i, $e := .Directories}}
-               <Directory Id="APPDIR{{$i}}" Name="{{$e}}" />
-               {{end}}
-               {{end}}
-            </Directory>
-         </Directory>
+    <!--
+      Component: application binaries.
+      Both exes land in INSTALLDIR; ssh-ca-client.exe is the KeyPath.
+    -->
+    <ComponentGroup Id="CG.ApplicationFiles" Directory="INSTALLDIR">
+      <Component Id="C.ApplicationFiles" Guid="66807fd7-177d-4462-822a-24211b9fb0f1">
+        <File Id="SshCaClientExe"
+              Source="dist\gui_windows_amd64_v1\ssh-ca-client.exe"
+              KeyPath="yes" />
+        <File Id="SshCaClientCliExe"
+              Source="dist\cli_windows_amd64_v1\ssh-ca-client-cli.exe" />
+      </Component>
+    </ComponentGroup>
 
-         {{if gt (.Env.Vars | len) 0}}
-         <Component Id="ENVS" Guid="{{.Env.GUID}}">
-          {{range $i, $e := .Env.Vars}}
-          <Environment Id="ENV{{$i}}"
-            Name="{{$e.Name}}"
-            Value="{{$e.Value}}"
-            Permanent="{{$e.Permanent}}"
-            Part="{{$e.Part}}"
-            Action="{{$e.Action}}"
-            System="{{$e.System}}" />
-          {{end}}
-        </Component>
-        {{end}}
+    <!--
+      Component: Event Log source registration.
+    -->
+    <ComponentGroup Id="CG.EventLog" Directory="INSTALLDIR">
+      <Component Id="C.EventLog" Guid="6ccdcec5-b549-4ed1-8f60-65c9e78b05e7">
+        <RegistryValue Root="HKLM"
+                       Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
+                       Name="EventMessageFile"
+                       Type="expandable"
+                       Value="[INSTALLDIR]ssh-ca-client.exe"
+                       KeyPath="yes" />
+        <RegistryValue Root="HKLM"
+                       Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
+                       Name="TypesSupported"
+                       Type="integer"
+                       Value="7" />
+      </Component>
+    </ComponentGroup>
 
-         {{if gt (.Shortcuts.Items | len) 0}}
-         <Directory Id="ProgramMenuFolder">
-            <Directory Id="ProgramMenuSubfolder" Name="{{.Product}}">
-               <Component Id="ApplicationShortcuts" Guid="{{.Shortcuts.GUID}}">
-               {{range $i, $e := .Shortcuts.Items}}
-                  <Shortcut Id="ApplicationShortcut{{$i}}"
-                        Name="{{$e.Name}}"
-                        Description="{{$e.Description}}"
-                        Target="{{$e.Target}}"
-                        WorkingDirectory="{{$e.WDir}}"
-                        {{if gt ($e.Arguments | len) 0}}
-                        Arguments="{{$e.Arguments}}"
-                        {{end}}
-                        >
-                        {{if gt ($e.Icon | len) 0}}
-                        <Icon Id="Icon{{$i}}" SourceFile="{{$e.Icon}}" />
-                        {{end}}
-                  </Shortcut>
-                  <RegistryValue Root="HKCU"
-                    Key="Software\{{$.Company}}\{{$.Product}}"
-                    Name="installed{{$i}}"
-                    Type="integer" Value="1" KeyPath="yes"/>
-                {{end}}
-                <RemoveFolder Id="ProgramMenuSubfolder" On="uninstall"/>
-               </Component>
-            </Directory>
-         </Directory>
-         {{end}}
+    <!--
+      Component: Start Menu shortcut.
+      RegistryValue provides the KeyPath as required by WiX for shortcut components.
+    -->
+    <ComponentGroup Id="CG.Shortcuts" Directory="ProgramMenuSubfolder">
+      <Component Id="C.Shortcuts" Guid="4d117172-5c8f-4389-ba93-58c9f35e6a0f">
+        <Shortcut Id="StartMenuShortcut"
+                  Name="Serverless SSH CA Client"
+                  Description="Serverless SSH CA Client"
+                  Target="[INSTALLDIR]ssh-ca-client.exe"
+                  WorkingDirectory="INSTALLDIR" />
+        <RemoveFolder Id="RemoveProgramMenuSubfolder"
+                      Directory="ProgramMenuSubfolder"
+                      On="uninstall" />
+        <RegistryValue Root="HKCU"
+                       Key="Software\Andrew Heberle\Serverless SSH CA Client"
+                       Name="installed"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
 
-      </Directory>
+    <!--
+      Component: Run on login (HKCU).
+      Only installed when START_ON_LOGIN=1.
+    -->
+    <ComponentGroup Id="CG.RunOnLogin" Directory="INSTALLDIR">
+      <Component Id="C.RunOnLogin" Guid="d4e5f6a7-b8c9-0123-defa-456789012345">
+        <Condition>START_ON_LOGIN = 1</Condition>
+        <RegistryValue Root="HKCU"
+                       Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                       Name="Serverless SSH CA Client"
+                       Type="string"
+                       Value="[INSTALLDIR]ssh-ca-client.exe"
+                       KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
 
-      {{range $i, $e := .InstallHooks}}
-      <SetProperty Id="CustomInstallExec{{$i}}" Value="{{$e.CookedCommand}}" Before="CustomInstallExec{{$i}}" Sequence="execute"/>
-      <CustomAction Id="CustomInstallExec{{$i}}" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="no"/>
-      {{end}}
-      {{range $i, $e := .UninstallHooks}}
-      <SetProperty Id="CustomUninstallExec{{$i}}" Value="{{$e.CookedCommand}}" Before="CustomUninstallExec{{$i}}" Sequence="execute"/>
-      <CustomAction Id="CustomUninstallExec{{$i}}" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="no"/>
-      {{end}}
-      <InstallExecuteSequence>
-         <RemoveExistingProducts After="InstallValidate"/>
-         {{range $i, $e := .InstallHooks}}
-         <Custom Action="CustomInstallExec{{$i}}" After="{{if eq $i 0}}InstallFiles{{else}}CustomInstallExec{{dec $i}}{{end}}">NOT Installed AND NOT REMOVE</Custom>
-         {{end}}
-         {{range $i, $e := .UninstallHooks}}
-         <Custom Action="CustomUninstallExec{{$i}}" After="{{if eq $i 0}}InstallInitialize{{else}}CustomUninstallExec{{dec $i}}{{end}}">REMOVE ~= "ALL"</Custom>
-         {{end}}
-      </InstallExecuteSequence>
+    <!--
+      Component: Enable OpenSSH Agent service.
+      Only activated when ENABLE_SSH_AGENT=1.
+      Sets the service start type to Automatic and starts it.
+    -->
+    <ComponentGroup Id="CG.SSHAgent" Directory="INSTALLDIR">
+      <Component Id="C.SSHAgent" Guid="e5f6a7b8-c9d0-1234-efab-567890123456">
+        <Condition>ENABLE_SSH_AGENT = 1</Condition>
+        <util:ServiceConfig ServiceName="ssh-agent"
+                            OnInstall="yes"
+                            OnReinstall="yes"
+                            StartType="auto" />
+        <ServiceControl Id="StartSSHAgent"
+                        Name="ssh-agent"
+                        Start="install"
+                        Stop="uninstall"
+                        Wait="yes" />
+      </Component>
+    </ComponentGroup>
 
-      <Feature Id="DefaultFeature" Level="1">
-         {{if gt (.Env.Vars | len) 0}}
-         <ComponentRef Id="ENVS"/>
-         {{end}}
-         {{if gt (.Files.Items | len) 0}}
-         <ComponentRef Id="ApplicationFiles"/>
-         {{end}}
-         {{if gt (.Shortcuts.Items | len) 0}}
-         <ComponentRef Id="ApplicationShortcuts"/>
-         {{end}}
-         {{range $i, $e := .Directories}}
-         <ComponentGroupRef Id="AppFiles{{$i}}" />
-         {{end}}
-      </Feature>
+    <Feature Id="DefaultFeature" Level="1">
+      <ComponentGroupRef Id="CG.ApplicationFiles" />
+      <ComponentGroupRef Id="CG.EventLog" />
+      <ComponentGroupRef Id="CG.Shortcuts" />
+      <ComponentGroupRef Id="CG.RunOnLogin" />
+      <ComponentGroupRef Id="CG.SSHAgent" />
+    </Feature>
 
-      <UI>
-         <!-- Define the installer UI -->
-         <UIRef Id="WixUI_HK" />
-      </UI>
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallValidate" />
+    </InstallExecuteSequence>
 
-      <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <!-- UI -->
+    <ui:WixUI Id="WixUI_HK" InstallDirectory="INSTALLDIR" />
+    <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
 
-      <!-- this should help to propagate env var changes -->
-      <CustomActionRef Id="WixBroadcastEnvironmentChange" />
-
-   </Product>
+  </Package>
 
 </Wix>

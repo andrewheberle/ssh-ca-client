@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+
+    <!--
+      InstallOptionsDlg: presented after InstallDirDlg on fresh installs.
+
+      Exposes two options, both ticked by default:
+        START_ON_LOGIN    - adds ssh-ca-client.exe to HKCU\...\Run
+        ENABLE_SSH_AGENT  - sets the ssh-agent service to Automatic and starts it
+
+      Silent install overrides (default is enabled for both):
+        msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0
+        msiexec /i ssh-ca-client.msi /qn ENABLE_SSH_AGENT=0
+        msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0 ENABLE_SSH_AGENT=0
+    -->
+    <UI>
+      <Dialog Id="InstallOptionsDlg" Width="370" Height="270"
+              Title="[ProductName] Setup">
+
+        <Control Id="BannerBitmap" Type="Bitmap"
+                 X="0" Y="0" Width="370" Height="44"
+                 TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+        <Control Id="BannerLine" Type="Line"
+                 X="0" Y="44" Width="370" Height="0" />
+        <Control Id="Title" Type="Text"
+                 X="15" Y="6" Width="200" Height="15"
+                 Transparent="yes" NoPrefix="yes"
+                 Text="{\WixUI_Font_Title}Installation Options" />
+        <Control Id="Description" Type="Text"
+                 X="25" Y="23" Width="340" Height="15"
+                 Transparent="yes" NoPrefix="yes"
+                 Text="Configure additional installation options." />
+
+        <!-- Divider between banner and body -->
+        <Control Id="BodyLine" Type="Line"
+                 X="0" Y="44" Width="370" Height="0" />
+
+        <!-- Option 1: Start on login -->
+        <Control Id="StartOnLoginCheckBox" Type="CheckBox"
+                 X="20" Y="70" Width="330" Height="18"
+                 CheckBoxValue="1" Property="START_ON_LOGIN"
+                 Text="&amp;Start Serverless SSH CA Client on login" />
+        <Control Id="StartOnLoginDescription" Type="Text"
+                 X="34" Y="90" Width="316" Height="24"
+                 Transparent="yes"
+                 Text="Adds the client to the current user&#39;s startup entries so it launches automatically at login." />
+
+        <!-- Option 2: Enable OpenSSH Agent -->
+        <Control Id="EnableSSHAgentCheckBox" Type="CheckBox"
+                 X="20" Y="126" Width="330" Height="18"
+                 CheckBoxValue="1" Property="ENABLE_SSH_AGENT"
+                 Text="&amp;Enable OpenSSH Authentication Agent service" />
+        <Control Id="EnableSSHAgentDescription" Type="Text"
+                 X="34" Y="146" Width="316" Height="24"
+                 Transparent="yes"
+                 Text="Sets the OpenSSH Authentication Agent (ssh-agent) service to start automatically. Required for client operation." />
+
+        <Control Id="BottomLine" Type="Line"
+                 X="0" Y="234" Width="370" Height="0" />
+
+        <Control Id="Back" Type="PushButton"
+                 X="180" Y="243" Width="56" Height="17"
+                 Text="!(loc.WixUIBack)" />
+        <Control Id="Next" Type="PushButton"
+                 X="236" Y="243" Width="56" Height="17"
+                 Default="yes" Text="!(loc.WixUINext)" />
+        <Control Id="Cancel" Type="PushButton"
+                 X="304" Y="243" Width="56" Height="17"
+                 Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+
+      </Dialog>
+    </UI>
+
+  </Fragment>
+</Wix>

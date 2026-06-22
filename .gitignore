@@ -180,3 +180,4 @@ ssh-ca-client
 !cmd/ssh-ca-client
 ssh-ca-client-cli
 !cmd/ssh-ca-client-cli
+LICENSE.rtf
