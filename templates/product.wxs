@@ -27,6 +27,15 @@
       </Upgrade>
       <Condition Message="A newer version of this software is already installed.">NOT NEWERVERSIONDETECTED</Condition>
 
+			<!--
+      Properties for install options.
+      Both default to enabled (1). Can be overridden on the msiexec command line:
+        msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0 START_SSH_AGENT=0
+			-->
+			<Property Id="START_ON_LOGIN" Value="1" Secure="yes" />
+			<Property Id="START_SSH_AGENT" Value="1" Secure="yes" />
+			<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+
       <Directory Id="TARGETDIR" Name="SourceDir">
 
          <Directory Id="$(var.Program_Files)">
@@ -44,6 +53,60 @@
                {{end}}
                {{end}}
             </Directory>
+
+						<!--
+							Component: Event Log source registration.
+						-->
+						<Component Id="C.EventLog" Guid="6ccdcec5-b549-4ed1-8f60-65c9e78b05e7">
+							<RegistryValue Root="HKLM"
+														Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
+														Name="EventMessageFile"
+														Type="expandable"
+														Value="[INSTALLDIR]ssh-ca-client.exe"
+														KeyPath="yes" />
+							<RegistryValue Root="HKLM"
+														Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
+														Name="TypesSupported"
+														Type="integer"
+														Value="7" />
+						</Component>
+
+						<!--
+							Component: Run on login (HKLM).
+							Condition restricts installation to when START_ON_LOGIN=1.
+							MSI handles removal of the registry value on uninstall automatically.
+						-->
+						<Component Id="C.RunOnLogin" Guid="d4e5f6a7-b8c9-0123-defa-456789012345">
+							<Condition>START_ON_LOGIN = 1</Condition>
+							<RegistryValue Root="HKLM"
+														Key="Software\Microsoft\Windows\CurrentVersion\Run"
+														Name="Serverless SSH CA Client"
+														Type="string"
+														Value="[INSTALLDIR]ssh-ca-client.exe"
+														KeyPath="yes" />
+						</Component>
+
+						<!--
+							Component: Enable OpenSSH Agent service.
+							Condition restricts installation to when START_SSH_AGENT=1.
+							Sets the ssh-agent service startup type to Manual (DWORD 3), removing
+							the default Disabled state so the service can be started on demand.
+							Adds ssh-agent.exe to the HKLM Run key so it starts at login for all
+							users, which also satisfies the on-demand start for the current user
+							on next login.
+
+							Registry Start type values:
+								0 = Boot, 1 = System, 2 = Automatic, 3 = Manual, 4 = Disabled
+						-->
+						<Component Id="C.SSHAgent" Guid="e5f6a7b8-c9d0-1234-efab-567890123456">
+							<Condition>START_SSH_AGENT = 1</Condition>
+							<RegistryValue Root="HKLM"
+														Key="Software\Microsoft\Windows\CurrentVersion\Run"
+														Name="OpenSSH Authentication Agent"
+														Type="expandable"
+														Value="%SystemRoot%\System32\OpenSSH\ssh-agent.exe"
+														KeyPath="yes" />
+						</Component>
          </Directory>
 
          {{if gt (.Env.Vars | len) 0}}
@@ -122,6 +185,9 @@
          {{range $i, $e := .Directories}}
          <ComponentGroupRef Id="AppFiles{{$i}}" />
          {{end}}
+				 <ComponentRef Id="C.EventLog" />
+				 <ComponentRef Id="C.RunOnLogin" />
+      	 <ComponentRef Id="C.SSHAgent" />
       </Feature>
 
       <UI>
