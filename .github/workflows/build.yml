@@ -102,6 +102,7 @@ jobs:
           candle.exe -arch x64 `
             -ext WixUIExtension `
             -ext WixUtilExtension `
+            -dINSTALLER_VERSION=$env:INSTALLER_VERSION `
             templates\product.wxs templates\ui.wxs templates\options_dialog.wxs `
             -o tmp\
 
