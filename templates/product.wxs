@@ -115,7 +115,7 @@
                            Key="Software\Microsoft\Windows\CurrentVersion\Run"
                            Name="OpenSSH Authentication Agent"
                            Type="expandable"
-                           Value="%windir%\System32\OpenSSH\ssh-agent.exe"
+                           Value="%SystemRoot%\System32\OpenSSH\ssh-agent.exe"
 													 KeyPath="yes" />
           </Component>
 
