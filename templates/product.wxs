@@ -34,7 +34,6 @@
 			-->
 			<Property Id="START_ON_LOGIN" Value="1" Secure="yes" />
 			<Property Id="START_SSH_AGENT" Value="1" Secure="yes" />
-			<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
 
       <Directory Id="TARGETDIR" Name="SourceDir">
 
