@@ -38,9 +38,11 @@ func Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	var lifetime, renewAt time.Duration
-	var listenAddr, logDir, systemConfigFile, userConfigFile string
-	var install, uninstall, disableProxy, addOnStart bool
+	var (
+		lifetime, renewAt                                    time.Duration
+		listenAddr, logDir, systemConfigFile, userConfigFile string
+		disableProxy, addOnStart                             bool
+	)
 
 	flags := pflag.NewFlagSet("tray", pflag.ExitOnError)
 
@@ -58,24 +60,7 @@ func Execute(ctx context.Context, args []string) error {
 		disableProxy = true
 	}
 	flags.BoolVar(&addOnStart, "add-on-start", true, "Add current key and certificate (if valid) to SSH agent on start")
-	flags.BoolVar(&install, "install", false, "Perform post-install steps")
-	_ = flags.MarkHidden("install")
-	flags.BoolVar(&uninstall, "uninstall", false, "Perform pre-uninstall steps")
-	_ = flags.MarkHidden("uninstall")
 	_ = flags.Parse(args)
-
-	// ensure install and uninstall are not called togther
-	if install && uninstall {
-		return fmt.Errorf("--install and --uninstall cannot be used together")
-	}
-
-	// handle install or uninstall
-	if install {
-		return runInstall()
-	}
-	if uninstall {
-		return runUninstall()
-	}
 
 	// check renewAt is not larger than lifetime
 	if renewAt > lifetime {
