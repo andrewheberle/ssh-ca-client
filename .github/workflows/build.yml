@@ -99,14 +99,14 @@ jobs:
         run: |
           $msiPath = ".\dist\ssh-ca-client_${env:INSTALLER_VERSION}_amd64.msi"
 
-          & candle.exe -arch x64 `
+          candle.exe -arch x64 `
             -ext WixUIExtension `
             -ext WixUtilExtension `
-            -dINSTALLER_VERSION=${env:INSTALLER_VERSION} `
+            -dINSTALLER_VERSION=$env:INSTALLER_VERSION `
             templates\product.wxs templates\ui.wxs templates\options_dialog.wxs `
             -o tmp\
 
-          & light.exe `
+          light.exe `
             -ext WixUIExtension `
             -ext WixUtilExtension `
             tmp\product.wixobj tmp\ui.wixobj tmp\options_dialog.wixobj `
