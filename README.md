@@ -11,6 +11,8 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 There are two versions of the client, one CLI based and the other GUI based both of which
 are tested on Windows and Linux.
 
+### As a Snap
+
 [![Get it from the Snap Store](https://snapcraft.io/en/dark/install.svg)](https://snapcraft.io/ssh-ca-client)
 
 On Linux the client is available from the Snapcraft store, however at this time
@@ -32,6 +34,8 @@ sudo snap connect ssh-ca-client:home
 path/to/wrapper.sh
 ```
 
+### From a Release or Package
+
 Alternatively binary releases and a Debian/Ubuntu package for Linux are
 available from the GitHub Releases page or you may add the APT repository to
 your system as follows:
@@ -43,8 +47,15 @@ sudo apt-get update
 sudo apt-get install ssh-ca-client
 ```
 
+### As a MSI
+
 On Windows there is an MSI build that includes both the GUI and CLI versions
 and is the recommended option for Windows users.
+
+This MSI will perform the following additional configuration:
+
+1. Set the `ssh-agent` service to `Manual`
+2. Add `ssh-ca-client.exe` and `ssh-agent.exe` to run on login
 
 ### Building From Source
 

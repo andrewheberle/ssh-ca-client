@@ -39,7 +39,7 @@
         <Control Id="StartOnLoginDescription" Type="Text"
                  X="34" Y="90" Width="316" Height="24"
                  Transparent="yes"
-                 Text="Adds the client to the current user&apos;s startup entries so it launches automatically at login." />
+                 Text="Adds the SSH CA client so it launches automatically at login." />
 
         <Control Id="EnableSSHAgentCheckBox" Type="CheckBox"
                  X="20" Y="126" Width="330" Height="18"
@@ -48,7 +48,7 @@
         <Control Id="EnableSSHAgentDescription" Type="Text"
                  X="34" Y="146" Width="316" Height="24"
                  Transparent="yes"
-                 Text="Sets the OpenSSH Authentication Agent (ssh-agent) service to start automatically. Required for client operation." />
+                 Text="Sets the OpenSSH Authentication Agent (ssh-agent) service to manual start and starts the Agent at login." />
 
         <Control Id="BottomLine" Type="Line"
                  X="0" Y="234" Width="370" Height="0" />
