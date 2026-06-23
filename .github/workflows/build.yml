@@ -103,7 +103,7 @@ jobs:
           candle.exe -arch x64 `
             -ext WixUIExtension `
             -ext WixUtilExtension `
-            -dINSTALLER_VERSION=$version `
+            "-dINSTALLER_VERSION=$version" `
             templates\product.wxs templates\ui.wxs templates\options_dialog.wxs `
             -o tmp\
 
