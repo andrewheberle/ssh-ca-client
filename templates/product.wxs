@@ -7,6 +7,10 @@
     <?error Unsupported value of sys.BUILDARCH=$(sys.BUILDARCH)?>
 <?endif?>
 
+<?ifndef $(env.INSTALLER_VERSION) ?>
+	<?error INSTALLER_VERSION must be defined ?>
+<?endif?>
+
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
   <Product Id="*" UpgradeCode="75b8e17f-138e-447e-bf35-c093ab5293e8"
@@ -154,6 +158,8 @@
     </UI>
 
     <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
+
+		<CustomActionRef Id="WixBroadcastEnvironmentChange" />
 
   </Product>
 
