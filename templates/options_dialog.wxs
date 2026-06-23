@@ -6,13 +6,13 @@
       InstallOptionsDlg: presented after InstallDirDlg on fresh installs.
 
       Exposes two options, both ticked by default:
-        START_ON_LOGIN   - adds ssh-ca-client.exe to HKCU Run key
-        ENABLE_SSH_AGENT - sets the ssh-agent service to Automatic and starts it
+        START_ON_LOGIN   - adds ssh-ca-client.exe to HKLM Run key
+        START_SSH_AGENT  - adds ssh-agent.exe to HKLM Run
 
       Silent install overrides:
         msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0
-        msiexec /i ssh-ca-client.msi /qn ENABLE_SSH_AGENT=0
-        msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0 ENABLE_SSH_AGENT=0
+        msiexec /i ssh-ca-client.msi /qn START_SSH_AGENT=0
+        msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0 START_SSH_AGENT=0
     -->
     <UI>
       <Dialog Id="InstallOptionsDlg" Width="370" Height="270"
@@ -43,12 +43,12 @@
 
         <Control Id="EnableSSHAgentCheckBox" Type="CheckBox"
                  X="20" Y="126" Width="330" Height="18"
-                 CheckBoxValue="1" Property="ENABLE_SSH_AGENT"
-                 Text="&amp;Enable OpenSSH Authentication Agent service" />
+                 CheckBoxValue="1" Property="START_SSH_AGENT"
+                 Text="&amp;Start OpenSSH Authentication Agent" />
         <Control Id="EnableSSHAgentDescription" Type="Text"
                  X="34" Y="146" Width="316" Height="24"
                  Transparent="yes"
-                 Text="Sets the OpenSSH Authentication Agent (ssh-agent) service to manual start and starts the Agent at login." />
+                 Text="Sets the OpenSSH Authentication Agent (ssh-agent.exe) to run at login. This requires the OpenSSH Authentication Agent service to be set to Manual." />
 
         <Control Id="BottomLine" Type="Line"
                  X="0" Y="234" Width="370" Height="0" />

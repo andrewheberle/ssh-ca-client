@@ -52,13 +52,32 @@ sudo apt-get install ssh-ca-client
 On Windows there is an MSI build that includes both the GUI and CLI versions
 and is the recommended option for Windows users.
 
-This MSI will perform the following additional configuration:
+Thi MSI adds `ssh-ca-client.exe` and `ssh-agent.exe` to run on login however
+the "OpenSSH Authentication Agent" service must be set to "Manual" in order for
+correct operation of the client as it relies on the SSH agent.
 
-1. Set the `ssh-agent` service to `Manual`
-2. Add `ssh-ca-client.exe` and `ssh-agent.exe` to run on login
+The following command run from an elevate PowerShell session will perform this
+action:
+
+```powershell
+Set-Service -Name "ssh-agent" -StartupType Manual
+```
 
 After installation you must log off and back into your session again to ensure
 `ssh-agent.exe` is started along with the SSH CA client.
+
+#### Installation Options
+
+The MSI supports the following options to adjust the installation:
+
+* `START_ON_LOGIN` - By default this is `1` so the client is started on login
+* `START_SSH_AGENT` - This controls wether `ssh-agent.exe` is started on login
+
+```batch
+msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0
+msiexec /i ssh-ca-client.msi /qn START_SSH_AGENT=0
+msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0 START_SSH_AGENT=0
+```
 
 ### Building From Source
 
