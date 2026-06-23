@@ -1,4 +1,4 @@
-module github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/resize
+module github.com/nfnt/resize
 
 go 1.25.0
 
