@@ -83,13 +83,13 @@
           </Component>
 
           <!--
-            Component: Run on login (HKCU).
+            Component: Run on login (HKLM).
             Condition restricts installation to when START_ON_LOGIN=1.
             MSI handles removal of the registry value on uninstall automatically.
           -->
           <Component Id="C.RunOnLogin" Guid="d4e5f6a7-b8c9-0123-defa-456789012345">
             <Condition>START_ON_LOGIN = 1</Condition>
-            <RegistryValue Root="HKCU"
+            <RegistryValue Root="HKLM"
                            Key="Software\Microsoft\Windows\CurrentVersion\Run"
                            Name="Serverless SSH CA Client"
                            Type="string"
