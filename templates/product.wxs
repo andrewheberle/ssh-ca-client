@@ -9,33 +9,22 @@
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-  <Product Id="*"
+  <Product Id="*" UpgradeCode="75b8e17f-138e-447e-bf35-c093ab5293e8"
            Name="Serverless SSH CA Client"
+					 Version="$(env.INSTALLER_VERSION)"
            Manufacturer="Andrew Heberle"
-           Version="$(env.INSTALLER_VERSION)"
-           UpgradeCode="75b8e17f-138e-447e-bf35-c093ab5293e8"
            Language="1033">
 
-    <Package InstallerVersion="200"
-             Compressed="yes"
-             Comments="Windows Installer Package"
-             InstallScope="perMachine" />
+    <Package InstallerVersion="200" Compressed="yes" Comments="Windows Installer Package" InstallScope="perMachine" />
 
     <Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
 
     <Upgrade Id="75b8e17f-138e-447e-bf35-c093ab5293e8">
-      <UpgradeVersion Minimum="$(env.INSTALLER_VERSION)"
-                      OnlyDetect="yes"
-                      Property="NEWERVERSIONDETECTED" />
-      <UpgradeVersion Minimum="0.0.0"
-                      Maximum="$(env.INSTALLER_VERSION)"
-                      IncludeMinimum="yes"
-                      IncludeMaximum="no"
+      <UpgradeVersion Minimum="$(env.INSTALLER_VERSION)" OnlyDetect="yes" Property="NEWERVERSIONDETECTED" />
+      <UpgradeVersion Minimum="0.0.0" Maximum="$(env.INSTALLER_VERSION)" IncludeMinimum="yes" IncludeMaximum="no"
                       Property="OLDERVERSIONBEINGUPGRADED" />
     </Upgrade>
-    <Condition Message="A newer version of this software is already installed.">
-      NOT NEWERVERSIONDETECTED
-    </Condition>
+    <Condition Message="A newer version of this software is already installed.">NOT NEWERVERSIONDETECTED</Condition>
 
     <!--
       Properties for install options.
