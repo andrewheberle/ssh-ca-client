@@ -109,8 +109,6 @@ jobs:
           $rtf = "{\rtf1\ansi\deff0 {\fonttbl {\f0 Courier New;}} \f0\fs18 " + $escaped + "}"
           [System.IO.File]::WriteAllText("LICENSE.rtf", $rtf, [System.Text.Encoding]::ASCII)
       - name: Build MSI
-        env:
-          INSTALLER_VERSION: ${{ env.GITHUB_REF_NAME }}
         run: |
           $msiPath = ".\dist\ssh-ca-client_${env:INSTALLER_VERSION}_amd64.msi"
 
