@@ -57,6 +57,9 @@ This MSI will perform the following additional configuration:
 1. Set the `ssh-agent` service to `Manual`
 2. Add `ssh-ca-client.exe` and `ssh-agent.exe` to run on login
 
+After installation you must log off and back into your session again to ensure
+`ssh-agent.exe` is started along with the SSH CA client.
+
 ### Building From Source
 
 #### CLI
