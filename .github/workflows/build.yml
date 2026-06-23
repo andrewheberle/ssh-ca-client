@@ -84,7 +84,7 @@ jobs:
         run: |
           $lastTag = git describe --tags --abbrev=0
           $version = $lastTag -replace '^v', ''
-          "INSTALLER_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "INSTALLER_VERSION=${version}.${env:GITHUB_RUN_NUMBER}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Convert LICENSE to RTF
         run: |
           $text = Get-Content -Path "LICENSE" -Raw
@@ -99,14 +99,14 @@ jobs:
         run: |
           $msiPath = ".\dist\ssh-ca-client_${env:INSTALLER_VERSION}_amd64.msi"
 
-          candle.exe -arch x64 `
+          & candle.exe -arch x64 `
             -ext WixUIExtension `
             -ext WixUtilExtension `
             -dINSTALLER_VERSION=${env:INSTALLER_VERSION} `
             templates\product.wxs templates\ui.wxs templates\options_dialog.wxs `
             -o tmp\
 
-          light.exe `
+          & light.exe `
             -ext WixUIExtension `
             -ext WixUtilExtension `
             tmp\product.wixobj tmp\ui.wixobj tmp\options_dialog.wixobj `
