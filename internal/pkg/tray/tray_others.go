@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/andrewheberle/serverless-ssh-ca/client/internal/pkg/client"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/client"
 )
 
 type Application struct {

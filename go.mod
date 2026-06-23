@@ -7,7 +7,6 @@ require (
 	fyne.io/systray v1.12.1
 	github.com/allan-simon/go-singleinstance v0.0.0-20210120080615-d0997106ab37
 	github.com/andrewheberle/opener v1.0.2
-	github.com/andrewheberle/serverless-ssh-ca/client v0.0.0-20260517132014-c2bd7a8a32b6
 	github.com/andrewheberle/simplecommand v0.5.1
 	github.com/andrewheberle/sshagent v1.0.0
 	github.com/bep/simplecobra v0.7.0
