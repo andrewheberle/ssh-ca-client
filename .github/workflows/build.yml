@@ -97,12 +97,13 @@ jobs:
           [System.IO.File]::WriteAllText("LICENSE.rtf", $rtf, [System.Text.Encoding]::ASCII)
       - name: Build MSI
         run: |
+          $version = $env:INSTALLER_VERSION
           $msiPath = ".\dist\ssh-ca-client_${env:INSTALLER_VERSION}_amd64.msi"
 
           candle.exe -arch x64 `
             -ext WixUIExtension `
             -ext WixUtilExtension `
-            -dINSTALLER_VERSION=$env:INSTALLER_VERSION `
+            -dINSTALLER_VERSION=$version `
             templates\product.wxs templates\ui.wxs templates\options_dialog.wxs `
             -o tmp\
 
