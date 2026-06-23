@@ -7,7 +7,7 @@
     <?error Unsupported value of sys.BUILDARCH=$(sys.BUILDARCH)?>
 <?endif?>
 
-<?ifndef $(var.INSTALLER_VERSION) ?>
+<?ifndef INSTALLER_VERSION ?>
 	<?error INSTALLER_VERSION must be defined ?>
 <?endif?>
 
@@ -158,8 +158,6 @@
     </UI>
 
     <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
-
-		<CustomActionRef Id="WixBroadcastEnvironmentChange" />
 
   </Product>
 
