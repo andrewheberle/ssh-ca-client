@@ -44,7 +44,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Attest build artifacts
-        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763 # v4.1.1
         with:
           subject-checksums: ./dist/checksums.txt
       - name: Upload build artifacts
@@ -104,7 +104,7 @@ jobs:
           go tool github.com/mh-cbon/go-msi make --arch amd64 --out "$(Join-Path $([System.Environment]::CurrentDirectory) "tmp")" --src ".\templates" --msi ".\dist\ssh-ca-client_$($env:GITHUB_REF_NAME)_amd64.msi" --version "$($env:GITHUB_REF_NAME)"
           Write-Output "$((Get-FileHash -Algorithm SHA256 -Path ".\dist\ssh-ca-client_$($env:GITHUB_REF_NAME)_amd64.msi").Hash) ssh-ca-client_$($env:GITHUB_REF_NAME)_amd64.msi" | Out-File -FilePath ".\dist\ssh-ca-client.sha256sum"
       - name: Attest MSI
-        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763 # v4.1.1
         with:
           subject-checksums: ./dist/ssh-ca-client.sha256sum
       - name: Upload MSI as artifact
