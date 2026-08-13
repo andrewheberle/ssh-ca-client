@@ -5,7 +5,7 @@ ssh-ca-client-cli-show - Show any existing private key, public key, certificate 
 ## Synopsis
 
 ```sh
-ssh-ca-client-cli [global options] show [--certificate]
+ssh-ca-client-cli [global options] show [--certificate [--git]]
                                         [--private]
                                         [--public]
                                         [--status [--json]]
@@ -27,7 +27,17 @@ See [Options](ssh-ca-client-cli.md#options)
 ## Options
 
 `--certificate`
-Display the current certificate if one exists.
+Display the current certificate if one exists. When the `--git` flag is used
+with this option the current certificate will be output in a format suitable
+for use via `gpg.ssh.defaultKeyCommand` to provide a SSH public key for signing
+git commits:
+
+The `--git` flag may also be used by itself as it's use implies `--certificate`.
+
+```
+[gpg "ssh"]
+  defaultKeyCommand = ssh-ca-client-cli show --git
+```
 
 `--private`
 Display the users private key.
