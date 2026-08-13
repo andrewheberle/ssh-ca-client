@@ -19,6 +19,7 @@ type showCommand struct {
 	certificate bool
 	status      bool
 	json        bool
+	git         bool
 
 	config *config.Config
 	logger *slog.Logger
@@ -48,6 +49,7 @@ func (c *showCommand) Init(cd *simplecobra.Commandeer) error {
 	cmd.Flags().BoolVar(&c.public, "public", false, "Display public key")
 	cmd.Flags().BoolVar(&c.status, "status", false, "Display status only")
 	cmd.Flags().BoolVar(&c.json, "json", false, "Output status as JSON")
+	cmd.Flags().BoolVar(&c.git, "git", false, "Output certificate in a format suitable for git signing")
 	cmd.MarkFlagsMutuallyExclusive("public", "private", "certificate")
 	cmd.MarkFlagsMutuallyExclusive("status", "private")
 	cmd.MarkFlagsMutuallyExclusive("status", "certificate")
@@ -55,6 +57,10 @@ func (c *showCommand) Init(cd *simplecobra.Commandeer) error {
 	cmd.MarkFlagsMutuallyExclusive("json", "private")
 	cmd.MarkFlagsMutuallyExclusive("json", "certificate")
 	cmd.MarkFlagsMutuallyExclusive("json", "public")
+	cmd.MarkFlagsMutuallyExclusive("json", "git")
+	cmd.MarkFlagsMutuallyExclusive("git", "public")
+	cmd.MarkFlagsMutuallyExclusive("git", "private")
+	cmd.MarkFlagsMutuallyExclusive("git", "status")
 
 	return nil
 }
@@ -79,6 +85,11 @@ func (c *showCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 		return err
 	}
 	c.config = config
+
+	// if git was set this implies --certificate
+	if c.git {
+		c.certificate = true
+	}
 
 	return nil
 }
@@ -158,7 +169,13 @@ func (c *showCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args 
 			return err
 		}
 
-		fmt.Printf("%s\n", certBytes)
+		// add the prefix if using for git
+		prefix := ""
+		if c.git {
+			prefix = "key::"
+		}
+
+		fmt.Printf("%s%s\n", prefix, certBytes)
 	default:
 		pemBytes, err := c.config.GetPublicKeyBytes()
 		if err != nil {
