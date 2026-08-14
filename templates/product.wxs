@@ -86,16 +86,11 @@
 						</Component>
 
 						<!--
-							Component: Enable OpenSSH Agent service.
+							Component: Start OpenSSH Agent.
 							Condition restricts installation to when START_SSH_AGENT=1.
-							Sets the ssh-agent service startup type to Manual (DWORD 3), removing
-							the default Disabled state so the service can be started on demand.
 							Adds ssh-agent.exe to the HKLM Run key so it starts at login for all
-							users, which also satisfies the on-demand start for the current user
-							on next login.
-
-							Registry Start type values:
-								0 = Boot, 1 = System, 2 = Automatic, 3 = Manual, 4 = Disabled
+							users, this requires the OpenSSH Authentication Agent service to be set
+							to "Manual" startup.
 						-->
 						<Component Id="C.SSHAgent" Guid="e5f6a7b8-c9d0-1234-efab-567890123456">
 							<Condition>START_SSH_AGENT = 1</Condition>

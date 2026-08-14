@@ -31,8 +31,7 @@ or `%APPDATA%\Serverless SSH CA Client\config.yml` (Windows).
 This option changes the behaviour of reads/writes to the user configuration
 file so that instead of using DPAPI on Windows for protection of sensitive
 data and storing the encryption key in the users login keyring on other
-platforms, instead a random key is generated and written to the path
-specified.
+platforms, a random key is generated and written to the path specified.
 
 This `keyfile` is then used for encryption/decryption operations of this data.
 
