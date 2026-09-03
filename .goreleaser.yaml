@@ -162,6 +162,7 @@ snapcrafts:
       Please review the documentation here:
       * https://github.com/andrewheberle/ssh-ca-client
       * https://github.com/andrewheberle/serverless-ssh-ca
+    icon: ./snap/gui/ssh-ca-client.png
     disable: false
     channel_templates:
       - edge
