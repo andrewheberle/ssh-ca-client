@@ -17,6 +17,7 @@ import (
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/tray"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/version"
 	"github.com/spf13/pflag"
 )
 
@@ -41,10 +42,10 @@ func Execute(ctx context.Context, args []string) error {
 	var (
 		lifetime, renewAt                                    time.Duration
 		listenAddr, logDir, systemConfigFile, userConfigFile string
-		disableProxy, addOnStart                             bool
+		disableProxy, addOnStart, showVersion                bool
 	)
 
-	flags := pflag.NewFlagSet("tray", pflag.ExitOnError)
+	flags := pflag.NewFlagSet("ssh-ca-client", pflag.ExitOnError)
 
 	flags.DurationVar(&lifetime, "life", time.Hour*24, "Lifetime of SSH certificate")
 	flags.DurationVar(&renewAt, "renew", time.Hour, "Renew once remaining time gets below this value")
@@ -52,6 +53,7 @@ func Execute(ctx context.Context, args []string) error {
 	flags.StringVar(&logDir, "log", filepath.Join(logBase, "log"), "Log directory")
 	flags.StringVar(&systemConfigFile, "config", filepath.Join(system, "config.yml"), "Path to configuration file")
 	flags.StringVar(&userConfigFile, "user", filepath.Join(user, "user.yml"), "Path to user configuration file")
+	flags.BoolVar(&showVersion, "version", false, "Show version and exit")
 	// only proxy pageant on Windows
 	if runtime.GOOS == "windows" {
 		flags.BoolVar(&disableProxy, "disable-proxy", false, "Disable proxying of PuTTY Agent (pageant) requests")
@@ -61,6 +63,12 @@ func Execute(ctx context.Context, args []string) error {
 	}
 	flags.BoolVar(&addOnStart, "add-on-start", true, "Add current key and certificate (if valid) to SSH agent on start")
 	_ = flags.Parse(args)
+
+	// handle version flag
+	if showVersion {
+		fmt.Printf("ssh-ca-client %s\n", version.Version())
+		os.Exit(0)
+	}
 
 	// check renewAt is not larger than lifetime
 	if renewAt > lifetime {
