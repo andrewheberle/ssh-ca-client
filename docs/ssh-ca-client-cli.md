@@ -20,6 +20,9 @@ The default is `/etc/serverless-ssh-ca/config.yml` (Linux/BSD/Darwin) or
 `--debug`
 Enable debug logging.
 
+`--json`
+Enable JSON logging.
+
 `--user <path>`
 The path to store user specific configuration (this is ignored for the `host`)
 sub-command.
