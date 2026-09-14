@@ -42,7 +42,7 @@ func Execute(ctx context.Context, args []string) error {
 	var (
 		lifetime, renewAt                                    time.Duration
 		listenAddr, logDir, systemConfigFile, userConfigFile string
-		disableProxy, addOnStart, showVersion                bool
+		disableProxy, addOnStart, showVersion, json          bool
 	)
 
 	flags := pflag.NewFlagSet("ssh-ca-client", pflag.ExitOnError)
@@ -54,6 +54,7 @@ func Execute(ctx context.Context, args []string) error {
 	flags.StringVar(&systemConfigFile, "config", filepath.Join(system, "config.yml"), "Path to configuration file")
 	flags.StringVar(&userConfigFile, "user", filepath.Join(user, "user.yml"), "Path to user configuration file")
 	flags.BoolVar(&showVersion, "version", false, "Show version and exit")
+	flags.BoolVar(&json, "json", false, "Enable JSON logging")
 	// only proxy pageant on Windows
 	if runtime.GOOS == "windows" {
 		flags.BoolVar(&disableProxy, "disable-proxy", false, "Disable proxying of PuTTY Agent (pageant) requests")
@@ -133,7 +134,13 @@ func Execute(ctx context.Context, args []string) error {
 		_ = log.Close()
 	}()
 
-	logger := slog.New(slog.NewTextHandler(log, &slog.HandlerOptions{}))
+	var h slog.Handler
+	if json {
+		h = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{})
+	} else {
+		h = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{})
+	}
+	logger := slog.New(h)
 	logger.Info("logging to log file", "file", logFile)
 
 	// make sure we are only running once
