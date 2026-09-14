@@ -641,12 +641,15 @@ func (lh *LoginHandler) executeLogin(ctx context.Context, addr string) error {
 	// wait here until done
 	if err := lh.Wait(ctx); err != nil {
 		if errors.Is(err, http.ErrServerClosed) {
+			lh.logger.Warn("server was already closed")
 			return nil
 		}
 
+		lh.logger.Error("there was an error from the server", "error", err)
 		return err
 	}
 
+	lh.logger.Info("server process finished")
 	return nil
 }
 
