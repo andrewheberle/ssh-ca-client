@@ -27,6 +27,7 @@ import (
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
+	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
 
@@ -711,5 +712,5 @@ func (lh *LoginHandler) CertificateAuthority() string {
 		return ""
 	}
 
-	return string(lh.config.CertificateAuthority().Marshal())
+	return string(ssh.MarshalAuthorizedKey(ca))
 }

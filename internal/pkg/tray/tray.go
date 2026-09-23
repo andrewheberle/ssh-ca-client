@@ -157,7 +157,7 @@ func (app *Application) onReady() {
 		"redirect_url", app.client.OIDCConfig().RedirectURL,
 		"scopes", app.client.OIDCConfig().Scopes,
 		"ca_url", app.client.CertificateAuthorityURL(),
-		"tusted_ca", app.client.CertificateAuthority(),
+		"trusted_ca", app.client.CertificateAuthority(),
 	)
 
 	// handle clicks

@@ -116,6 +116,10 @@ func mergeConfig(a, b SystemConfig) (SystemConfig, error) {
 		return SystemConfig{}, ErrConfigIncomplete
 	}
 
+	if a.TrustedCertificateAuthority != "" {
+		b.CertificateAuthorityURL = a.CertificateAuthorityURL
+	}
+
 	if b.TrustedCertificateAuthority != "" {
 		ca, _, _, _, err := ssh.ParseAuthorizedKey([]byte(b.TrustedCertificateAuthority))
 		if err != nil {
