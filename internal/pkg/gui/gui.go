@@ -42,9 +42,9 @@ func Execute(ctx context.Context, args []string) error {
 	}
 
 	var (
-		lifetime, renewAt                                              time.Duration
-		listenAddr, logDir, systemConfigFile, userConfigFile           string
-		disableProxy, addOnStart, showVersion, debugLogging, logToFile bool
+		lifetime, renewAt                                                    time.Duration
+		listenAddr, logDir, systemConfigFile, userConfigFile                 string
+		disableProxy, addOnStart, showVersion, debugLogging, logToFile, json bool
 	)
 
 	flags := pflag.NewFlagSet("ssh-ca-client", pflag.ExitOnError)
@@ -56,6 +56,7 @@ func Execute(ctx context.Context, args []string) error {
 	flags.StringVar(&systemConfigFile, "config", filepath.Join(system, "config.yml"), "Path to configuration file")
 	flags.StringVar(&userConfigFile, "user", filepath.Join(user, "user.yml"), "Path to user configuration file")
 	flags.BoolVar(&showVersion, "version", false, "Show version and exit")
+	flags.BoolVar(&json, "json", false, "Enable JSON logging")
 	flags.BoolVar(&debugLogging, "debug", false, "Enable debug logging")
 	if runtime.GOOS == "windows" {
 		// windows specific flags

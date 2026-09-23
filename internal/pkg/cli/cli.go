@@ -16,6 +16,7 @@ type rootCommand struct {
 	systemConfigFile string
 	userConfigFile   string
 	debug            bool
+	json             bool
 	keyfile          string
 
 	*simplecommand.Command
@@ -44,6 +45,7 @@ func (c *rootCommand) Init(cd *simplecobra.Commandeer) error {
 	cmd.PersistentFlags().StringVar(&c.userConfigFile, "user", filepath.Join(user, "user.yml"), "Path to user configuration file")
 	cmd.PersistentFlags().StringVar(&c.keyfile, "keyfile", "", "Path to key file for user configuration protection")
 	cmd.PersistentFlags().BoolVar(&c.debug, "debug", false, "Enable debug logging")
+	cmd.PersistentFlags().BoolVar(&c.json, "json", false, "Enable JSON logging")
 
 	return nil
 }

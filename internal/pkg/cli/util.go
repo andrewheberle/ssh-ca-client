@@ -104,8 +104,19 @@ func logger(this *simplecobra.Commandeer) (*slog.Logger, error) {
 		return nil, fmt.Errorf("problem accessing debug flag: %w", err)
 	}
 
+	json, err := this.CobraCommand.Flags().GetBool("json")
+	if err != nil {
+		return nil, fmt.Errorf("problem accessing json flag: %w", err)
+	}
+
+	var h slog.Handler
+
 	logLevel := new(slog.LevelVar)
-	h := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel})
+	if json {
+		h = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel})
+	} else {
+		h = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel})
+	}
 	logger := slog.New(h)
 
 	if debug {
