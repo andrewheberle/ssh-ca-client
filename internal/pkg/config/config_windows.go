@@ -117,7 +117,7 @@ func mergeConfig(a, b SystemConfig) (SystemConfig, error) {
 	}
 
 	if a.TrustedCertificateAuthority != "" {
-		b.CertificateAuthorityURL = a.CertificateAuthorityURL
+		b.TrustedCertificateAuthority = a.TrustedCertificateAuthority
 	}
 
 	if b.TrustedCertificateAuthority != "" {
