@@ -2,10 +2,12 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
+	"golang.org/x/crypto/ssh"
 	"golang.org/x/sys/windows/registry"
 	"sigs.k8s.io/yaml"
 )
@@ -110,8 +112,17 @@ func mergeConfig(a, b SystemConfig) (SystemConfig, error) {
 		b.CertificateAuthorityURL = a.CertificateAuthorityURL
 	}
 
-	if a.ClientID == "" || a.Issuer == "" || len(a.Scopes) == 0 || a.RedirectURL == "" || a.CertificateAuthorityURL == "" {
+	if b.ClientID == "" || b.Issuer == "" || len(b.Scopes) == 0 || b.RedirectURL == "" || b.CertificateAuthorityURL == "" {
 		return SystemConfig{}, ErrConfigIncomplete
+	}
+
+	if b.TrustedCertificateAuthority != "" {
+		ca, _, _, _, err := ssh.ParseAuthorizedKey([]byte(b.TrustedCertificateAuthority))
+		if err != nil {
+			return SystemConfig{}, fmt.Errorf("problem parsing trusted_ca: %w", err)
+		}
+
+		b.ca = ca
 	}
 
 	return b, nil

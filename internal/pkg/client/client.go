@@ -702,3 +702,14 @@ func NewHttpClient() *http.Client {
 		},
 	}
 }
+
+// Returns the set trusted_ca public key as a string or a blank string if not set
+func (lh *LoginHandler) CertificateAuthority() string {
+	ca := lh.config.CertificateAuthority()
+
+	if ca == nil {
+		return ""
+	}
+
+	return string(lh.config.CertificateAuthority().Marshal())
+}
