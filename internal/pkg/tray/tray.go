@@ -156,7 +156,8 @@ func (app *Application) onReady() {
 		"issuer", app.client.OIDCConfig().Issuer,
 		"redirect_url", app.client.OIDCConfig().RedirectURL,
 		"scopes", app.client.OIDCConfig().Scopes,
-		"ssh_ca_url", app.client.CertificateAuthorityURL(),
+		"ca_url", app.client.CertificateAuthorityURL(),
+		"trusted_ca", app.client.CertificateAuthority(),
 	)
 
 	// handle clicks

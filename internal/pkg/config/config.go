@@ -315,7 +315,7 @@ func (c *Config) Signer() (ssh.Signer, error) {
 	return c.signer()
 }
 
-// CertificateAuthority returns the CA PublicKey
+// CertificateAuthority returns the Config's ssh.PublicKey
 func (c *Config) CertificateAuthority() ssh.PublicKey {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -323,7 +323,7 @@ func (c *Config) CertificateAuthority() ssh.PublicKey {
 	return c.system.CertificateAuthority()
 }
 
-// CertificateAuthority returns the CA PublicKey
+// System returns the current system config
 func (c *Config) System() *SystemConfig {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
