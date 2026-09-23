@@ -24,6 +24,8 @@ import (
 //go:embed icons
 var resources embed.FS
 
+const EventLogSource = "Serverless SSH CA Client"
+
 func Execute(ctx context.Context, args []string) error {
 	// beeep.AppName = config.FriendlyAppName
 
@@ -40,9 +42,9 @@ func Execute(ctx context.Context, args []string) error {
 	}
 
 	var (
-		lifetime, renewAt                                    time.Duration
-		listenAddr, logDir, systemConfigFile, userConfigFile string
-		disableProxy, addOnStart, showVersion                bool
+		lifetime, renewAt                                              time.Duration
+		listenAddr, logDir, systemConfigFile, userConfigFile           string
+		disableProxy, addOnStart, showVersion, debugLogging, logToFile bool
 	)
 
 	flags := pflag.NewFlagSet("ssh-ca-client", pflag.ExitOnError)
@@ -54,12 +56,16 @@ func Execute(ctx context.Context, args []string) error {
 	flags.StringVar(&systemConfigFile, "config", filepath.Join(system, "config.yml"), "Path to configuration file")
 	flags.StringVar(&userConfigFile, "user", filepath.Join(user, "user.yml"), "Path to user configuration file")
 	flags.BoolVar(&showVersion, "version", false, "Show version and exit")
-	// only proxy pageant on Windows
+	flags.BoolVar(&debugLogging, "debug", false, "Enable debug logging")
 	if runtime.GOOS == "windows" {
+		// windows specific flags
 		flags.BoolVar(&disableProxy, "disable-proxy", false, "Disable proxying of PuTTY Agent (pageant) requests")
+		flags.BoolVar(&logToFile, "log.file", false, "Log to file instead of the Windows Event Log")
 	} else {
 		// always disabled on non-Windows platforms
 		disableProxy = true
+		// always log to file for non-Windows
+		logToFile = true
 	}
 	flags.BoolVar(&addOnStart, "add-on-start", true, "Add current key and certificate (if valid) to SSH agent on start")
 	_ = flags.Parse(args)
@@ -124,17 +130,26 @@ func Execute(ctx context.Context, args []string) error {
 	}
 
 	// set up logger
-	logFile := filepath.Join(logDir, "tray.log")
-	log, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
+	level := new(slog.LevelVar)
+	if debugLogging {
+		level.Set(slog.LevelDebug)
 	}
-	defer func() {
-		_ = log.Close()
-	}()
+	var logger *slog.Logger
+	if logToFile {
+		logFile := filepath.Join(logDir, "tray.log")
+		log, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			_ = log.Close()
+		}()
 
-	logger := slog.New(slog.NewTextHandler(log, &slog.HandlerOptions{}))
-	logger.Info("logging to log file", "file", logFile)
+		logger = slog.New(newLogHandler(log, level))
+		logger.Info("logging to log file", "file", logFile)
+	} else {
+		logger = slog.New(newLogHandler(nil, level))
+	}
 
 	// make sure we are only running once
 	lockFile, err := singleinstance.CreateLockFile(filepath.Join(user, "tray.lock"))
