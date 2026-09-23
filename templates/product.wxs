@@ -61,7 +61,7 @@
 														Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
 														Name="EventMessageFile"
 														Type="expandable"
-														Value="[INSTALLDIR]ssh-ca-client.exe"
+														Value="%SystemRoot%\System32\EventCreate.exe"
 														KeyPath="yes" />
 							<RegistryValue Root="HKLM"
 														Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"

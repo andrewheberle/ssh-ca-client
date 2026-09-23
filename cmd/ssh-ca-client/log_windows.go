@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/gui"
 	"golang.org/x/sys/windows/svc/eventlog"
 )
 
 func logFatal(format string, a ...any) {
-	logger, err := eventlog.Open("Serverless SSH CA Client")
+	logger, err := eventlog.Open(gui.EventLogSource)
 	if err != nil {
 		panic(err)
 	}
