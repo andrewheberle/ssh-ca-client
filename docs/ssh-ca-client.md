@@ -24,7 +24,8 @@ The default is `/etc/serverless-ssh-ca/config.yml` (Linux/BSD/Darwin) or
 `%PROGRAMDATA%\Serverless SSH CA Client\config.yml` (Windows).
 
 `--json`
-Enable JSON logging.
+Enable JSON logging (on Windows this flag is only relevant when `--log.file`
+is passed).
 
 `--life <duration>`
 Lifetime of SSH certificate (default 24h0m0s).
@@ -33,6 +34,12 @@ The maximum life configured on the CA cannot be exceeded.
 
 `--log <path>`
 Log directory.
+
+`--log.file`
+Log to a file (Windows only option).
+
+By default on Windows logs are sent to the Event Log however this can be
+directed to a file inside the configured log directory with this flag.
 
 The default is `$HOME/.config/serverless-ssh-ca/log` (Linux/BSD/Darwin)
 or `%APPDATA%\Serverless SSH CA Client\log` (Windows).

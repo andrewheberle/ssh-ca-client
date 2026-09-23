@@ -146,10 +146,10 @@ func Execute(ctx context.Context, args []string) error {
 			_ = log.Close()
 		}()
 
-		logger = slog.New(newLogHandler(log, level))
+		logger = slog.New(newLogHandler(log, level, json))
 		logger.Info("logging to log file", "file", logFile)
 	} else {
-		logger = slog.New(newLogHandler(nil, level))
+		logger = slog.New(newLogHandler(nil, level, json))
 	}
 
 	// make sure we are only running once
