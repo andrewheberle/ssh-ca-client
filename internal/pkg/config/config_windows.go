@@ -88,48 +88,48 @@ func loadConfig(name string) SystemConfig {
 	return config
 }
 
-// Function merges a -> b with values set in a overridding b
+// Function merges policy -> base with values set via policy overridding base
 //
 // An error is returned if values are not set after merge
-func mergeConfig(a, b SystemConfig) (SystemConfig, error) {
-	if a.ClientID != "" {
-		b.ClientID = a.ClientID
+func mergeConfig(policy, base SystemConfig) (SystemConfig, error) {
+	if policy.ClientID != "" {
+		base.ClientID = policy.ClientID
 	}
 
-	if a.Issuer != "" {
-		b.Issuer = a.Issuer
+	if policy.Issuer != "" {
+		base.Issuer = policy.Issuer
 	}
 
-	if len(a.Scopes) > 0 {
-		b.Scopes = a.Scopes
+	if len(policy.Scopes) > 0 {
+		base.Scopes = policy.Scopes
 	}
 
-	if a.RedirectURL != "" {
-		b.RedirectURL = a.RedirectURL
+	if policy.RedirectURL != "" {
+		base.RedirectURL = policy.RedirectURL
 	}
 
-	if a.CertificateAuthorityURL != "" {
-		b.CertificateAuthorityURL = a.CertificateAuthorityURL
+	if policy.CertificateAuthorityURL != "" {
+		base.CertificateAuthorityURL = policy.CertificateAuthorityURL
 	}
 
-	if b.ClientID == "" || b.Issuer == "" || len(b.Scopes) == 0 || b.RedirectURL == "" || b.CertificateAuthorityURL == "" {
+	if base.ClientID == "" || base.Issuer == "" || len(base.Scopes) == 0 || base.RedirectURL == "" || base.CertificateAuthorityURL == "" {
 		return SystemConfig{}, ErrConfigIncomplete
 	}
 
-	if a.TrustedCertificateAuthority != "" {
-		b.TrustedCertificateAuthority = a.TrustedCertificateAuthority
+	if policy.TrustedCertificateAuthority != "" {
+		base.TrustedCertificateAuthority = policy.TrustedCertificateAuthority
 	}
 
-	if b.TrustedCertificateAuthority != "" {
-		ca, _, _, _, err := ssh.ParseAuthorizedKey([]byte(b.TrustedCertificateAuthority))
+	if base.TrustedCertificateAuthority != "" {
+		ca, _, _, _, err := ssh.ParseAuthorizedKey([]byte(base.TrustedCertificateAuthority))
 		if err != nil {
 			return SystemConfig{}, fmt.Errorf("problem parsing trusted_ca: %w", err)
 		}
 
-		b.ca = ca
+		base.ca = ca
 	}
 
-	return b, nil
+	return base, nil
 }
 
 func loadSystemConfig(name string) (SystemConfig, error) {
