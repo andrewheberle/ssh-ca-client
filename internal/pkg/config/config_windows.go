@@ -88,7 +88,8 @@ func loadConfig(name string) SystemConfig {
 	return config
 }
 
-// Function merges policy -> base with values set via policy overridding base
+// Function merges policy -> base with values set via policy overridding values
+// in base.
 //
 // An error is returned if values are not set after merge
 func mergeConfig(policy, base SystemConfig) (SystemConfig, error) {

@@ -11,8 +11,15 @@ on:
 
 jobs:
   test:
-    name: Run Go tests and with coverage
-    runs-on: ubuntu-latest
+    name: Run Go tests with coverage (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      # match release builds in .goreleaser.yaml
+      CGO_ENABLED: 0
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -30,6 +37,8 @@ jobs:
         run: go mod download
 
       - name: Run Go tests with coverage
+        # bash avoids PowerShell splitting -coverprofile=coverage.txt on Windows
+        shell: bash
         run: go test -coverprofile=coverage.txt ./...
 
       - name: Upload results to Codecov
@@ -37,3 +46,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: andrewheberle/ssh-ca-client
+          flags: ${{ runner.os }}
