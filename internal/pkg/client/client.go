@@ -27,6 +27,7 @@ import (
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
+	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
 
@@ -701,4 +702,15 @@ func NewHttpClient() *http.Client {
 			},
 		},
 	}
+}
+
+// Returns the set trusted_ca public key as a string or a blank string if not set
+func (lh *LoginHandler) CertificateAuthority() string {
+	ca := lh.config.CertificateAuthority()
+
+	if ca == nil {
+		return ""
+	}
+
+	return string(ssh.MarshalAuthorizedKey(ca))
 }

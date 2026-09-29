@@ -2,10 +2,12 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
+	"golang.org/x/crypto/ssh"
 	"golang.org/x/sys/windows/registry"
 	"sigs.k8s.io/yaml"
 )
@@ -86,35 +88,49 @@ func loadConfig(name string) SystemConfig {
 	return config
 }
 
-// Function merges a -> b with values set in a overridding b
+// Function merges policy -> base with values set via policy overridding values
+// in base.
 //
 // An error is returned if values are not set after merge
-func mergeConfig(a, b SystemConfig) (SystemConfig, error) {
-	if a.ClientID != "" {
-		b.ClientID = a.ClientID
+func mergeConfig(policy, base SystemConfig) (SystemConfig, error) {
+	if policy.ClientID != "" {
+		base.ClientID = policy.ClientID
 	}
 
-	if a.Issuer != "" {
-		b.Issuer = a.Issuer
+	if policy.Issuer != "" {
+		base.Issuer = policy.Issuer
 	}
 
-	if len(a.Scopes) > 0 {
-		b.Scopes = a.Scopes
+	if len(policy.Scopes) > 0 {
+		base.Scopes = policy.Scopes
 	}
 
-	if a.RedirectURL != "" {
-		b.RedirectURL = a.RedirectURL
+	if policy.RedirectURL != "" {
+		base.RedirectURL = policy.RedirectURL
 	}
 
-	if a.CertificateAuthorityURL != "" {
-		b.CertificateAuthorityURL = a.CertificateAuthorityURL
+	if policy.CertificateAuthorityURL != "" {
+		base.CertificateAuthorityURL = policy.CertificateAuthorityURL
 	}
 
-	if a.ClientID == "" || a.Issuer == "" || len(a.Scopes) == 0 || a.RedirectURL == "" || a.CertificateAuthorityURL == "" {
+	if base.ClientID == "" || base.Issuer == "" || len(base.Scopes) == 0 || base.RedirectURL == "" || base.CertificateAuthorityURL == "" {
 		return SystemConfig{}, ErrConfigIncomplete
 	}
 
-	return b, nil
+	if policy.TrustedCertificateAuthority != "" {
+		base.TrustedCertificateAuthority = policy.TrustedCertificateAuthority
+	}
+
+	if base.TrustedCertificateAuthority != "" {
+		ca, _, _, _, err := ssh.ParseAuthorizedKey([]byte(base.TrustedCertificateAuthority))
+		if err != nil {
+			return SystemConfig{}, fmt.Errorf("problem parsing trusted_ca: %w", err)
+		}
+
+		base.ca = ca
+	}
+
+	return base, nil
 }
 
 func loadSystemConfig(name string) (SystemConfig, error) {
