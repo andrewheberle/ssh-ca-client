@@ -9,7 +9,7 @@ require (
 	github.com/andrewheberle/opener v1.0.2
 	github.com/andrewheberle/simplecommand v0.5.1
 	github.com/andrewheberle/sshagent v1.0.0
-	github.com/bep/simplecobra v0.7.0
+	github.com/bep/simplecobra v0.8.0
 	github.com/coreos/go-oidc/v3 v3.21.0
 	github.com/forfuncsake/krl v0.1.0
 	github.com/gen2brain/beeep v0.11.2
