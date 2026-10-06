@@ -5,6 +5,7 @@ package e2e
 import (
 	"bytes"
 	"context"
+	"crypto"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
@@ -166,6 +167,7 @@ type testCA struct {
 }
 
 type caConfig struct {
+	key      crypto.Signer
 	keyType  sshkey.KeyType
 	curve    elliptic.Curve
 	bindings map[string]string
@@ -184,6 +186,13 @@ func withBinding(name, value string) caOption {
 func withBindings(bindings map[string]string) caOption {
 	return func(c *caConfig) {
 		maps.Copy(c.bindings, bindings)
+	}
+}
+
+// withCAKey sets the CA private key rather than generating one
+func withCAKey(key crypto.Signer) caOption {
+	return func(c *caConfig) {
+		c.key = key
 	}
 }
 
@@ -232,10 +241,14 @@ func newCA(t *testing.T, opts ...caOption) *testCA {
 		o(config)
 	}
 
-	// generate CA key
-	key, err := sshkey.GeneratePrivateKey(config.keyType, config.curve)
-	if err != nil {
-		t.Fatalf("generating CA key: %v", err)
+	// generate CA key unless one was provided
+	key := config.key
+	if key == nil {
+		var err error
+		key, err = sshkey.GeneratePrivateKey(config.keyType, config.curve)
+		if err != nil {
+			t.Fatalf("generating CA key: %v", err)
+		}
 	}
 	signer, err := ssh.NewSignerFromSigner(key)
 	if err != nil {

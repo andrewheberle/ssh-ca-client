@@ -3,7 +3,9 @@
 package e2e
 
 import (
+	"bytes"
 	"context"
+	"crypto/ed25519"
 	"crypto/elliptic"
 	"net/http"
 	"testing"
@@ -88,6 +90,44 @@ func TestCA_KeyTypes(t *testing.T) {
 			}
 			if err := cert.CertificateValid(ca.PublicKey, pub, c); err != nil {
 				t.Errorf("certificate not valid: %v", err)
+			}
+
+			ca.krl(t, api.GetCertificateTypeKrlParamsCertificateTypeUser)
+			ca.krl(t, api.GetCertificateTypeKrlParamsCertificateTypeHost)
+		})
+	}
+}
+
+// TestCA_Ed25519KeySeeds checks the CA can sign KRLs with Ed25519 keys whose
+// seed has a leading zero byte. sshpk drops the zero from the PKCS#8 encoding
+// of the key when the next byte is below 0x80, which WebCrypto then rejects.
+func TestCA_Ed25519KeySeeds(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name   string
+		prefix []byte
+	}{
+		{"leading zeros", []byte{0x00, 0x00}},
+		{"leading zero", []byte{0x00, 0x29}},
+		{"leading zero below 0x80", []byte{0x00, 0x7f}},
+		// the leading zero is kept when the next byte is 0x80 or above
+		{"leading zero above 0x7f", []byte{0x00, 0x80}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			seed := bytes.Repeat([]byte{0x5a}, ed25519.SeedSize)
+			copy(seed, tt.prefix)
+
+			ca := newCA(t, withCAKey(ed25519.NewKeyFromSeed(seed)))
+
+			store := ca.newStore(t)
+			u := ca.userCertificate(t, store, ca.IDP.tokens(t, "alice@example.com"))
+			if err := u.Request(); err != nil {
+				t.Fatalf("requesting user certificate: %v", err)
 			}
 
 			ca.krl(t, api.GetCertificateTypeKrlParamsCertificateTypeUser)
