@@ -133,6 +133,16 @@ nfpms:
     contents:
       - src: systemd/
         dst: /usr/lib/systemd/system
+      - src: deb/ssh-ca-client.desktop
+        dst: /usr/share/applications/ssh-ca-client.desktop
+      - src: cmd/ssh-ca-client/winres/icon32.png
+        dst: /usr/share/icons/hicolor/32x32/apps/ssh-ca-client.png
+      - src: cmd/ssh-ca-client/winres/icon64.png
+        dst: /usr/share/icons/hicolor/64x64/apps/ssh-ca-client.png
+      - src: cmd/ssh-ca-client/winres/icon128.png
+        dst: /usr/share/icons/hicolor/128x128/apps/ssh-ca-client.png
+      - src: cmd/ssh-ca-client/winres/icon256.png
+        dst: /usr/share/icons/hicolor/256x256/apps/ssh-ca-client.png
     mtime: "{{ .CommitDate }}"
 
 sboms:

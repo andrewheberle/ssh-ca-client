@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Serverless SSH CA Client
+Comment=Request and renew SSH certificates from a Serverless SSH CA
+Exec=ssh-ca-client
+Icon=ssh-ca-client
+Terminal=false
+Type=Application
+Categories=Utility;
