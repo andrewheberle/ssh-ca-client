@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/gorilla/securecookie"
 	"golang.org/x/oauth2"
 )
 
@@ -245,9 +246,10 @@ type browser struct {
 
 // browserResult is the outcome of a simulated browser login
 type browserResult struct {
-	Code int    // status code of the callback response
-	Body string // body of the callback response
-	Err  error  // set if the browser could not complete the flow
+	Code   int         // status code of the callback response
+	Header http.Header // headers of the callback response
+	Body   string      // body of the callback response
+	Err    error       // set if the browser could not complete the flow
 
 	LoginURL string // the login URL the browser was opened at
 }
@@ -311,7 +313,7 @@ func (b browser) completeLogin(idp *fakeIdP, loginURL string) *browserResult {
 
 	body, _ := io.ReadAll(res.Body)
 
-	return &browserResult{Code: res.StatusCode, Body: string(body), LoginURL: loginURL}
+	return &browserResult{Code: res.StatusCode, Header: res.Header, Body: string(body), LoginURL: loginURL}
 }
 
 // callback calls Callback directly without first calling Login
@@ -576,6 +578,7 @@ func TestOidcHandler_GetTokensContext_Interactive(t *testing.T) {
 			if res.Code != http.StatusOK {
 				t.Errorf("callback status = %d, want %d", res.Code, http.StatusOK)
 			}
+			checkResultPage(t, res.Header, res.Body, successPage.Title)
 
 			// the login server is stopped once the login completes
 			if res, err := http.Get(res.LoginURL); err == nil {
@@ -686,9 +689,11 @@ func TestOidcHandler_GetTokensContext_CallbackFailure(t *testing.T) {
 				t.Errorf("refreshToken = %q, want empty", h.refreshToken)
 			}
 
-			if res := awaitBrowser(t, callbacks); res.Code != tt.wantStatus {
+			res := awaitBrowser(t, callbacks)
+			if res.Code != tt.wantStatus {
 				t.Errorf("callback status = %d, want %d", res.Code, tt.wantStatus)
 			}
+			checkResultPage(t, res.Header, res.Body, "Login failed")
 		})
 	}
 }
@@ -697,11 +702,32 @@ func TestOidcHandler_Callback_NoLoginInProgress(t *testing.T) {
 	idp := newFakeIdP(t)
 	h := newHandler(t, idp)
 
-	if res := callback(h); res.Code != http.StatusBadRequest {
+	res := callback(h)
+	if res.Code != http.StatusBadRequest {
 		t.Errorf("callback status = %d, want %d", res.Code, http.StatusBadRequest)
 	}
+	checkResultPage(t, res.Header(), res.Body.String(), "Login failed")
 	if idp.tokenRequests != 0 {
 		t.Errorf("token endpoint called %d times, want 0", idp.tokenRequests)
+	}
+}
+
+func TestOidcHandler_Login_SessionSaveFailure(t *testing.T) {
+	h := newHandler(t, newFakeIdP(t))
+	// the encoded session is always longer than this so saving fails
+	for _, c := range h.store.Codecs {
+		c.(*securecookie.SecureCookie).MaxLength(1)
+	}
+
+	rec := httptest.NewRecorder()
+	h.Login(rec, httptest.NewRequest(http.MethodGet, "/auth/login", nil))
+
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("login status = %d, want %d", rec.Code, http.StatusInternalServerError)
+	}
+	checkResultPage(t, rec.Header(), rec.Body.String(), "Login failed")
+	if !strings.Contains(rec.Body.String(), "Could not save session state.") {
+		t.Errorf("body does not contain the error message:\n%s", rec.Body.String())
 	}
 }
 

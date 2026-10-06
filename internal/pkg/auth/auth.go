@@ -217,7 +217,7 @@ func (h *OidcHandler) Login(w http.ResponseWriter, r *http.Request) {
 	// generate random state string and add to session
 	b := make([]byte, 128)
 	if _, err := rand.Read(b); err != nil {
-		http.Error(w, "Could not generate random bytes", http.StatusInternalServerError)
+		h.writeResult(w, http.StatusInternalServerError, errorPage("Could not generate random bytes"))
 		h.logger.Error("Could not generate random bytes", "error", err)
 		return
 	}
@@ -226,7 +226,7 @@ func (h *OidcHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	// save to session
 	if err := session.Save(r, w); err != nil {
-		http.Error(w, "Could not save session state", http.StatusInternalServerError)
+		h.writeResult(w, http.StatusInternalServerError, errorPage("Could not save session state"))
 		h.logger.Error("Could not save session state", "error", err)
 		return
 	}
@@ -255,7 +255,7 @@ func (h *OidcHandler) Callback(w http.ResponseWriter, r *http.Request) {
 
 	// only accept a callback while a login is waiting for one
 	if !h.loginPending() {
-		http.Error(w, "No login in progress", http.StatusBadRequest)
+		h.writeResult(w, http.StatusBadRequest, errorPage("No login in progress"))
 		// usually a stale or reloaded browser tab
 		h.logger.Warn("No login in progress")
 		return
@@ -309,7 +309,7 @@ func (h *OidcHandler) Callback(w http.ResponseWriter, r *http.Request) {
 	})
 
 	// Signal complete
-	_, _ = w.Write([]byte("You may now close this window"))
+	h.writeResult(w, http.StatusOK, successPage)
 	h.logger.Info("completed auth flow")
 }
 
@@ -326,7 +326,7 @@ func (h *OidcHandler) HttpHandler() http.Handler {
 // callbackError writes an error response for a failed callback, logs it and
 // passes the error to the waiting GetTokensContext so it returns immediately
 func (h *OidcHandler) callbackError(w http.ResponseWriter, msg string, code int, err error) {
-	http.Error(w, msg, code)
+	h.writeResult(w, code, errorPage(msg))
 
 	if err != nil {
 		h.logger.Error(msg, "error", err)
@@ -336,6 +336,13 @@ func (h *OidcHandler) callbackError(w http.ResponseWriter, msg string, code int,
 
 	h.logger.Error(msg)
 	h.deliver(loginResult{err: fmt.Errorf("%w: %s", ErrLoginFailed, msg)})
+}
+
+// writeResult writes the result page shown in the browser, logging any error
+func (h *OidcHandler) writeResult(w http.ResponseWriter, code int, page resultPage) {
+	if err := writeResult(w, code, page); err != nil {
+		h.logger.Warn("could not write result page", "error", err)
+	}
 }
 
 // loginPending reports whether an interactive login is waiting for a callback
