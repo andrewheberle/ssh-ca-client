@@ -93,7 +93,9 @@ OIDC IdP then the client can use the provided refresh token for subsequent
 certificate renewals.
 
 On Windows these system level options can be set using Group Policy via the
-ADMX/ADML files in the `policy` sub-directory.
+ADMX/ADML files in the `policy` sub-directory of this repository. These files
+are also installed by the MSI into a `policy` sub-directory of the install
+location (by default `C:\Program Files\Serverless SSH CA Client\policy`).
 
 The GUI and CLI store persistent user data such as the users private key,
 refresh token (if available) and certificate in the operating system keyring

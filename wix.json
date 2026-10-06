@@ -10,6 +10,9 @@
       "dist\\cli_windows_amd64_v1\\ssh-ca-client-cli.exe"
     ]
   },
+  "directories": [
+    "policy"
+  ],
   "env": {
     "guid": "bb3ae565-9b86-4568-9491-cc08809e551a",
     "vars": null
