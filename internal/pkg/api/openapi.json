@@ -182,8 +182,9 @@
         "properties": {
           "serial": {
             "type": "string",
-            "pattern": "^d+$",
-            "description": "Serial number of certificate to revoke"
+            "pattern": "^\\d+$",
+            "description": "Serial number of certificate to revoke",
+            "example": "12345678901234567890"
           },
           "public_key": {
             "type": "string",

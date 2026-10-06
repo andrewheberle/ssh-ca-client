@@ -9,6 +9,7 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 - `deb/` - Debian package specific files
 - `docs/` - documentation of commands
 - `internal/pkg/` - application packages; not importable by other modules
+- `internal/e2e/` - end-to-end tests against the published server package; `testdata/ca/` runs the CA under Node.js
 - `internal/pkg/api/` - generated OpenAPI primitives to interact with the server implementation. Do not edit `api.gen.go` or `openapi.json`.
 - `internal/pkg/cli/` - primary package used by the CLI
 - `internal/pkg/gui/` - primary package used by the GUI
@@ -22,6 +23,7 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 Run these before considering any change complete:
 - Build: `go build ./...`
 - Test: `go test -race ./...`
+- End-to-end test (needs Node.js 22.5+ and npm): `go test -tags e2e -race ./internal/e2e/...`
 - Vet: `go vet ./...`
 - Lint: `golangci-lint run`
 - Format: `gofmt -s -w .` (or `goimports`); never commit unformatted code

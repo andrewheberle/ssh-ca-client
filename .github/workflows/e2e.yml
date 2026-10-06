@@ -1,0 +1,55 @@
+name: End-to-end tests
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+
+jobs:
+  e2e:
+    name: Run end-to-end tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            race: '-race'
+            cgo: 1
+          # the race detector needs cgo and a C toolchain, so Windows is
+          # tested without it to match release builds in .goreleaser.yaml
+          - os: windows-latest
+            race: ''
+            cgo: 0
+    runs-on: ${{ matrix.os }}
+    env:
+      CGO_ENABLED: ${{ matrix.cgo }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: internal/e2e/testdata/ca/package-lock.json
+
+      - name: Install CA dependencies
+        working-directory: internal/e2e/testdata/ca
+        run: npm ci --no-audit --no-fund
+
+      - name: Run end-to-end tests
+        shell: bash
+        run: go test -tags e2e ${{ matrix.race }} -v ./internal/e2e/...
