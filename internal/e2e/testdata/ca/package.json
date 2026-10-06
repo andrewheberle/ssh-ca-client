@@ -1,0 +1,18 @@
+{
+	"name": "ssh-ca-client-e2e-ca",
+	"private": true,
+	"description": "Runs the published Serverless SSH CA under Node.js for end-to-end tests of the client",
+	"type": "module",
+	"scripts": {
+		"build": "node build.mjs"
+	},
+	"dependencies": {
+		"@andrewheberle/serverless-ssh-ca": "0.18.1"
+	},
+	"devDependencies": {
+		"esbuild": "0.28.2"
+	},
+	"engines": {
+		"node": ">=22.5.0"
+	}
+}

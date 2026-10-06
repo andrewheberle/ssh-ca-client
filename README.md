@@ -59,6 +59,26 @@ go install github.com/andrewheberle/ssh-ca-client/cmd/ssh-ca-client-cli@latest
 go install github.com/andrewheberle/ssh-ca-client/cmd/ssh-ca-client@latest
 ```
 
+#### Testing
+
+Unit tests have no external dependencies:
+
+```sh
+go test -race ./...
+```
+
+End-to-end tests run the client against the published
+[Serverless SSH CA](https://www.npmjs.com/package/@andrewheberle/serverless-ssh-ca)
+package and require Node.js 22.5 or later and npm:
+
+```sh
+go test -tags e2e -race ./internal/e2e/...
+```
+
+The CA's npm dependencies are installed on the first run, which requires
+network access. The version of the CA that is tested against is set in
+[internal/e2e/testdata/ca/package.json](internal/e2e/testdata/ca/package.json).
+
 ## Configuration
 
 The client requires the IdP and CA details set as follows:
