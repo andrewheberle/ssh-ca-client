@@ -56,10 +56,14 @@ Lifetime of SSH certificate (default 24h0m0s).
 The maximum life configured on the CA cannot be exceeded.
 
 `--log <path>`
-Log directory.
+Log directory, which contains `tray.log` (when logging to a file) and
+`crash.log`, which records any crashes and is kept across restarts.
 
-The default is `$HOME/.config/serverless-ssh-ca/log` (Linux/BSD/Darwin)
-or `%APPDATA%\Serverless SSH CA Client\log` (Windows).
+The default is `log` inside the state directory, which is
+`%LOCALAPPDATA%\Serverless SSH CA Client` (Windows),
+`$XDG_STATE_HOME/serverless-ssh-ca` or `$HOME/.local/state/serverless-ssh-ca`
+(Linux/BSD/Darwin) or `$SNAP_USER_COMMON` (snap). The lock file that prevents
+more than one instance running is also kept in the state directory.
 
 `--log.file`
 Log to a file (Windows only option).
@@ -87,6 +91,10 @@ The following changes affect users of previous versions:
   a new private key and then request a new certificate.
 * On Windows the configuration is read from the registry (or Group Policy)
   rather than a YAML configuration file.
+* Logs, and the lock file, are kept in the state directory described under
+  `--log` rather than `%APPDATA%\Serverless SSH CA Client` (Windows) or
+  `$HOME/.config/serverless-ssh-ca` (Linux). Logs in the previous location are
+  no longer used.
 
 ## ssh-ca-client
 

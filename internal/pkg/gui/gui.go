@@ -31,14 +31,8 @@ var resources embed.FS
 const EventLogSource = "Serverless SSH CA Client"
 
 func Execute(ctx context.Context, args []string) error {
-	// find config dirs
-	user, _, err := config.ConfigDirs()
-	if err != nil {
-		return err
-	}
-
-	// get log dir
-	logBase, err := config.LogDir()
+	// logs and the lock file are kept in the state directory
+	state, err := stateDir()
 	if err != nil {
 		return err
 	}
@@ -53,7 +47,7 @@ func Execute(ctx context.Context, args []string) error {
 
 	flags.DurationVar(&lifetime, "life", time.Hour*24, "Lifetime of SSH certificate")
 	flags.DurationVar(&renewAt, "renew", time.Hour, "Renew once remaining time gets below this value")
-	flags.StringVar(&logDir, "log", filepath.Join(logBase, "log"), "Log directory")
+	flags.StringVar(&logDir, "log", filepath.Join(state, "log"), "Log directory")
 	flags.StringVar(&configLocation, "config", config.ConfigPath(), "Configuration location")
 	flags.BoolVar(&showVersion, "version", false, "Show version and exit")
 	flags.BoolVar(&json, "json", false, "Enable JSON logging")
@@ -82,8 +76,8 @@ func Execute(ctx context.Context, args []string) error {
 		return fmt.Errorf("--renew cannot be larger than --life")
 	}
 
-	// make sure the user config location (for the lock file) exists
-	if err := os.MkdirAll(user, 0755); err != nil {
+	// make sure the state directory (for the lock file) exists
+	if err := os.MkdirAll(state, 0755); err != nil {
 		return err
 	}
 
@@ -92,15 +86,18 @@ func Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	// set location to write panics
+	// set location to write panics. This is appended to so a crash report is
+	// kept when the application is restarted after a crash.
 	crashFile := filepath.Join(logDir, "crash.log")
-	crash, err := os.Create(crashFile)
+	crash, err := os.OpenFile(crashFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
 	defer func() {
 		_ = crash.Close()
 	}()
+	// mark each start so a crash report can be matched to a run
+	_, _ = fmt.Fprintf(crash, "%s ssh-ca-client %s started\n", time.Now().Format(time.RFC3339), version.Version())
 	_ = debug.SetCrashOutput(crash, debug.CrashOptions{})
 
 	// set up logger
@@ -126,7 +123,7 @@ func Execute(ctx context.Context, args []string) error {
 	}
 
 	// make sure we are only running once
-	lockFile, err := singleinstance.CreateLockFile(filepath.Join(user, "tray.lock"))
+	lockFile, err := singleinstance.CreateLockFile(filepath.Join(state, "tray.lock"))
 	if err != nil {
 		logger.Error("could not take lock", "error", err)
 		return err

@@ -2,30 +2,12 @@ package config
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
 	"github.com/knadh/koanf/v2"
 	"github.com/pda0/koanf-winreg/v2/winreg"
 	"golang.org/x/sys/windows/registry"
 )
-
-func LogDir() (string, error) {
-	user, _, err := ConfigDirs()
-
-	return user, err
-}
-
-func ConfigDirs() (user, system string, err error) {
-	dir, err := os.UserConfigDir()
-	if err != nil {
-		return "", "", err
-	}
-
-	return filepath.Join(dir, names.AppName), filepath.Join(os.Getenv("ProgramData"), names.AppName), nil
-}
 
 // Registry hives accepted as the config location on Windows
 const (

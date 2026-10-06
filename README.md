@@ -322,7 +322,7 @@ The defaults are as follows:
 | `--life`          | `24h`                                      | `24h`                                  |
 | `--renew`         | `1h`                                       | `1h`                                   |
 | `--config`        | `HKLM`                                     | `/etc/serverless-ssh-ca/config.yml`    |
-| `--log`           | `%APPDATA%\Serverless SSH CA Client\log`   | `~/.config/serverless-ssh-ca/log`      |
+| `--log`           | `%LOCALAPPDATA%\Serverless SSH CA Client\log` | `~/.local/state/serverless-ssh-ca/log` |
 | `--log.file`      | `false`                                    | n/a (always logs to a file)            |
 | `--disable-proxy` | `false`                                    | n/a (always disabled)                  |
 | `--add-on-start`  | `true`                                     | `true`                                 |
@@ -330,6 +330,12 @@ The defaults are as follows:
 The `--addr` and `--user` options from previous versions have been removed. The
 listen address for the OIDC auth flow is taken from the configured
 `redirect_url` and user data is stored in the operating system keyring.
+
+On Linux the default log directory follows `$XDG_STATE_HOME` if set, and when
+running as a snap logs are written to `$SNAP_USER_COMMON`. Previous versions
+logged to `%APPDATA%\Serverless SSH CA Client\log` (Windows) or
+`~/.config/serverless-ssh-ca/log` (Linux), and any logs there are no longer
+used.
 
 # Attributions
 
