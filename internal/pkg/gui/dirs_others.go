@@ -16,12 +16,12 @@ import (
 func stateDir() (string, error) {
 	// are we running as a snap?
 	if dir := os.Getenv("SNAP_USER_COMMON"); dir != "" {
-		return dir, nil
+		return validatedStatePath(dir)
 	}
 
 	// relative paths are invalid and must be ignored
 	if dir := os.Getenv("XDG_STATE_HOME"); dir != "" && filepath.IsAbs(dir) {
-		return filepath.Join(dir, names.AppName), nil
+		return validatedStatePath(filepath.Join(dir, names.AppName))
 	}
 
 	home, err := os.UserHomeDir()
@@ -29,5 +29,5 @@ func stateDir() (string, error) {
 		return "", fmt.Errorf("could not find home directory: %w", err)
 	}
 
-	return filepath.Join(home, ".local", "state", names.AppName), nil
+	return validatedStatePath(filepath.Join(home, ".local", "state", names.AppName))
 }

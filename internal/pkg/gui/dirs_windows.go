@@ -18,5 +18,5 @@ func stateDir() (string, error) {
 		return "", fmt.Errorf("could not find local application data directory: %w", err)
 	}
 
-	return filepath.Join(dir, names.AppName), nil
+	return validatedStatePath(filepath.Join(dir, names.AppName))
 }
