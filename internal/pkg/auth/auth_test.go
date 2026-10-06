@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"bytes"
 	"context"
 	"crypto"
 	"crypto/rand"
@@ -11,12 +12,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"math/big"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -25,7 +28,7 @@ import (
 )
 
 const (
-	testClientID    = "test-client"
+	testClientID = "test-client"
 	// port 0 has the login server listen on any free port
 	testRedirectURL = "http://127.0.0.1:0/auth/callback"
 )
@@ -365,7 +368,7 @@ func awaitBrowser(t *testing.T, ch <-chan *browserResult) *browserResult {
 func newHandler(t *testing.T, idp *fakeIdP, opts ...OidcHandlerOption) *OidcHandler {
 	t.Helper()
 
-	h, err := NewOidcHandler(OidcConfig{
+	h, err := NewOidcHandler(context.Background(), OidcConfig{
 		ClientID:    testClientID,
 		Issuer:      idp.URL,
 		RedirectURL: testRedirectURL,
@@ -424,7 +427,7 @@ func TestNewOidcHandler(t *testing.T) {
 		}
 		for _, tt := range tests {
 			t.Run(tt.redirectURL, func(t *testing.T) {
-				h, err := NewOidcHandler(OidcConfig{
+				h, err := NewOidcHandler(context.Background(), OidcConfig{
 					ClientID:    testClientID,
 					Issuer:      idp.URL,
 					RedirectURL: tt.redirectURL,
@@ -440,7 +443,7 @@ func TestNewOidcHandler(t *testing.T) {
 	})
 
 	t.Run("custom login path", func(t *testing.T) {
-		h, err := NewOidcHandler(OidcConfig{
+		h, err := NewOidcHandler(context.Background(), OidcConfig{
 			ClientID:    testClientID,
 			Issuer:      idp.URL,
 			LoginPath:   "/custom/login",
@@ -467,8 +470,46 @@ func TestNewOidcHandler(t *testing.T) {
 		}
 	})
 
+	t.Run("with logger", func(t *testing.T) {
+		var buf bytes.Buffer
+		logger := slog.New(slog.NewTextHandler(&buf, nil))
+
+		h := newHandler(t, idp, WithLogger(logger), WithLoginTimeout(50*time.Millisecond))
+		if h.logger != logger {
+			t.Fatalf("logger was not set by WithLogger")
+		}
+
+		// the login URL is logged so it can be visited if no browser opens
+		stubOpenURL(t, func(string) error { return errors.New("no browser") })
+		_, _ = h.GetTokensContext(context.Background())
+
+		for _, want := range []string{"starting interactive login flow", "please visit URL manually", "url=http://127.0.0.1:", `error="no browser"`} {
+			if !strings.Contains(buf.String(), want) {
+				t.Errorf("log output does not contain %q:\n%s", want, buf.String())
+			}
+		}
+	})
+
+	t.Run("nil logger ignored", func(t *testing.T) {
+		h := newHandler(t, idp, WithLogger(nil))
+
+		if h.logger == nil {
+			t.Fatalf("logger = nil, want default logger")
+		}
+		// must not panic
+		h.logger.Info("test")
+	})
+
+	t.Run("idp requests use a client with a timeout", func(t *testing.T) {
+		h := newHandler(t, idp)
+
+		if h.httpClient == nil || h.httpClient.Timeout != idpTimeout {
+			t.Errorf("httpClient = %+v, want timeout %v", h.httpClient, idpTimeout)
+		}
+	})
+
 	t.Run("invalid issuer", func(t *testing.T) {
-		_, err := NewOidcHandler(OidcConfig{ClientID: testClientID, Issuer: idp.URL + "/missing"})
+		_, err := NewOidcHandler(context.Background(), OidcConfig{ClientID: testClientID, Issuer: idp.URL + "/missing"})
 		if err == nil {
 			t.Errorf("NewOidcHandler() error = nil, want error")
 		}
@@ -982,4 +1023,96 @@ func TestOidcHandler_GetTokensContext_Cache(t *testing.T) {
 			t.Errorf("tokens cached after failed login")
 		}
 	})
+}
+
+func TestNewOidcHandler_Discovery(t *testing.T) {
+	// hangingIssuer returns the URL of an issuer that never responds
+	hangingIssuer := func(t *testing.T) string {
+		t.Helper()
+
+		release := make(chan struct{})
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			select {
+			case <-release:
+			case <-r.Context().Done():
+			}
+		}))
+		t.Cleanup(srv.Close)
+		// cleanups run last-in first-out so the handler is released first
+		t.Cleanup(func() { close(release) })
+
+		return srv.URL
+	}
+
+	newWithContext := func(ctx context.Context, issuer string) (*OidcHandler, error) {
+		return NewOidcHandler(ctx, OidcConfig{
+			ClientID:    testClientID,
+			Issuer:      issuer,
+			RedirectURL: testRedirectURL,
+		})
+	}
+
+	t.Run("timeout", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+		defer cancel()
+
+		start := time.Now()
+		h, err := newWithContext(ctx, hangingIssuer(t))
+		if !errors.Is(err, context.DeadlineExceeded) {
+			t.Errorf("NewOidcHandler() error = %v, want %v", err, context.DeadlineExceeded)
+		}
+		if h != nil {
+			t.Errorf("NewOidcHandler() returned a handler on error")
+		}
+		if elapsed := time.Since(start); elapsed > time.Second {
+			t.Errorf("NewOidcHandler() took %v after timeout, want prompt return", elapsed)
+		}
+	})
+
+	t.Run("cancelled", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		if _, err := newWithContext(ctx, hangingIssuer(t)); !errors.Is(err, context.Canceled) {
+			t.Errorf("NewOidcHandler() error = %v, want %v", err, context.Canceled)
+		}
+	})
+
+	t.Run("error includes issuer", func(t *testing.T) {
+		issuer := newFakeIdP(t).URL + "/missing"
+
+		_, err := newWithContext(context.Background(), issuer)
+		if err == nil || !strings.Contains(err.Error(), issuer) {
+			t.Errorf("NewOidcHandler() error = %v, want it to contain %q", err, issuer)
+		}
+	})
+
+	t.Run("signing keys fetched after discovery context ends", func(t *testing.T) {
+		// the provider must not keep the discovery context, otherwise
+		// verifying tokens later fails once it is cancelled
+		idp := newFakeIdP(t)
+		ctx, cancel := context.WithCancel(context.Background())
+		h, err := newWithContext(ctx, idp.URL)
+		if err != nil {
+			t.Fatalf("NewOidcHandler() error = %v", err)
+		}
+		cancel()
+
+		callbacks := stubBrowser(t, idp, browser{}, nil)
+		if _, err := h.GetTokensContext(context.Background()); err != nil {
+			t.Fatalf("GetTokensContext() error = %v", err)
+		}
+		awaitBrowser(t, callbacks)
+	})
+}
+
+func TestOidcHandler_Callback_NoLoginInProgress_LogsWarning(t *testing.T) {
+	var buf bytes.Buffer
+	h := newHandler(t, newFakeIdP(t), WithLogger(slog.New(slog.NewTextHandler(&buf, nil))))
+
+	callback(h)
+
+	if !strings.Contains(buf.String(), "level=WARN") || !strings.Contains(buf.String(), "No login in progress") {
+		t.Errorf("log output = %q, want a warning about no login in progress", buf.String())
+	}
 }

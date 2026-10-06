@@ -53,6 +53,10 @@ const (
 	// serverShutdownTimeout is how long in-flight requests to the login HTTP
 	// server, such as the callback response, have to complete
 	serverShutdownTimeout = time.Second * 5
+
+	// idpTimeout limits each HTTP request to the IdP, such as provider
+	// discovery, fetching signing keys and token requests
+	idpTimeout = time.Second * 30
 )
 
 // openURL opens the login URL in the user's browser. This is a variable so
@@ -75,6 +79,7 @@ type OidcHandler struct {
 
 	// internal state
 	mu           sync.Mutex
+	httpClient   *http.Client
 	oauth2Config oauth2.Config
 	store        *sessions.CookieStore
 	verifier     *oidc.IDTokenVerifier
@@ -104,11 +109,18 @@ type OidcConfig struct {
 
 var _ Handler = &OidcHandler{}
 
-func NewOidcHandler(config OidcConfig, opts ...OidcHandlerOption) (*OidcHandler, error) {
+// NewOidcHandler creates a handler for the OIDC provider at config.Issuer.
+// Provider discovery is performed using ctx, so cancelling ctx aborts it, and
+// each request to the IdP is limited to 30 seconds.
+func NewOidcHandler(ctx context.Context, config OidcConfig, opts ...OidcHandlerOption) (*OidcHandler, error) {
+	// use a client with a timeout for all requests to the IdP. The provider
+	// keeps this client for fetching signing keys but not ctx itself.
+	client := &http.Client{Timeout: idpTimeout}
+
 	// set up oidc provider
-	provider, err := oidc.NewProvider(context.Background(), config.Issuer)
+	provider, err := oidc.NewProvider(oidc.ClientContext(ctx, client), config.Issuer)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not discover OIDC provider %q: %w", config.Issuer, err)
 	}
 
 	// default the login path to be /auth/login
@@ -131,6 +143,7 @@ func NewOidcHandler(config OidcConfig, opts ...OidcHandlerOption) (*OidcHandler,
 	// set defaults
 	h := &OidcHandler{
 		callbackPath: u.Path,
+		httpClient:   client,
 		listenAddr:   listenAddr,
 		logger:       slog.New(slog.DiscardHandler),
 		loginPath:    config.LoginPath,
@@ -204,13 +217,14 @@ func (h *OidcHandler) Login(w http.ResponseWriter, r *http.Request) {
 // waiting GetTokensContext call. Callbacks received when no interactive
 // login is in progress are rejected.
 func (h *OidcHandler) Callback(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	ctx := oidc.ClientContext(r.Context(), h.httpClient)
 	code := r.URL.Query().Get("code")
 
 	// only accept a callback while a login is waiting for one
 	if !h.loginPending() {
 		http.Error(w, "No login in progress", http.StatusBadRequest)
-		h.logger.Error("No login in progress")
+		// usually a stale or reloaded browser tab
+		h.logger.Warn("No login in progress")
 		return
 	}
 
@@ -444,7 +458,7 @@ func (h *OidcHandler) interactiveLogin(ctx context.Context) (loginResult, error)
 	h.logger.Info("starting interactive login flow", "url", loginURL)
 
 	if err := openURL(loginURL); err != nil {
-		h.logger.Error("could not open browser, please visit URL manually", "url", loginURL)
+		h.logger.Error("could not open browser, please visit URL manually", "url", loginURL, "error", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, h.loginTimeout)
@@ -474,7 +488,7 @@ func (h *OidcHandler) setTokens(tokens *Tokens, expiry time.Time) {
 // refresh obtains new tokens using the current refresh token. The returned
 // refresh token is the one to use next time, which may be unchanged.
 func (h *OidcHandler) refresh(ctx context.Context) (*Tokens, time.Time, string, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	ctx, cancel := context.WithTimeout(oidc.ClientContext(ctx, h.httpClient), time.Second*10)
 	defer cancel()
 
 	tokenSource := h.oauth2Config.TokenSource(ctx, &oauth2.Token{
@@ -545,6 +559,16 @@ func generatePKCE() (string, string) {
 }
 
 type OidcHandlerOption func(*OidcHandler)
+
+// WithLogger sets the logger used by the handler. The default discards all
+// log messages. A nil logger is ignored.
+func WithLogger(logger *slog.Logger) OidcHandlerOption {
+	return func(h *OidcHandler) {
+		if logger != nil {
+			h.logger = logger
+		}
+	}
+}
 
 // WithLoginTimeout sets how long GetTokensContext waits for the interactive
 // login flow to complete. The default is [DefaultLoginTimeout].

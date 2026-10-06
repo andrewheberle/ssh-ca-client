@@ -5,8 +5,7 @@ ssh-ca-client-cli-host - Request and renew host SSH certificates from the Server
 ## Synopsis
 
 ```sh
-ssh-ca-client-cli [global options] host [--addr <address>]
-                                        [--delay <duration>]
+ssh-ca-client-cli [global options] host [--delay <duration>]
                                         [--force]
                                         [--key <key(s)>]
                                         [--life <duration>]
@@ -25,6 +24,13 @@ When renewing using an existing certificate the principals of the certificate
 cannot be changed and the requested lifetime cannot be longer than the current
 certificate or the configured maximim of the CA.
 
+When an initial request requires an interactive login, a local web server is
+started on the host and port of the `redirect_url` from the configuration for
+the duration of the login. A single login is used for all requested keys.
+
+**Note:** The `--addr` option from previous versions has been removed as the
+listen address is now taken from the `redirect_url`, which must use `http`.
+
 As this command writes certificates issued for host SSH keys it needs write access to the directory holding the SSH host keys, which by default is `/etc/ssh` so this command should be run as `root`.
 
 ## Global Options
@@ -33,17 +39,14 @@ See [Options](ssh-ca-client-cli.md#options)
 
 ## Options
 
-`--addr <address>`
-The local listen address for the OIDC authentication process.
-
-The default is `localhost:3000`.
-
 `--debug`
 Enable debug logging/output.
 
 `--delay <duration>`
-The provided duration is used to add a delay between requests if more than one
-certificate is being requested in one operation.
+The provided duration is used to add a delay between requests to the CA if more
+than one certificate is being requested or renewed in one operation. Each delay
+is randomised to between 50% and 150% of this value. A value of `0` disables
+the delay.
 
 This is a `duration` so may be provided with the following units:
 
@@ -58,7 +61,8 @@ Force renewal of existing certificate(s) regardless of the current validity
 period left.
 
 `--key <key(s)>`
-A list of one or more host keys to request certificates for. This option may be
+A list of one or more host keys to request certificates for. ECDSA, Ed25519 and
+RSA (2048 bits or larger) keys are supported. This option may be
 passed a comma seperate list of keys or may be provided more than once so
 `--key /etc/ssh/ssh_host_ed25519_key,/etc/ssh/ssh_host_ecdsa_key`
 and `--key /etc/ssh/ssh_host_ed25519_key --key /etc/ssh/ssh_host_ecdsa_key` are
@@ -108,19 +112,19 @@ The default is `0.5`.
 * Request a certificate with three principals:
 
   ```sh
-  ssh-ca-client-cli host --prinicpals foo,foo.example.com,192.168.1.10
+  ssh-ca-client-cli host --principals foo,foo.example.com,192.168.1.10
   ```
 
 * Request a certificate with a short lifespan period:
 
   ```sh
-  ssh-ca-client-cli host --life 7d
+  ssh-ca-client-cli host --life 168h
   ```
 
 * Request a certificate for an ED25519 and ECDSA host key:
 
   ```sh
-  ssh-ca-client-cli host --keys /etc/ssh/ssh_host_ed25519_key --keys /etc/ssh/ssh_host_ecdsa_key
+  ssh-ca-client-cli host --key /etc/ssh/ssh_host_ed25519_key --key /etc/ssh/ssh_host_ecdsa_key
   ```
 
 * Renew existing certificates:
@@ -133,17 +137,18 @@ The default is `0.5`.
 
 The following configuration options, specified by the `--config` flag, must be set.
 
-The only optional value is `trusted_ca` however this it is strongly recommended to set this value.
+All values are required.
 
 ```yaml
 # The issuer, client_id, scopes and redirect_url must match your OIDC IdP
 issuer: https://idp.example.com/
 client_id: OIDC Client ID
 scopes: ["openid", "email", "profile", "offline_access"]
+# The redirect_url must use http as the client listens on this address during login
 redirect_url: http://localhost:3000/auth/callback
 # The CA URL must match the route the Worker CA is deployed to
 ca_url: https://ca.example.com/
-# Providing the SSH public key of the CA is optional but recommended to allow the client to validate issued certificates are from the expected CA
+# The SSH public key of the CA, used to validate issued certificates are from the expected CA
 trusted_ca: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMgJTsYW+tHl0lz/rnO8djbwq0B3uZ5sGugXU6Ha5S2rTdzMDgit2DO+hoivdT4I07rMrRtmFI179wUY06gIf00=
 ```
 

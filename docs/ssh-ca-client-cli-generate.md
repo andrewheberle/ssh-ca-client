@@ -1,6 +1,6 @@
 ## Name
 
-ssh-ca-client-cli-generate - Request and renew host SSH certificates from the Serverless SSH CA
+ssh-ca-client-cli-generate - Generate a user SSH private key
 
 ## Synopsis
 
@@ -12,8 +12,8 @@ ssh-ca-client-cli [global options] generate [--force]
 ## Description
 
 Generate a private key or overwrite an existing private key and store the
-resulting key in the user configuration location, specified by the `--user`
-global option.
+resulting key in the users keyring. Overwriting a private key also removes any
+existing certificate, as it is not valid for the new key.
 
 ## Global Options
 
@@ -40,12 +40,6 @@ Show what would occur but make no changes.
 
   ```sh
   ssh-ca-client-cli generate --force --dryrun
-  ```
-
-* Generate a new private key on a system without using the users keyring:
-
-  ```sh
-  ssh-ca-client-cli --keyfile ~/.config/serverless-ssh-ca/keyfile generate
   ```
 
 ## ssh-ca-client-cli

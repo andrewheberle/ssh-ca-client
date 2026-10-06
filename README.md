@@ -78,6 +78,13 @@ The default location for this config file is
 `/etc/serverless-ssh-ca/config.yml` on other plaforms however this may also be
 overidden using the `--config` command line flag.
 
+On Windows the CLI (`ssh-ca-client-cli`) reads its configuration from the
+registry instead, with `--config` selecting the hive to use: `HKLM` (the
+default) or `HKCU`.
+
+The `redirect_url` must use `http` as the client listens on this address during
+an interactive login.
+
 If one of the requested scopes is `offline_access` and this is supported by the
 OIDC IdP then the client can use the provided refresh token for subsequent
 certificate renewals.
@@ -85,11 +92,15 @@ certificate renewals.
 On Windows these system level options can be set using Group Policy via the
 ADMX/ADML files in the `policy` sub-directory.
 
-The client saves persistent user data such as the users private key, refresh
+The GUI saves persistent user data such as the users private key, refresh
 token (if available) and certificate into a user specific configuration file,
 which by default is `%APPDATA%\Serverless SSH CA Client\config.yml` on Windows
 and `$HOME/.config/serverless-ssh-ca/user.yaml` on other platforms however this
 can be overidden using the `--user` command line flag.
+
+The CLI stores this user data in the operating system keyring (Windows
+Credential Manager, macOS Keychain or a Secret Service provider such as
+`gnome-keyring` on Linux/BSD) instead and does not support the `--user` option.
 
 This allows the use of a shared/system configuration file that defines the
 OIDC and SSH CA configuration with user specific data kept seperate.
@@ -114,26 +125,19 @@ above.
 
 ### Configuration Privacy/Security
 
-On Windows, sensitive data such as the users SSH private key and the OIDC refresh
-token are encrypted using the Windows Data Protection API (DPAPI), while on Linux
-a random key is generated and saved in the users `login` keyring which is then
-used to encrypt this data using AES-GCM.
+For the GUI, on Windows sensitive data such as the users SSH private key and the
+OIDC refresh token are encrypted using the Windows Data Protection API (DPAPI),
+while on Linux a random key is generated and saved in the users `login` keyring
+which is then used to encrypt this data using AES-GCM.
 
 If this random key is lost or deleted this data cannot be recovered so the user
-must regenerate their private key by either deleting the user data manually or
-using the CLI and request a new certificate.
+must regenerate their private key by deleting the user data manually and
+request a new certificate.
 
-Alternatively for systems that do not run a secret service like
-`gnome-keyring-daemon` it is possible to provide the `--keyfile <path>` option
-to the CLI which will store the random key in the specified path.
-
-**Note:** There is no migration process included between the default
-DPAPI/keyring protection options and the `--keyfile` option. In this case you
-must regenerate your private key and request a new certificate.
-
-On systems that use both the GUI and CLI, this will introduce a situation where
-neither coexist with each other as the GUI does **not** support the `--keyfile`
-option as this feature is primarily for CLI based systems.
+The CLI stores this data directly in the operating system keyring, so a
+keyring/secret service must be available to use the `login`, `generate` and
+`show` sub-commands. The `--keyfile` option from previous versions of the CLI
+has been removed. The `host` sub-command does not use the keyring.
 
 
 ## Requirements
@@ -165,12 +169,12 @@ ssh-ca-client-cli generate
 #### Show Existing Key/Public Key/Certificate
 
 ```sh
-ssh-ca-client-cli show [--private|--certificate|--public|--status]
+ssh-ca-client-cli show [--private|--certificate [--git]|--public]
 ```
 
 By default the client only displays the users public key, however the
-`--private` and `--certificate` options may be provided or the `--status`
-option can be passed to display a summary of the users key/certificate.
+`--private` and `--certificate` options may be provided. The `--git` option
+outputs the certificate in a format suitable for signing git commits.
 
 #### Requesting a Certificate
 
@@ -269,13 +273,15 @@ The `host` sub-command supports the following command-line options:
 | Flag        | Type       | Default | Description |
 |---|---|---|---|
 | `--life` | `time.Duration` | 30d | Lifetime of certificate |
-| `--delay` | `time.Duration` | 250ms | Delay between multiple key renewals
-| `--key` | `[]string` | /etc/ssh/ssh_host_rsa_key,/etc/ssh/ssh_host_ecdsa_key,/etc/ssh/ssh_host_ed25519_key | Key(s) to request/renew certificates for (may be specified multiple times or as a comma seperated string) |
+| `--delay` | `time.Duration` | 250ms | Delay between requests/renewals for multiple keys (randomised between 50% and 150%) |
+| `--key` | `[]string` | /etc/ssh/ssh_host_ed25519_key,/etc/ssh/ssh_host_ecdsa_key,/etc/ssh/ssh_host_rsa_key | Key(s) to request/renew certificates for (may be specified multiple times or as a comma seperated string). ECDSA, Ed25519 and RSA (2048 bits or larger) keys are supported |
 | `--principals` | `[]string` | `hostname` | Principal(s) to request on certificate (may be specified multiple times or as a comma seperated string) |
-| `--addr` | `string` | localhost:3000 | Listen address for OIDC auth flow |
 | `--renew` | `bool` | false | Attempt to renew existing certificate(s) for the specified key(s) |
 | `--force` | `bool` | false | Force renewal of certificate(s) regardless of remaining validity |
 | `--renewat` | `float64` | 0.5 | Renew at this fraction of remaining validity for existing certificate(s) |
+
+The `--addr` option from previous versions has been removed as the listen
+address for the OIDC auth flow is now taken from the configured `redirect_url`.
 
 #### Example
 

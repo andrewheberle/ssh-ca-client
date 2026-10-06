@@ -73,12 +73,18 @@ func (c *loginCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 		return err
 	}
 
-	auth, err := auth.NewOidcHandler(auth.OidcConfig{
+	// the command context is cancelled on CTRL-C
+	ctx := this.CobraCommand.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	auth, err := auth.NewOidcHandler(ctx, auth.OidcConfig{
 		ClientID:    config.ClientID,
 		Issuer:      config.Issuer,
 		RedirectURL: config.RedirectURL,
 		Scopes:      config.Scopes,
-	}, auth.WithTokenStore(ts))
+	}, auth.WithTokenStore(ts), auth.WithLogger(c.logger))
 	if err != nil {
 		return err
 	}
