@@ -6,15 +6,16 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 
 ## Repository layout
 - `cmd/` - entrypoints for commands; should only include minimal code then call Execute of the relevant package
+- `deb/` - Debian package specific files
 - `docs/` - documentation of commands
 - `internal/pkg/` - application packages; not importable by other modules
 - `internal/pkg/api/` - generated OpenAPI primitives to interact with the server implementation. Do not edit `api.gen.go` or `openapi.json`.
 - `internal/pkg/cli/` - primary package used by the CLI
 - `internal/pkg/gui/` - primary package used by the GUI
 - `pkg/` - application packages; importable by others
-- `policy/` - Group Policy Object's for Windows to manage GUI on Windows
+- `policy/` - Group Policy Object's for Windows to manage GUI on Windows; included in MSI build
 - `snap/` - Snap specific scripts and files
-- `systemd/` - example systemd units for host key renewals
+- `systemd/` - Systemd units for host key renewals; included in APT package
 - `templates/` - templates used for MSI build
 
 ## Build, test, lint
