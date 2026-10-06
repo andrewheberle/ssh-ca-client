@@ -86,10 +86,12 @@ func Set(service, user, value string) error {
 		return deleteParts(service, user, 1)
 	}
 
-	parts := split(value)
-	if len(parts) > maxParts {
+	// reject values needing too many parts before splitting them
+	if len(value) > maxParts*ChunkSize {
 		return fmt.Errorf("%w: %d bytes", ErrTooLarge, len(value))
 	}
+
+	parts := split(value)
 
 	// write the parts before the header so the value is never read with an
 	// incomplete set of parts
@@ -171,7 +173,7 @@ func deleteParts(service, user string, from int) error {
 
 // split returns value in parts of at most ChunkSize bytes
 func split(value string) []string {
-	parts := make([]string, 0, len(value)/ChunkSize+1)
+	var parts []string
 	for len(value) > ChunkSize {
 		parts = append(parts, value[:ChunkSize])
 		value = value[ChunkSize:]

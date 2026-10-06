@@ -214,6 +214,51 @@ func TestSet_Errors(t *testing.T) {
 		}
 	})
 
+	t.Run("largest value", func(t *testing.T) {
+		fake := useFake(t)
+
+		want := value(maxParts * ChunkSize)
+		if err := Set(service, user, want); err != nil {
+			t.Fatalf("Set() error = %v", err)
+		}
+		if fake.count() != 1+maxParts {
+			t.Errorf("stored %d entries, want %d", fake.count(), 1+maxParts)
+		}
+
+		got, err := Get(service, user)
+		if err != nil {
+			t.Fatalf("Get() error = %v", err)
+		}
+		if got != want {
+			t.Errorf("Get() did not return the stored value")
+		}
+	})
+
+	t.Run("too large keeps existing value", func(t *testing.T) {
+		fake := useFake(t)
+
+		if err := Set(service, user, value(5000)); err != nil {
+			t.Fatalf("Set() error = %v", err)
+		}
+		before := fake.count()
+
+		if err := Set(service, user, value(maxParts*ChunkSize+1)); !errors.Is(err, ErrTooLarge) {
+			t.Fatalf("Set() error = %v, want %v", err, ErrTooLarge)
+		}
+
+		// nothing is written or removed for a rejected value
+		if fake.count() != before {
+			t.Errorf("stored %d entries, want %d", fake.count(), before)
+		}
+		got, err := Get(service, user)
+		if err != nil {
+			t.Fatalf("Get() error = %v", err)
+		}
+		if got != value(5000) {
+			t.Errorf("Get() did not return the existing value")
+		}
+	})
+
 	t.Run("part fails keeps existing value", func(t *testing.T) {
 		fake := useFake(t)
 
