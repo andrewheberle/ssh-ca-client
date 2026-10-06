@@ -8,8 +8,11 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// ParseCert will parse the provided byte slice (in OpenSSH certficate format)
+// ParseCert will parse the provided byte slice (in OpenSSH certificate format)
 // and return a [*ssh.Certificate].
+//
+// Only the first certificate in certBytes is parsed and any remaining data
+// is ignored.
 //
 // Any parsing errors will result in a nil [*ssh.Certificate] returned along
 // with the error.
