@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"time"
 
 	"github.com/andrewheberle/simplecommand"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/keyringstore"
@@ -21,17 +20,6 @@ type showCommand struct {
 	logger *slog.Logger
 
 	*simplecommand.Command
-}
-
-type showStatusJson struct {
-	PrivateKey  string                     `json:"private_key,omitempty"`
-	Certificate *showStatusCertificateJson `json:"certificate,omitempty"`
-}
-
-type showStatusCertificateJson struct {
-	Status   string        `json:"status"`
-	Expiry   time.Time     `json:"valid_until"`
-	TimeLeft time.Duration `json:"time_left"`
 }
 
 func (c *showCommand) Init(cd *simplecobra.Commandeer) error {

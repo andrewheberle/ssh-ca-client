@@ -295,7 +295,7 @@ func (b browser) completeLogin(idp *fakeIdP, loginURL string) *browserResult {
 	if err != nil {
 		return &browserResult{Err: fmt.Errorf("callback request failed: %w", err)}
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 
 	body, _ := io.ReadAll(res.Body)
 
@@ -557,7 +557,7 @@ func TestOidcHandler_GetTokensContext_Interactive(t *testing.T) {
 
 			// the login server is stopped once the login completes
 			if res, err := http.Get(res.LoginURL); err == nil {
-				res.Body.Close()
+				func() { _ = res.Body.Close() }()
 				t.Errorf("login server still running after GetTokens()")
 			}
 
@@ -612,7 +612,7 @@ func TestOidcHandler_GetTokensContext_NoCallback(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not listen: %v", err)
 		}
-		defer ln.Close()
+		defer func() { _ = ln.Close() }()
 		h.listenAddr = ln.Addr().String()
 
 		stubOpenURL(t, func(string) error {

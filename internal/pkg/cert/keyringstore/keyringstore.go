@@ -109,7 +109,7 @@ func (s *Storage) AddToAgent() error {
 	if err != nil {
 		return fmt.Errorf("%w: could not connect to agent: %w", ErrAddingToAgent, err)
 	}
-	defer closeAgent()
+	defer func() { _ = closeAgent() }()
 
 	if err := a.Add(sshcert.AddedKey(key, cert)); err != nil {
 		return fmt.Errorf("%w: %w", ErrAddingToAgent, err)

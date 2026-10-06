@@ -61,7 +61,7 @@ func serveAgentAt(t *testing.T, socket string) *testAgent {
 			a.active.Add(1)
 			go func() {
 				defer a.active.Add(-1)
-				defer conn.Close()
+				defer func() { _ = conn.Close() }()
 				_ = agent.ServeAgent(a.Agent, conn)
 			}()
 		}
