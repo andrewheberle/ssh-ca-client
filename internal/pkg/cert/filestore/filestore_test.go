@@ -11,6 +11,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -230,7 +231,7 @@ func TestStorage_GeneratePrivateKey(t *testing.T) {
 				t.Fatalf("key file not written: %v", err)
 			}
 
-			key, err := sshkey.ParseKey(k)
+			key, err := parseECDSAKey(k)
 			if err != nil {
 				t.Fatalf("stored key could not be parsed: %v", err)
 			}
@@ -422,7 +423,7 @@ func TestStorage_PublicKey(t *testing.T) {
 		if err != nil {
 			t.Fatalf("ReadFile() error = %v", err)
 		}
-		key, err := sshkey.ParseKey(k)
+		key, err := parseECDSAKey(k)
 		if err != nil {
 			t.Fatalf("ParseKey() error = %v", err)
 		}
@@ -649,7 +650,7 @@ func TestStorage_PrivateKey(t *testing.T) {
 		if err != nil {
 			t.Fatalf("PrivateKeyBytes() error = %v", err)
 		}
-		parsed, err := sshkey.ParseKey(gotBytes)
+		parsed, err := parseECDSAKey(gotBytes)
 		if err != nil {
 			t.Fatalf("PrivateKeyBytes() could not be parsed: %v", err)
 		}
@@ -1292,4 +1293,20 @@ func TestStorage_GeneratePrivateKey_KeyType(t *testing.T) {
 			t.Errorf("HasPrivateKey() = true after failed generation")
 		}
 	})
+}
+
+// parseECDSAKey parses an ECDSA private key, the type GeneratePrivateKey
+// creates by default
+func parseECDSAKey(pemBytes []byte) (*ecdsa.PrivateKey, error) {
+	key, err := sshkey.ParsePrivateKey(pemBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	k, ok := key.(*ecdsa.PrivateKey)
+	if !ok {
+		return nil, fmt.Errorf("key is %T, want *ecdsa.PrivateKey", key)
+	}
+
+	return k, nil
 }

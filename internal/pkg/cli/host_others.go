@@ -16,8 +16,16 @@ import (
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/filestore"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/host"
 	"github.com/bep/simplecobra"
+)
+
+const (
+	// defaultHostDelay is the default delay between requests for multiple keys
+	defaultHostDelay = time.Millisecond * 250
+
+	// defaultHostRenewAt is the default fraction of a certificates lifetime
+	// after which it is renewed
+	defaultHostRenewAt = 0.5
 )
 
 type hostCommand struct {
@@ -55,14 +63,14 @@ func (c *hostCommand) Init(cd *simplecobra.Commandeer) error {
 	}
 
 	cmd := cd.CobraCommand
-	cmd.Flags().DurationVar(&c.lifetime, "life", host.DefaultLifetime, "Lifetime of SSH certificate")
-	cmd.Flags().DurationVar(&c.delay, "delay", host.DefaultDelay, "Delay between requests/renewals (randomised between 50% and 150%)")
+	cmd.Flags().DurationVar(&c.lifetime, "life", cert.DefaultHostCertificateLifetime, "Lifetime of SSH certificate")
+	cmd.Flags().DurationVar(&c.delay, "delay", defaultHostDelay, "Delay between requests/renewals (randomised between 50% and 150%)")
 	cmd.Flags().StringSliceVar(&c.keypath, "key", []string{"/etc/ssh/ssh_host_ed25519_key", "/etc/ssh/ssh_host_ecdsa_key", "/etc/ssh/ssh_host_rsa_key"}, "Path to private key(s)")
 	cmd.Flags().StringSliceVar(&c.principals, "principals", principals, "Principals to add to the host certificate request")
 	cmd.Flags().BoolVar(&c.renew, "renew", false, "Renew existing certificate")
 	cmd.MarkFlagsMutuallyExclusive("renew", "principals")
-	cmd.Flags().BoolVar(&c.force, "force", false, fmt.Sprintf("Force renewal even if current certificate has more than %0.1f%% validity left", host.DefaultRenewAt*100.0))
-	cmd.Flags().Float64Var(&c.renewat, "renewat", host.DefaultRenewAt, "Renew at fraction of lifetime")
+	cmd.Flags().BoolVar(&c.force, "force", false, fmt.Sprintf("Force renewal even if current certificate has more than %0.1f%% validity left", defaultHostRenewAt*100.0))
+	cmd.Flags().Float64Var(&c.renewat, "renewat", defaultHostRenewAt, "Renew at fraction of lifetime")
 	cmd.MarkFlagsMutuallyExclusive("force", "renewat")
 
 	return nil
@@ -95,13 +103,7 @@ func (c *hostCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 		return err
 	}
 
-	// the command context is cancelled on CTRL-C
-	ctx := this.CobraCommand.Context()
-	if ctx == nil {
-		ctx = context.Background()
-	}
-
-	auth, err := auth.NewOidcHandler(ctx, auth.OidcConfig{
+	auth, err := auth.NewOidcHandler(auth.OidcConfig{
 		ClientID:    config.ClientID,
 		Issuer:      config.Issuer,
 		RedirectURL: config.RedirectURL,

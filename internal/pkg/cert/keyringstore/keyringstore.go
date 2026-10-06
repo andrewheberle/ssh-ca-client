@@ -11,11 +11,11 @@ import (
 	"sync"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/keyringutil"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshcert"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
 	"github.com/andrewheberle/sshagent"
-	"github.com/zalando/go-keyring"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
 )
@@ -169,14 +169,14 @@ func (s *Storage) GeneratePrivateKey() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if err := keyring.Set(storeKeyService, s.user, string(pemBytes)); err != nil {
+	if err := keyringutil.Set(storeKeyService, s.user, string(pemBytes)); err != nil {
 		return fmt.Errorf("could not set key in keyring: %w", err)
 	}
 
 	// delete any existing cert as this is invalid after the key has been updated
-	if err := keyring.Delete(storeCertService, s.user); err != nil {
-		// any error here except keyring.ErrNotFound is bad
-		if !errors.Is(err, keyring.ErrNotFound) {
+	if err := keyringutil.Delete(storeCertService, s.user); err != nil {
+		// any error here except keyringutil.ErrNotFound is bad
+		if !errors.Is(err, keyringutil.ErrNotFound) {
 			return fmt.Errorf("could not delete certificate: %w", err)
 		}
 	}
@@ -278,7 +278,7 @@ func (s *Storage) SaveCertificate(c *ssh.Certificate) error {
 
 	certBytes := ssh.MarshalAuthorizedKey(c)
 
-	return keyring.Set(storeCertService, s.user, string(certBytes))
+	return keyringutil.Set(storeCertService, s.user, string(certBytes))
 }
 
 // Returns a [ssh.Signer] for the current private key in the SSH Agent.
@@ -293,7 +293,7 @@ func (s *Storage) Signer() (ssh.Signer, error) {
 // key returns the parsed private key and the raw stored key. ECDSA, Ed25519
 // and RSA keys are supported.
 func (s *Storage) key() (crypto.Signer, []byte, error) {
-	v, err := keyring.Get(storeKeyService, s.user)
+	v, err := keyringutil.Get(storeKeyService, s.user)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -322,7 +322,7 @@ func (s *Storage) signer() (ssh.Signer, error) {
 }
 
 func (s *Storage) cert() (*ssh.Certificate, []byte, error) {
-	v, err := keyring.Get(storeCertService, s.user)
+	v, err := keyringutil.Get(storeCertService, s.user)
 	if err != nil {
 		return nil, nil, err
 	}

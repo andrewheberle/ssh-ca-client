@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/client"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/httpclient"
 	sshkrl "github.com/forfuncsake/krl"
 	"github.com/hiddeco/sshsig"
 	"golang.org/x/crypto/ssh"
@@ -26,7 +26,7 @@ var (
 
 func Get(server string, certificatetype api.GetCertificateTypeKrlParamsCertificateType, opts ...api.ClientOption) (*Response, error) {
 	if opts == nil {
-		opts = append(opts, api.WithHTTPClient(client.NewHttpClient()))
+		opts = append(opts, api.WithHTTPClient(httpclient.New()))
 	}
 	client, err := api.NewClientWithResponses(server, opts...)
 	if err != nil {

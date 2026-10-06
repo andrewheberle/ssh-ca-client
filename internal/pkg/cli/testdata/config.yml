@@ -1,0 +1,8 @@
+# A valid configuration for tests. Nothing listens on these addresses as the
+# tests never contact the IdP or CA.
+issuer: http://127.0.0.1:1/
+client_id: test-client
+scopes: ["openid"]
+redirect_url: http://127.0.0.1:1/auth/callback
+ca_url: http://127.0.0.1:1/
+trusted_ca: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMgJTsYW+tHl0lz/rnO8djbwq0B3uZ5sGugXU6Ha5S2rTdzMDgit2DO+hoivdT4I07rMrRtmFI179wUY06gIf00=

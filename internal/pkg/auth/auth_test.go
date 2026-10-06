@@ -21,10 +21,12 @@ import (
 	"net/url"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"golang.org/x/oauth2"
 )
 
 const (
@@ -50,6 +52,10 @@ type fakeIdP struct {
 
 	key      *rsa.PrivateKey
 	otherKey *rsa.PrivateKey
+
+	// discoveryDown makes discovery fail as if the IdP was unavailable
+	discoveryDown atomic.Bool
+	discoveries   atomic.Int32
 
 	mu              sync.Mutex
 	code            grant
@@ -91,6 +97,12 @@ func newRSAKey(t *testing.T) *rsa.PrivateKey {
 }
 
 func (idp *fakeIdP) discovery(w http.ResponseWriter, r *http.Request) {
+	idp.discoveries.Add(1)
+	if idp.discoveryDown.Load() {
+		http.Error(w, "unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
 	writeJSON(w, http.StatusOK, map[string]any{
 		"issuer":                                idp.URL,
 		"authorization_endpoint":                idp.URL + "/authorize",
@@ -368,7 +380,7 @@ func awaitBrowser(t *testing.T, ch <-chan *browserResult) *browserResult {
 func newHandler(t *testing.T, idp *fakeIdP, opts ...OidcHandlerOption) *OidcHandler {
 	t.Helper()
 
-	h, err := NewOidcHandler(context.Background(), OidcConfig{
+	h, err := NewOidcHandler(OidcConfig{
 		ClientID:    testClientID,
 		Issuer:      idp.URL,
 		RedirectURL: testRedirectURL,
@@ -392,6 +404,16 @@ func TestNewOidcHandler(t *testing.T) {
 		}
 		if h.oauth2Config.ClientID != testClientID {
 			t.Errorf("ClientID = %q, want %q", h.oauth2Config.ClientID, testClientID)
+		}
+		// the IdP is not contacted until tokens are needed
+		if h.verifier != nil || h.oauth2Config.Endpoint.TokenURL != "" {
+			t.Errorf("provider discovered by NewOidcHandler()")
+		}
+		h.mu.Lock()
+		err := h.discover(context.Background())
+		h.mu.Unlock()
+		if err != nil {
+			t.Fatalf("discover() error = %v", err)
 		}
 		if h.oauth2Config.Endpoint.TokenURL != idp.URL+"/token" {
 			t.Errorf("TokenURL = %q, want %q", h.oauth2Config.Endpoint.TokenURL, idp.URL+"/token")
@@ -427,7 +449,7 @@ func TestNewOidcHandler(t *testing.T) {
 		}
 		for _, tt := range tests {
 			t.Run(tt.redirectURL, func(t *testing.T) {
-				h, err := NewOidcHandler(context.Background(), OidcConfig{
+				h, err := NewOidcHandler(OidcConfig{
 					ClientID:    testClientID,
 					Issuer:      idp.URL,
 					RedirectURL: tt.redirectURL,
@@ -443,7 +465,7 @@ func TestNewOidcHandler(t *testing.T) {
 	})
 
 	t.Run("custom login path", func(t *testing.T) {
-		h, err := NewOidcHandler(context.Background(), OidcConfig{
+		h, err := NewOidcHandler(OidcConfig{
 			ClientID:    testClientID,
 			Issuer:      idp.URL,
 			LoginPath:   "/custom/login",
@@ -508,8 +530,8 @@ func TestNewOidcHandler(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid issuer", func(t *testing.T) {
-		_, err := NewOidcHandler(context.Background(), OidcConfig{ClientID: testClientID, Issuer: idp.URL + "/missing"})
+	t.Run("missing issuer", func(t *testing.T) {
+		_, err := NewOidcHandler(OidcConfig{ClientID: testClientID, RedirectURL: testRedirectURL})
 		if err == nil {
 			t.Errorf("NewOidcHandler() error = nil, want error")
 		}
@@ -1025,7 +1047,7 @@ func TestOidcHandler_GetTokensContext_Cache(t *testing.T) {
 	})
 }
 
-func TestNewOidcHandler_Discovery(t *testing.T) {
+func TestOidcHandler_Discovery(t *testing.T) {
 	// hangingIssuer returns the URL of an issuer that never responds
 	hangingIssuer := func(t *testing.T) string {
 		t.Helper()
@@ -1044,46 +1066,136 @@ func TestNewOidcHandler_Discovery(t *testing.T) {
 		return srv.URL
 	}
 
-	newWithContext := func(ctx context.Context, issuer string) (*OidcHandler, error) {
-		return NewOidcHandler(ctx, OidcConfig{
+	// newForIssuer creates a handler for issuer, which must not contact it
+	newForIssuer := func(t *testing.T, issuer string, opts ...OidcHandlerOption) *OidcHandler {
+		t.Helper()
+
+		h, err := NewOidcHandler(OidcConfig{
 			ClientID:    testClientID,
 			Issuer:      issuer,
 			RedirectURL: testRedirectURL,
-		})
+		}, opts...)
+		if err != nil {
+			t.Fatalf("NewOidcHandler() error = %v", err)
+		}
+
+		return h
 	}
 
+	// a non-interactive context avoids starting a login if discovery works
+	nonInteractive := func(ctx context.Context) context.Context { return NonInteractive(ctx) }
+
+	t.Run("handler created while idp unreachable", func(t *testing.T) {
+		// nothing listens on the issuer address
+		idp := newFakeIdP(t)
+		idp.Close()
+
+		h := newForIssuer(t, idp.URL)
+
+		_, err := h.GetTokensContext(nonInteractive(context.Background()))
+		if err == nil || !strings.Contains(err.Error(), "could not discover OIDC provider") {
+			t.Errorf("GetTokensContext() error = %v, want discovery error", err)
+		}
+		if errors.Is(err, ErrInteractiveLoginRequired) {
+			t.Errorf("GetTokensContext() error = %v, want a discovery error not %v", err, ErrInteractiveLoginRequired)
+		}
+	})
+
+	t.Run("discovery retried until idp available", func(t *testing.T) {
+		idp := newFakeIdP(t)
+		idp.discoveryDown.Store(true)
+		idp.refresh.refreshToken = "refresh-new"
+
+		h := newForIssuer(t, idp.URL)
+		h.refreshToken = "refresh-old"
+		if got := idp.discoveries.Load(); got != 0 {
+			t.Fatalf("NewOidcHandler() made %d discovery requests, want 0", got)
+		}
+
+		if _, err := h.GetTokensContext(nonInteractive(context.Background())); err == nil {
+			t.Fatalf("GetTokensContext() error = nil while idp unavailable")
+		}
+
+		// the refresh token is kept while the idp is unavailable
+		if h.refreshToken != "refresh-old" {
+			t.Errorf("refreshToken = %q, want %q", h.refreshToken, "refresh-old")
+		}
+
+		idp.discoveryDown.Store(false)
+		tokens, err := h.GetTokensContext(nonInteractive(context.Background()))
+		if err != nil {
+			t.Fatalf("GetTokensContext() error = %v", err)
+		}
+		if want := idp.lastIssued(); *tokens != want {
+			t.Errorf("GetTokensContext() = %+v, want %+v", *tokens, want)
+		}
+
+		// discovery is not repeated once it succeeds
+		h.mu.Lock()
+		h.tokens = nil
+		h.mu.Unlock()
+		if _, err := h.GetTokensContext(nonInteractive(context.Background())); err != nil {
+			t.Fatalf("GetTokensContext() error = %v", err)
+		}
+		if got := idp.discoveries.Load(); got != 2 {
+			t.Errorf("discovery requests = %d, want 2", got)
+		}
+	})
+
+	t.Run("cached tokens do not need the idp", func(t *testing.T) {
+		idp := newFakeIdP(t)
+		h := newForIssuer(t, idp.URL)
+		callbacks := stubBrowser(t, idp, browser{}, nil)
+
+		want, err := h.GetTokensContext(context.Background())
+		if err != nil {
+			t.Fatalf("GetTokensContext() error = %v", err)
+		}
+		awaitBrowser(t, callbacks)
+
+		idp.Close()
+		got, err := h.GetTokensContext(nonInteractive(context.Background()))
+		if err != nil {
+			t.Fatalf("GetTokensContext() error = %v", err)
+		}
+		if *got != *want {
+			t.Errorf("GetTokensContext() = %+v, want %+v", *got, *want)
+		}
+	})
+
 	t.Run("timeout", func(t *testing.T) {
+		h := newForIssuer(t, hangingIssuer(t))
+
 		ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
 		defer cancel()
 
 		start := time.Now()
-		h, err := newWithContext(ctx, hangingIssuer(t))
-		if !errors.Is(err, context.DeadlineExceeded) {
-			t.Errorf("NewOidcHandler() error = %v, want %v", err, context.DeadlineExceeded)
-		}
-		if h != nil {
-			t.Errorf("NewOidcHandler() returned a handler on error")
+		if _, err := h.GetTokensContext(nonInteractive(ctx)); !errors.Is(err, context.DeadlineExceeded) {
+			t.Errorf("GetTokensContext() error = %v, want %v", err, context.DeadlineExceeded)
 		}
 		if elapsed := time.Since(start); elapsed > time.Second {
-			t.Errorf("NewOidcHandler() took %v after timeout, want prompt return", elapsed)
+			t.Errorf("GetTokensContext() took %v after timeout, want prompt return", elapsed)
 		}
 	})
 
 	t.Run("cancelled", func(t *testing.T) {
+		h := newForIssuer(t, hangingIssuer(t))
+
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
 
-		if _, err := newWithContext(ctx, hangingIssuer(t)); !errors.Is(err, context.Canceled) {
-			t.Errorf("NewOidcHandler() error = %v, want %v", err, context.Canceled)
+		if _, err := h.GetTokensContext(nonInteractive(ctx)); !errors.Is(err, context.Canceled) {
+			t.Errorf("GetTokensContext() error = %v, want %v", err, context.Canceled)
 		}
 	})
 
 	t.Run("error includes issuer", func(t *testing.T) {
 		issuer := newFakeIdP(t).URL + "/missing"
+		h := newForIssuer(t, issuer)
 
-		_, err := newWithContext(context.Background(), issuer)
+		_, err := h.GetTokensContext(nonInteractive(context.Background()))
 		if err == nil || !strings.Contains(err.Error(), issuer) {
-			t.Errorf("NewOidcHandler() error = %v, want it to contain %q", err, issuer)
+			t.Errorf("GetTokensContext() error = %v, want it to contain %q", err, issuer)
 		}
 	})
 
@@ -1091,10 +1203,14 @@ func TestNewOidcHandler_Discovery(t *testing.T) {
 		// the provider must not keep the discovery context, otherwise
 		// verifying tokens later fails once it is cancelled
 		idp := newFakeIdP(t)
+		h := newForIssuer(t, idp.URL)
+
 		ctx, cancel := context.WithCancel(context.Background())
-		h, err := newWithContext(ctx, idp.URL)
+		h.mu.Lock()
+		err := h.discover(ctx)
+		h.mu.Unlock()
 		if err != nil {
-			t.Fatalf("NewOidcHandler() error = %v", err)
+			t.Fatalf("discover() error = %v", err)
 		}
 		cancel()
 
@@ -1114,5 +1230,145 @@ func TestOidcHandler_Callback_NoLoginInProgress_LogsWarning(t *testing.T) {
 
 	if !strings.Contains(buf.String(), "level=WARN") || !strings.Contains(buf.String(), "No login in progress") {
 		t.Errorf("log output = %q, want a warning about no login in progress", buf.String())
+	}
+}
+
+func TestNonInteractive(t *testing.T) {
+	if IsNonInteractive(context.Background()) {
+		t.Errorf("IsNonInteractive(Background) = true, want false")
+	}
+
+	ctx := NonInteractive(context.Background())
+	if !IsNonInteractive(ctx) {
+		t.Errorf("IsNonInteractive(NonInteractive()) = false, want true")
+	}
+
+	// the marker is kept by derived contexts
+	derived, cancel := context.WithTimeout(ctx, time.Minute)
+	defer cancel()
+	if !IsNonInteractive(derived) {
+		t.Errorf("IsNonInteractive(derived) = false, want true")
+	}
+}
+
+func TestOidcHandler_GetTokensContext_NonInteractive(t *testing.T) {
+	// failBrowser fails the test if an interactive login is started
+	failBrowser := func(t *testing.T) {
+		stubOpenURL(t, func(string) error {
+			t.Errorf("interactive login started with a non-interactive context")
+			return nil
+		})
+	}
+	ctx := NonInteractive(context.Background())
+
+	t.Run("no tokens", func(t *testing.T) {
+		h := newHandler(t, newFakeIdP(t))
+		failBrowser(t)
+
+		tokens, err := h.GetTokensContext(ctx)
+		if !errors.Is(err, ErrInteractiveLoginRequired) {
+			t.Errorf("GetTokensContext() error = %v, want %v", err, ErrInteractiveLoginRequired)
+		}
+		if tokens != nil {
+			t.Errorf("GetTokensContext() = %+v, want nil", tokens)
+		}
+
+		// no login server was started, so the port is free
+		ln, err := net.Listen("tcp", h.listenAddr)
+		if err != nil {
+			t.Errorf("login server address in use: %v", err)
+		} else {
+			ln.Close()
+		}
+	})
+
+	t.Run("cached tokens", func(t *testing.T) {
+		idp := newFakeIdP(t)
+		h := newHandler(t, idp)
+		callbacks := stubBrowser(t, idp, browser{}, nil)
+
+		want, err := h.GetTokensContext(context.Background())
+		if err != nil {
+			t.Fatalf("GetTokensContext() error = %v", err)
+		}
+		awaitBrowser(t, callbacks)
+
+		failBrowser(t)
+		got, err := h.GetTokensContext(ctx)
+		if err != nil {
+			t.Fatalf("GetTokensContext() error = %v", err)
+		}
+		if *got != *want {
+			t.Errorf("GetTokensContext() = %+v, want %+v", *got, *want)
+		}
+	})
+
+	t.Run("refresh token", func(t *testing.T) {
+		idp := newFakeIdP(t)
+		idp.refresh.refreshToken = "refresh-new"
+		h := newHandler(t, idp)
+		h.refreshToken = "refresh-old"
+		failBrowser(t)
+
+		got, err := h.GetTokensContext(ctx)
+		if err != nil {
+			t.Fatalf("GetTokensContext() error = %v", err)
+		}
+		if want := idp.lastIssued(); *got != want {
+			t.Errorf("GetTokensContext() = %+v, want %+v", *got, want)
+		}
+		if h.refreshToken != "refresh-new" {
+			t.Errorf("refreshToken = %q, want %q", h.refreshToken, "refresh-new")
+		}
+	})
+
+	t.Run("refresh token rejected", func(t *testing.T) {
+		idp := newFakeIdP(t)
+		idp.refresh.status = http.StatusBadRequest
+		store := &memStore{v: "refresh-old"}
+		h := newHandler(t, idp, WithTokenStore(store))
+		failBrowser(t)
+
+		_, err := h.GetTokensContext(ctx)
+		if !errors.Is(err, ErrInteractiveLoginRequired) {
+			t.Errorf("GetTokensContext() error = %v, want %v", err, ErrInteractiveLoginRequired)
+		}
+		var retrieveErr *oauth2.RetrieveError
+		if !errors.As(err, &retrieveErr) {
+			t.Errorf("GetTokensContext() error = %v, want it to wrap *oauth2.RetrieveError", err)
+		}
+
+		// the rejected refresh token is discarded
+		if h.refreshToken != "" || store.Get() != "" {
+			t.Errorf("refresh token kept after rejection: handler %q, store %q", h.refreshToken, store.Get())
+		}
+	})
+}
+
+func TestOidcHandler_GetTokensContext_RefreshNetworkError(t *testing.T) {
+	idp := newFakeIdP(t)
+	store := &memStore{v: "refresh-old"}
+	h := newHandler(t, idp, WithTokenStore(store))
+
+	// the IdP becomes unreachable after discovery succeeded
+	h.mu.Lock()
+	err := h.discover(context.Background())
+	h.mu.Unlock()
+	if err != nil {
+		t.Fatalf("discover() error = %v", err)
+	}
+	idp.Close()
+
+	_, err = h.GetTokensContext(NonInteractive(context.Background()))
+	if !errors.Is(err, ErrInteractiveLoginRequired) {
+		t.Errorf("GetTokensContext() error = %v, want %v", err, ErrInteractiveLoginRequired)
+	}
+
+	// the refresh token is kept so it can be used once the IdP is reachable
+	if h.refreshToken != "refresh-old" {
+		t.Errorf("refreshToken = %q, want %q", h.refreshToken, "refresh-old")
+	}
+	if store.deletes != 0 || store.Get() != "refresh-old" {
+		t.Errorf("persisted refresh token removed after network error (deletes = %d)", store.deletes)
 	}
 }

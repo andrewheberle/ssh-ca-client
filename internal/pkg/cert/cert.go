@@ -11,15 +11,15 @@ import (
 	"time"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/client"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/httpclient"
 	"golang.org/x/crypto/ssh"
 )
 
 var (
-	ErrAddingToAgent                  = client.ErrAddingToAgent
+	ErrAddingToAgent                  = errors.New("could not add to agent")
 	ErrCertificateMismatch            = errors.New("certificate did not match private key")
 	ErrCertificateNotFound            = errors.New("no certificate found")
-	ErrCertificateNotValid            = client.ErrCertificateNotValid
+	ErrCertificateNotValid            = errors.New("certificate validity not ok")
 	ErrKeyNotFound                    = errors.New("no key private key found")
 	ErrNoAuthHandlerAvailable         = errors.New("no auth handler was available")
 	ErrNotImplemented                 = errors.New("method not implemented")
@@ -138,7 +138,7 @@ var (
 func newBaseCertificate(server string, store Storage, opts ...Option) (*BaseCertificate, error) {
 	// set up defaults
 	base := &BaseCertificate{
-		h:     client.NewHttpClient(),
+		h:     httpclient.New(),
 		store: store,
 	}
 

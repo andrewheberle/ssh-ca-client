@@ -11,8 +11,6 @@ import (
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
-	"golang.org/x/crypto/ssh"
-	yamlparser "sigs.k8s.io/yaml"
 )
 
 func LogDir() (string, error) {
@@ -38,29 +36,6 @@ func ConfigDirs() (user, system string, err error) {
 	}
 
 	return filepath.Join(dir, names.AppName), filepath.Join("/etc", names.AppName), nil
-}
-
-func loadSystemConfig(name string) (SystemConfig, error) {
-	y, err := os.ReadFile(name)
-	if err != nil {
-		return SystemConfig{}, err
-	}
-
-	var config SystemConfig
-	if err := yamlparser.UnmarshalStrict(y, &config); err != nil {
-		return SystemConfig{}, fmt.Errorf("problem parsing system config: %w", err)
-	}
-
-	if config.TrustedCertificateAuthority != "" {
-		ca, _, _, _, err := ssh.ParseAuthorizedKey([]byte(config.TrustedCertificateAuthority))
-		if err != nil {
-			return SystemConfig{}, fmt.Errorf("problem parsing trusted_ca: %w", err)
-		}
-
-		config.ca = ca
-	}
-
-	return config, nil
 }
 
 func loadClientConfig(configpath string) (*koanf.Koanf, error) {

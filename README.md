@@ -73,14 +73,18 @@ ca_url: https://ca.example.com/
 trusted_ca: ecdsa-sha2-nistp256 AAAAE2VjZ...
 ```
 
-The default location for this config file is
-`%PROGRAMDATA%\Serverless SSH CA Client\config.yml` on Windows and
-`/etc/serverless-ssh-ca/config.yml` on other plaforms however this may also be
-overidden using the `--config` command line flag.
+On Linux/BSD/Darwin this is a YAML file, by default
+`/etc/serverless-ssh-ca/config.yml`, however this may also be overidden using
+the `--config` command line flag.
 
-On Windows the CLI (`ssh-ca-client-cli`) reads its configuration from the
-registry instead, with `--config` selecting the hive to use: `HKLM` (the
-default) or `HKCU`.
+On Windows both the GUI and CLI read their configuration from the registry
+under `SOFTWARE\Andrew Heberle\Serverless SSH CA Client`, with `--config`
+selecting the hive to use: `HKLM` (the default) or `HKCU`. Any configuration
+set via Group Policy is applied over this.
+
+**Note:** Previous versions of the GUI read a YAML configuration file on
+Windows. This file is no longer used, so its settings must be moved to the
+registry or Group Policy.
 
 The `redirect_url` must use `http` as the client listens on this address during
 an interactive login.
@@ -92,18 +96,14 @@ certificate renewals.
 On Windows these system level options can be set using Group Policy via the
 ADMX/ADML files in the `policy` sub-directory.
 
-The GUI saves persistent user data such as the users private key, refresh
-token (if available) and certificate into a user specific configuration file,
-which by default is `%APPDATA%\Serverless SSH CA Client\config.yml` on Windows
-and `$HOME/.config/serverless-ssh-ca/user.yaml` on other platforms however this
-can be overidden using the `--user` command line flag.
+The GUI and CLI store persistent user data such as the users private key,
+refresh token (if available) and certificate in the operating system keyring
+(Windows Credential Manager, macOS Keychain or a Secret Service provider such
+as `gnome-keyring` on Linux/BSD). The GUI and CLI share this data, so a key
+generated or certificate requested by one is available to the other.
 
-The CLI stores this user data in the operating system keyring (Windows
-Credential Manager, macOS Keychain or a Secret Service provider such as
-`gnome-keyring` on Linux/BSD) instead and does not support the `--user` option.
-
-This allows the use of a shared/system configuration file that defines the
-OIDC and SSH CA configuration with user specific data kept seperate.
+This allows the use of a shared/system configuration that defines the OIDC and
+SSH CA configuration with user specific data kept seperate.
 
 ### As A Snap
 
@@ -125,19 +125,18 @@ above.
 
 ### Configuration Privacy/Security
 
-For the GUI, on Windows sensitive data such as the users SSH private key and the
-OIDC refresh token are encrypted using the Windows Data Protection API (DPAPI),
-while on Linux a random key is generated and saved in the users `login` keyring
-which is then used to encrypt this data using AES-GCM.
+Sensitive data such as the users SSH private key and the OIDC refresh token are
+stored in the operating system keyring, which protects them using the
+platforms own mechanisms. A keyring/secret service must therefore be available
+to use the GUI and the `login`, `generate` and `show` sub-commands of the CLI.
+The `host` sub-command does not use the keyring.
 
-If this random key is lost or deleted this data cannot be recovered so the user
-must regenerate their private key by deleting the user data manually and
-request a new certificate.
-
-The CLI stores this data directly in the operating system keyring, so a
-keyring/secret service must be available to use the `login`, `generate` and
-`show` sub-commands. The `--keyfile` option from previous versions of the CLI
-has been removed. The `host` sub-command does not use the keyring.
+**Note:** Previous versions stored this data in a user configuration file
+(`user.yml`), protected using DPAPI on Windows or a key held in the keyring on
+other platforms, and the CLI also supported a `--keyfile` option. This data is
+not migrated, so after upgrading generate a new private key (via the GUI
+"Generate" menu item or `ssh-ca-client-cli generate`) and request a new
+certificate.
 
 
 ## Requirements
@@ -303,31 +302,34 @@ ssh-ca-client-cli host --renew
 
 The GUI supports the following command line flags:
 
-| Flag              | Type            | Description                                                      |
-|-------------------|-----------------|------------------------------------------------------------------|
-| `--life`          | `time.Duration` | Lifetime of SSH certificate                                      |
-| `--renew`         | `time.Duration` | Renew once remaining time gets below this value                  |
-| `--addr`          | `string`        | Listen address for OIDC auth flow                                |
-| `--log`           | `string`        | Path to log file                                                 |
-| `--crash`         | `string`        | Path to log file for panics/crashes                              |
-| `--config`        | `string`        | Path to configuration file                                       |
-| `--user`          | `string`        | Path to user configuration file                                  |
-| `--disable-proxy` | `bool`          | Disable proxying of PuTTY Agent (pageant) requests               |
-| `--add-on-start`  | `bool`          | Add current key and certificate (if valid) to SSH agent on start |
+| Flag              | Type            | Description                                                                 |
+|-------------------|-----------------|-----------------------------------------------------------------------------|
+| `--life`          | `time.Duration` | Lifetime of SSH certificate                                                 |
+| `--renew`         | `time.Duration` | Renew once remaining time gets below this value                             |
+| `--config`        | `string`        | Configuration file (Linux) or registry hive, `HKLM` or `HKCU` (Windows)     |
+| `--log`           | `string`        | Log directory, which contains `tray.log` and `crash.log`                    |
+| `--log.file`      | `bool`          | Log to a file instead of the Windows Event Log (Windows only)               |
+| `--json`          | `bool`          | Enable JSON logging                                                         |
+| `--debug`         | `bool`          | Enable debug logging                                                        |
+| `--disable-proxy` | `bool`          | Disable proxying of PuTTY Agent (pageant) requests (Windows only)           |
+| `--add-on-start`  | `bool`          | Add current key and certificate (if valid) to SSH agent on start            |
+| `--version`       | `bool`          | Show version and exit                                                       |
 
 The defaults are as follows:
 
-| Flag              | Default (Windows)                                  | Default (Linux)                         |
-|-------------------|----------------------------------------------------|-----------------------------------------|
-| `--life`          | `24h`                                              | `24h`                                   |
-| `--renew`         | `1h`                                               | `1h`                                    |
-| `--addr`          | `localhost:3000`                                   | `localhost:3000`                        |
-| `--log`           | `%PROGRAMDATA%\Serverless SSH CA Client/tray.log`  | `~/.config/serverless-ssh-ca/tray.log`  |
-| `--crash`         | `%PROGRAMDATA%\Serverless SSH CA Client/crash.log` | `~/.config/serverless-ssh-ca/crash.log` |
-| `--config`        | `%APPDATA%\Serverless SSH CA Client/config.yml`    | `/etc/serverless-ssh-ca/config.yml`     |
-| `--user`          | `%PROGRAMDATA%\Serverless SSH CA Client/user.yml`  | `~/.config/serverless-ssh-ca/user.yml`  |
-| `--disable-proxy` | `false`                                            | `true`                                  |
-| `--add-on-start`  | `true`                                             | `true`                                  |
+| Flag              | Default (Windows)                          | Default (Linux)                        |
+|-------------------|--------------------------------------------|----------------------------------------|
+| `--life`          | `24h`                                      | `24h`                                  |
+| `--renew`         | `1h`                                       | `1h`                                   |
+| `--config`        | `HKLM`                                     | `/etc/serverless-ssh-ca/config.yml`    |
+| `--log`           | `%APPDATA%\Serverless SSH CA Client\log`   | `~/.config/serverless-ssh-ca/log`      |
+| `--log.file`      | `false`                                    | n/a (always logs to a file)            |
+| `--disable-proxy` | `false`                                    | n/a (always disabled)                  |
+| `--add-on-start`  | `true`                                     | `true`                                 |
+
+The `--addr` and `--user` options from previous versions have been removed. The
+listen address for the OIDC auth flow is taken from the configured
+`redirect_url` and user data is stored in the operating system keyring.
 
 # Attributions
 

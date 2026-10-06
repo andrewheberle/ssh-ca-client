@@ -11,11 +11,13 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	"os/user"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/keyringutil"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
 	"github.com/zalando/go-keyring"
 	"golang.org/x/crypto/ssh"
@@ -204,7 +206,7 @@ func TestStorage_GeneratePrivateKey(t *testing.T) {
 				t.Fatalf("key not stored in keyring: %v", err)
 			}
 
-			key, err := sshkey.ParseKey([]byte(k))
+			key, err := parseECDSAKey([]byte(k))
 			if err != nil {
 				t.Fatalf("stored key could not be parsed: %v", err)
 			}
@@ -332,7 +334,7 @@ func TestStorage_PublicKey(t *testing.T) {
 		if err != nil {
 			t.Fatalf("keyring.Get() error = %v", err)
 		}
-		key, err := sshkey.ParseKey([]byte(k))
+		key, err := parseECDSAKey([]byte(k))
 		if err != nil {
 			t.Fatalf("ParseKey() error = %v", err)
 		}
@@ -599,7 +601,7 @@ func TestStorage_PrivateKey(t *testing.T) {
 		if err != nil {
 			t.Fatalf("PrivateKeyBytes() error = %v", err)
 		}
-		parsed, err := sshkey.ParseKey(gotBytes)
+		parsed, err := parseECDSAKey(gotBytes)
 		if err != nil {
 			t.Fatalf("PrivateKeyBytes() could not be parsed: %v", err)
 		}
@@ -1210,4 +1212,52 @@ func TestStorage_GeneratePrivateKey_KeyType(t *testing.T) {
 			t.Errorf("HasPrivateKey() = true after failed generation")
 		}
 	})
+}
+
+// parseECDSAKey parses an ECDSA private key, the type GeneratePrivateKey
+// creates by default
+func parseECDSAKey(pemBytes []byte) (*ecdsa.PrivateKey, error) {
+	key, err := sshkey.ParsePrivateKey(pemBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	k, ok := key.(*ecdsa.PrivateKey)
+	if !ok {
+		return nil, fmt.Errorf("key is %T, want *ecdsa.PrivateKey", key)
+	}
+
+	return k, nil
+}
+
+func TestStorage_LargeKey(t *testing.T) {
+	// a RSA-3072 key is larger than a single Windows Credential Manager entry
+	// so is stored in parts
+	ca := newCA(t)
+	s := newStorage(t, ca, WithKeyType(sshkey.KeyTypeRSA))
+	generatePrivateKey(t, s)
+
+	if _, err := keyring.Get(storeKeyService+" #1", s.user); err != nil {
+		t.Fatalf("key was not stored in parts: %v", err)
+	}
+
+	keyBytes, err := s.PrivateKeyBytes()
+	if err != nil {
+		t.Fatalf("PrivateKeyBytes() error = %v", err)
+	}
+	if len(keyBytes) <= keyringutil.ChunkSize {
+		t.Fatalf("key is %d bytes, want more than %d", len(keyBytes), keyringutil.ChunkSize)
+	}
+
+	if !s.HasPrivateKey() {
+		t.Errorf("HasPrivateKey() = false, want true")
+	}
+
+	// a certificate for a new (also RSA) key is stored alongside it
+	if err := s.SaveCertificate(validCert(t, s, ca)); err != nil {
+		t.Fatalf("SaveCertificate() error = %v", err)
+	}
+	if !s.HasCertificate() {
+		t.Errorf("HasCertificate() = false, want true")
+	}
 }

@@ -13,9 +13,13 @@ import (
 	"time"
 
 	"github.com/allan-simon/go-singleinstance"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/client"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth/tokenstore"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/keyringstore"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/pageant"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/tray"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/version"
 	"github.com/spf13/pflag"
@@ -27,10 +31,8 @@ var resources embed.FS
 const EventLogSource = "Serverless SSH CA Client"
 
 func Execute(ctx context.Context, args []string) error {
-	// beeep.AppName = config.FriendlyAppName
-
 	// find config dirs
-	user, system, err := config.ConfigDirs()
+	user, _, err := config.ConfigDirs()
 	if err != nil {
 		return err
 	}
@@ -43,7 +45,7 @@ func Execute(ctx context.Context, args []string) error {
 
 	var (
 		lifetime, renewAt                                                    time.Duration
-		listenAddr, logDir, systemConfigFile, userConfigFile                 string
+		logDir, configLocation                                               string
 		disableProxy, addOnStart, showVersion, debugLogging, logToFile, json bool
 	)
 
@@ -51,10 +53,8 @@ func Execute(ctx context.Context, args []string) error {
 
 	flags.DurationVar(&lifetime, "life", time.Hour*24, "Lifetime of SSH certificate")
 	flags.DurationVar(&renewAt, "renew", time.Hour, "Renew once remaining time gets below this value")
-	flags.StringVar(&listenAddr, "addr", "localhost:3000", "Listen address for OIDC auth flow")
 	flags.StringVar(&logDir, "log", filepath.Join(logBase, "log"), "Log directory")
-	flags.StringVar(&systemConfigFile, "config", filepath.Join(system, "config.yml"), "Path to configuration file")
-	flags.StringVar(&userConfigFile, "user", filepath.Join(user, "user.yml"), "Path to user configuration file")
+	flags.StringVar(&configLocation, "config", config.ConfigPath(), "Configuration location")
 	flags.BoolVar(&showVersion, "version", false, "Show version and exit")
 	flags.BoolVar(&json, "json", false, "Enable JSON logging")
 	flags.BoolVar(&debugLogging, "debug", false, "Enable debug logging")
@@ -82,19 +82,13 @@ func Execute(ctx context.Context, args []string) error {
 		return fmt.Errorf("--renew cannot be larger than --life")
 	}
 
-	// make sure user config location exists
-	if err := os.MkdirAll(filepath.Dir(userConfigFile), 0755); err != nil {
+	// make sure the user config location (for the lock file) exists
+	if err := os.MkdirAll(user, 0755); err != nil {
 		return err
 	}
 
 	// make sure log dir exists
 	if err := os.MkdirAll(logDir, 0755); err != nil {
-		return err
-	}
-
-	// load config
-	c, err := config.LoadConfig(systemConfigFile, userConfigFile)
-	if err != nil {
 		return err
 	}
 
@@ -108,27 +102,6 @@ func Execute(ctx context.Context, args []string) error {
 		_ = crash.Close()
 	}()
 	_ = debug.SetCrashOutput(crash, debug.CrashOptions{})
-
-	// set options
-	opts := []client.LoginHandlerOption{
-		client.WithLifetime(lifetime),
-		client.AllowWithoutKey(),
-	}
-	if !disableProxy {
-		opts = append(opts, client.WithPageantProxy())
-	}
-
-	// set up login client
-	lh, err := client.NewLoginHandler(c, opts...)
-	if err != nil {
-		return err
-	}
-
-	// set up tray app
-	app, err := tray.New(names.FriendlyAppName, listenAddr, resources, lh, renewAt)
-	if err != nil {
-		return err
-	}
 
 	// set up logger
 	level := new(slog.LevelVar)
@@ -163,14 +136,61 @@ func Execute(ctx context.Context, args []string) error {
 		_ = os.Remove(lockFile.Name())
 	}()
 
+	// load config
+	conf, err := config.LoadClientConfig(configLocation)
+	if err != nil {
+		logger.Error("could not load config", "config", configLocation, "error", err)
+		return err
+	}
+
+	// the key and certificate are kept in the users keyring
+	store, err := keyringstore.New(conf.CertificateAuthorityPublicKey())
+	if err != nil {
+		logger.Error("could not set up key store", "error", err)
+		return err
+	}
+
+	// the refresh token is persisted in the users keyring
+	ts, err := tokenstore.NewKeyringStore()
+	if err != nil {
+		logger.Error("could not set up token store", "error", err)
+		return err
+	}
+
+	handler, err := auth.NewOidcHandler(auth.OidcConfig{
+		ClientID:    conf.ClientID,
+		Issuer:      conf.Issuer,
+		RedirectURL: conf.RedirectURL,
+		Scopes:      conf.Scopes,
+	}, auth.WithTokenStore(ts), auth.WithLogger(logger))
+	if err != nil {
+		logger.Error("could not set up OIDC authentication", "error", err)
+		return err
+	}
+
+	userCert, err := cert.NewUserCertificate(conf.CertificateAuthorityURL, store)
+	if err != nil {
+		logger.Error("could not set up certificate", "error", err)
+		return err
+	}
+	userCert.AuthHandler = handler
+	userCert.Lifetime = lifetime
+
+	// set up tray app
+	app, err := tray.New(names.FriendlyAppName, resources, userCert, conf, renewAt)
+	if err != nil {
+		logger.Error("could not set up tray application", "error", err)
+		return err
+	}
+
 	// start pageant proxy if requested
 	if !disableProxy {
 		logger.Info("attempting to start pageant proxy process")
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
 		go func() {
-			if err := lh.RunPageantProxy(ctx); err != nil {
+			if err := pageant.Run(ctx); err != nil {
 				// dont log an error if the error indicates the context was cancelled
 				if !errors.Is(err, context.Canceled) {
 					logger.Error("error from pageant proxy", "error", err)
@@ -180,9 +200,9 @@ func Execute(ctx context.Context, args []string) error {
 	}
 
 	// try to add to agent on start
-	if addOnStart {
+	if addOnStart && store.HasCertificate() {
 		logger.Info("attempting to add current certificate to ssh agent")
-		if err := lh.AddToAgent(); err != nil {
+		if err := store.AddToAgent(); err != nil {
 			logger.Warn("could not add current certificate to ssh agent", "error", err)
 		}
 	}

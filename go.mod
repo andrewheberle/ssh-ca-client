@@ -27,8 +27,6 @@ require (
 	golang.org/x/crypto v0.55.0
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sys v0.47.0
-	golang.zx2c4.com/wireguard/windows v1.1.1
-	sigs.k8s.io/yaml v1.6.0
 )
 
 replace github.com/nfnt/resize => ./internal/pkg/resize
@@ -79,7 +77,6 @@ require (
 	github.com/urfave/cli/v2 v2.25.7 // indirect
 	github.com/vmware-labs/yaml-jsonpath v0.3.2 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
-	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/image v0.12.0 // indirect
 	golang.org/x/mod v0.38.0 // indirect

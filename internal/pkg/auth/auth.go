@@ -24,7 +24,8 @@ import (
 
 // Handler provides the tokens needed to request a certificate. Any
 // interactive login, including running the local HTTP server it needs, is
-// handled by the implementation.
+// handled by the implementation, which must not start one when
+// [IsNonInteractive] reports true for the provided context.
 type Handler interface {
 	GetTokens() (*Tokens, error)
 	GetTokensContext(ctx context.Context) (*Tokens, error)
@@ -35,7 +36,37 @@ type Tokens struct {
 	Identity string
 }
 
-var ErrLoginFailed = errors.New("interactive login failed")
+var (
+	ErrLoginFailed = errors.New("interactive login failed")
+
+	// ErrInteractiveLoginRequired is returned by GetTokensContext when called
+	// with a [NonInteractive] context and no cached or refreshed tokens are
+	// available
+	ErrInteractiveLoginRequired = errors.New("interactive login required")
+)
+
+// errInvalidTokens marks a refresh that returned tokens that failed
+// verification
+var errInvalidTokens = errors.New("refreshed tokens were invalid")
+
+// nonInteractiveKey is the context key set by NonInteractive
+type nonInteractiveKey struct{}
+
+// NonInteractive returns a copy of ctx that prevents GetTokensContext from
+// starting an interactive login. Only cached tokens or a refresh token are
+// used, otherwise [ErrInteractiveLoginRequired] is returned. This is intended
+// for background renewals that must not open a browser.
+func NonInteractive(ctx context.Context) context.Context {
+	return context.WithValue(ctx, nonInteractiveKey{}, true)
+}
+
+// IsNonInteractive reports whether ctx (or a parent) was created by
+// [NonInteractive]. [Handler] implementations must not start an interactive
+// login when this is true.
+func IsNonInteractive(ctx context.Context) bool {
+	v, _ := ctx.Value(nonInteractiveKey{}).(bool)
+	return v
+}
 
 const (
 	// DefaultLoginTimeout is how long GetTokensContext waits for the interactive
@@ -80,9 +111,13 @@ type OidcHandler struct {
 	// internal state
 	mu           sync.Mutex
 	httpClient   *http.Client
+	issuer       string
 	oauth2Config oauth2.Config
 	store        *sessions.CookieStore
-	verifier     *oidc.IDTokenVerifier
+
+	// verifier is set, along with the oauth2Config endpoint, once provider
+	// discovery succeeds. It is guarded by mu.
+	verifier *oidc.IDTokenVerifier
 	refreshToken string
 	callbackPath string
 	loginPath    string
@@ -110,17 +145,15 @@ type OidcConfig struct {
 var _ Handler = &OidcHandler{}
 
 // NewOidcHandler creates a handler for the OIDC provider at config.Issuer.
-// Provider discovery is performed using ctx, so cancelling ctx aborts it, and
-// each request to the IdP is limited to 30 seconds.
-func NewOidcHandler(ctx context.Context, config OidcConfig, opts ...OidcHandlerOption) (*OidcHandler, error) {
-	// use a client with a timeout for all requests to the IdP. The provider
-	// keeps this client for fetching signing keys but not ctx itself.
-	client := &http.Client{Timeout: idpTimeout}
-
-	// set up oidc provider
-	provider, err := oidc.NewProvider(oidc.ClientContext(ctx, client), config.Issuer)
-	if err != nil {
-		return nil, fmt.Errorf("could not discover OIDC provider %q: %w", config.Issuer, err)
+//
+// The IdP is not contacted until tokens are first needed, so the handler can
+// be created while the IdP is unreachable (such as before the network is up).
+// Provider discovery is then performed by GetTokensContext, and retried by
+// later calls until it succeeds. Each request to the IdP is limited to 30
+// seconds.
+func NewOidcHandler(config OidcConfig, opts ...OidcHandlerOption) (*OidcHandler, error) {
+	if config.Issuer == "" {
+		return nil, fmt.Errorf("missing issuer")
 	}
 
 	// default the login path to be /auth/login
@@ -143,20 +176,20 @@ func NewOidcHandler(ctx context.Context, config OidcConfig, opts ...OidcHandlerO
 	// set defaults
 	h := &OidcHandler{
 		callbackPath: u.Path,
-		httpClient:   client,
-		listenAddr:   listenAddr,
+		// use a client with a timeout for all requests to the IdP
+		httpClient: &http.Client{Timeout: idpTimeout},
+		issuer:     config.Issuer,
+		listenAddr: listenAddr,
 		logger:       slog.New(slog.DiscardHandler),
 		loginPath:    config.LoginPath,
 		loginTimeout: DefaultLoginTimeout,
 		oauth2Config: oauth2.Config{
 			ClientID:    config.ClientID,
 			RedirectURL: config.RedirectURL,
-			Endpoint:    provider.Endpoint(),
 			Scopes:      config.Scopes,
 		},
 		store:      sessions.NewCookieStore(securecookie.GenerateRandomKey(32)),
 		tokenstore: new(tokenstore.DiscardStore),
-		verifier:   provider.Verifier(&oidc.Config{ClientID: config.ClientID}),
 	}
 
 	// set from options
@@ -359,6 +392,9 @@ func (h *OidcHandler) GetTokens() (*Tokens, error) {
 // one is available. Otherwise the interactive login flow is started: a local
 // HTTP server is run on the redirect URL address and this blocks until the
 // Callback completes, the login timeout is reached or ctx is done.
+//
+// If ctx was created by [NonInteractive] no interactive login is started and
+// [ErrInteractiveLoginRequired] is returned instead.
 func (h *OidcHandler) GetTokensContext(ctx context.Context) (*Tokens, error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -370,7 +406,13 @@ func (h *OidcHandler) GetTokensContext(ctx context.Context) (*Tokens, error) {
 	}
 	h.tokens = nil
 
+	// the IdP is needed from here on
+	if err := h.discover(ctx); err != nil {
+		return nil, err
+	}
+
 	// check for a refresh token
+	var refreshErr error
 	if h.refreshToken != "" {
 		tokens, expiry, refreshToken, err := h.refresh(ctx)
 		if err == nil {
@@ -379,10 +421,25 @@ func (h *OidcHandler) GetTokensContext(ctx context.Context) (*Tokens, error) {
 
 			return tokens, nil
 		}
+		refreshErr = err
 
-		// had an error so wipe the refresh token
-		h.logger.Warn("could not refresh tokens", "error", err)
-		h.setRefreshToken("")
+		// only discard the refresh token if the IdP rejected it or returned
+		// invalid tokens, not if the IdP could not be reached
+		var retrieveErr *oauth2.RetrieveError
+		if errors.As(err, &retrieveErr) || errors.Is(err, errInvalidTokens) {
+			h.logger.Warn("refresh token rejected", "error", err)
+			h.setRefreshToken("")
+		} else {
+			h.logger.Warn("could not refresh tokens", "error", err)
+		}
+	}
+
+	if IsNonInteractive(ctx) {
+		if refreshErr != nil {
+			return nil, fmt.Errorf("%w: refresh failed: %w", ErrInteractiveLoginRequired, refreshErr)
+		}
+
+		return nil, fmt.Errorf("%w: no refresh token available", ErrInteractiveLoginRequired)
 	}
 
 	// No refresh token or we had an error so trigger the interactive sign-in
@@ -396,6 +453,26 @@ func (h *OidcHandler) GetTokensContext(ctx context.Context) (*Tokens, error) {
 	h.setTokens(res.tokens, res.expiry)
 
 	return res.tokens, nil
+}
+
+// discover performs OIDC provider discovery if it has not already succeeded,
+// setting the token endpoint and ID token verifier. The caller must hold mu.
+func (h *OidcHandler) discover(ctx context.Context) error {
+	if h.verifier != nil {
+		return nil
+	}
+
+	// the provider keeps the client for fetching signing keys but not ctx
+	provider, err := oidc.NewProvider(oidc.ClientContext(ctx, h.httpClient), h.issuer)
+	if err != nil {
+		return fmt.Errorf("could not discover OIDC provider %q: %w", h.issuer, err)
+	}
+
+	h.oauth2Config.Endpoint = provider.Endpoint()
+	h.verifier = provider.Verifier(&oidc.Config{ClientID: h.oauth2Config.ClientID})
+	h.logger.Debug("discovered OIDC provider", "issuer", h.issuer)
+
+	return nil
 }
 
 // interactiveLogin runs the login HTTP server, opens the user's browser at the
@@ -503,7 +580,7 @@ func (h *OidcHandler) refresh(ctx context.Context) (*Tokens, time.Time, string, 
 
 	rawIDToken, expiry, err := h.verifyToken(ctx, token)
 	if err != nil {
-		return nil, time.Time{}, "", err
+		return nil, time.Time{}, "", fmt.Errorf("%w: %w", errInvalidTokens, err)
 	}
 
 	return &Tokens{Access: token.AccessToken, Identity: rawIDToken}, expiry, token.RefreshToken, nil
