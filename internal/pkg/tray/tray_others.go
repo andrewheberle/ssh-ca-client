@@ -3,13 +3,15 @@
 package tray
 
 import (
+	"context"
 	"embed"
 	"errors"
 	"log/slog"
 	"runtime"
 	"time"
 
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/client"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
 )
 
 type Application struct {
@@ -18,7 +20,13 @@ type Application struct {
 
 var ErrNotSupported = errors.New("not supported on this platform")
 
-func New(title, addr string, fs embed.FS, client *client.LoginHandler, renewAt time.Duration) (*Application, error) {
+// Certificate is the user certificate managed by the application
+type Certificate interface {
+	Store() cert.Storage
+	RequestContext(ctx context.Context) error
+}
+
+func New(title string, fs embed.FS, c Certificate, conf *config.ClientConfig, renewAt time.Duration) (*Application, error) {
 	return nil, ErrNotSupported
 }
 

@@ -1,6 +1,6 @@
 ## Name
 
-ssh-ca-client-cli-show - Show any existing private key, public key, certificate or current status.
+ssh-ca-client-cli-show - Show any existing private key, public key or certificate.
 
 ## Synopsis
 
@@ -8,17 +8,15 @@ ssh-ca-client-cli-show - Show any existing private key, public key, certificate 
 ssh-ca-client-cli [global options] show [--certificate [--git]]
                                         [--private]
                                         [--public]
-                                        [--status [--json]]
 ```
 
 ## Description
 
 This sub-command can be used to display any exsiting private key, public key or
-certificate in Open SSH format based on the contents of the configuration
-specified by the `--user` global option.
+certificate in Open SSH format from the users keyring.
 
-In addition general status can be displayed showing the existence of any of the
-above and the certificate expiry (if one exists).
+**Note:** The `--status` and `--json` options from previous versions have been
+removed.
 
 ## Global Options
 
@@ -45,14 +43,6 @@ Display the users private key.
 `--public`
 Display the users public key.
 
-`--status`
-Display general status.
-
-`--json`
-Display general status as JSON.
-
-This option is only valid with the `--status` option.
-
 ## Examples
 
 * Display the current private key in Open SSH format:
@@ -67,17 +57,10 @@ This option is only valid with the `--status` option.
   ssh-ca-client-cli show --certificate
   ```
 
-* Display the current status as JSON:
+* Display the current public key:
 
   ```sh
-  ssh-ca-client-cli show --status --json
-  ```
-
-* Show the current OpenSSH public key on a system without using the users
-  keyring:
-
-  ```sh
-  ssh-ca-client-cli --keyfile ~/.config/serverless-ssh-ca/keyfile show
+  ssh-ca-client-cli show --public
   ```
 
 ## ssh-ca-client-cli

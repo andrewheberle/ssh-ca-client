@@ -175,7 +175,6 @@ dist
 *.exe
 *.msi
 *.syso
-config.yml
 ssh-ca-client
 !cmd/ssh-ca-client
 ssh-ca-client-cli

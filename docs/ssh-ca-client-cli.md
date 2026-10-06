@@ -10,12 +10,16 @@ ssh-ca-client-cli [options] [subcommand]
 
 ## Options
 
-`--config <path>`
-Path to configuration file the defines global/system config such as the CA URL,
-OIDC IdP configuration and CA trust.
+`--config <location>`
+Location of the configuration that defines global/system config such as the CA
+URL, OIDC IdP configuration and CA trust.
 
-The default is `/etc/serverless-ssh-ca/config.yml` (Linux/BSD/Darwin) or
-`%PROGRAMDATA%\Serverless SSH CA Client\config.yml` (Windows).
+On Linux/BSD/Darwin this is the path to a YAML configuration file and the
+default is `/etc/serverless-ssh-ca/config.yml`.
+
+On Windows this is the registry hive to load the configuration from, either
+`HKLM` (`HKEY_LOCAL_MACHINE`) or `HKCU` (`HKEY_CURRENT_USER`), and the default
+is `HKLM`. Any configuration set via Group Policy is applied over this.
 
 `--debug`
 Enable debug logging.
@@ -23,26 +27,14 @@ Enable debug logging.
 `--json`
 Enable JSON logging.
 
-`--user <path>`
-The path to store user specific configuration (this is ignored for the `host`)
-sub-command.
+## User Data
 
-The default is `$HOME/.config/serverless-ssh-ca/user.yaml` (Linux/BSD/Darwin)
-or `%APPDATA%\Serverless SSH CA Client\config.yml` (Windows).
+The users SSH private key, certificate and OIDC refresh token (if available) are
+stored in the operating system keyring (Windows Credential Manager, macOS
+Keychain or a Secret Service provider such as `gnome-keyring` on Linux/BSD).
 
-`--keyfile <path>`
-This option changes the behaviour of reads/writes to the user configuration
-file so that instead of using DPAPI on Windows for protection of sensitive
-data and storing the encryption key in the users login keyring on other
-platforms, a random key is generated and written to the path specified.
-
-This `keyfile` is then used for encryption/decryption operations of this data.
-
-It is important that this file is protected and if this file is lost any
-encrypted data in the user configuration will also be lost.
-
-This option is primarily targted for systems that do not have secret service
-available, such as servers.
+**Note:** The `--user` and `--keyfile` options from previous versions have been
+removed, as user data is no longer stored in a user configuration file.
 
 ## Sub-Commands
 

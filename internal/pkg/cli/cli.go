@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"os"
-	"path/filepath"
 
 	"github.com/andrewheberle/simplecommand"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
@@ -13,11 +12,9 @@ import (
 )
 
 type rootCommand struct {
-	systemConfigFile string
-	userConfigFile   string
-	debug            bool
-	json             bool
-	keyfile          string
+	configFile string
+	debug      bool
+	json       bool
 
 	*simplecommand.Command
 }
@@ -35,15 +32,8 @@ func (c *rootCommand) Init(cd *simplecobra.Commandeer) error {
 		return err
 	}
 
-	user, system, err := config.ConfigDirs()
-	if err != nil {
-		return err
-	}
-
 	cmd := cd.CobraCommand
-	cmd.PersistentFlags().StringVar(&c.systemConfigFile, "config", filepath.Join(system, "config.yml"), "Path to configuration file")
-	cmd.PersistentFlags().StringVar(&c.userConfigFile, "user", filepath.Join(user, "user.yml"), "Path to user configuration file")
-	cmd.PersistentFlags().StringVar(&c.keyfile, "keyfile", "", "Path to key file for user configuration protection")
+	cmd.PersistentFlags().StringVar(&c.configFile, "config", config.ConfigPath(), "Configuration location")
 	cmd.PersistentFlags().BoolVar(&c.debug, "debug", false, "Enable debug logging")
 	cmd.PersistentFlags().BoolVar(&c.json, "json", false, "Enable JSON logging")
 

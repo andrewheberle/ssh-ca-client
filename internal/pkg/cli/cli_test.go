@@ -2,10 +2,95 @@ package cli_test
 
 import (
 	"context"
+	"errors"
+	"os"
 	"testing"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cli"
 )
+
+// missingConfig is a config location that is invalid on all platforms: a
+// missing file on Linux/BSD/Darwin and not a registry hive on Windows
+const missingConfig = "testdata/missing.yml"
+
+// execute runs the CLI with args, discarding any help or usage output
+func execute(t *testing.T, args ...string) error {
+	t.Helper()
+
+	devnull, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0)
+	if err != nil {
+		t.Fatalf("could not open %s: %v", os.DevNull, err)
+	}
+	defer func() { _ = devnull.Close() }()
+
+	stdout := os.Stdout
+	os.Stdout = devnull
+	defer func() { os.Stdout = stdout }()
+
+	return cli.Execute(context.Background(), args)
+}
+
+// flagTest is a sub-command and flags that must be accepted
+type flagTest struct {
+	name string
+	args []string
+}
+
+// runFlagTests checks each set of args is accepted. "--help" is appended so
+// all flags are parsed but the command is not run, which avoids any access to
+// configuration, keyrings, keys or the network.
+func runFlagTests(t *testing.T, tests []flagTest) {
+	t.Helper()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := execute(t, append(tt.args, "--help")...); err != nil {
+				t.Errorf("Execute(%q) error = %v, want flags to be accepted", tt.args, err)
+			}
+		})
+	}
+}
+
+func TestExecute_Flags(t *testing.T) {
+	runFlagTests(t, []flagTest{
+		{"global flags", []string{"--config", "location", "--debug", "--json"}},
+		{"global flags after sub-command", []string{"login", "--config", "location", "--debug", "--json"}},
+		{"generate", []string{"generate", "--force", "--dryrun"}},
+		{"generate short flags", []string{"generate", "-n"}},
+		{"login", []string{"login", "--add", "--force", "--life", "1h", "--skip-agent"}},
+		{"show", []string{"show", "--certificate", "--git"}},
+		{"show private", []string{"show", "--private"}},
+		{"show public", []string{"show", "--public"}},
+		{"krl", []string{"krl", "--host", "--out", "krl.bin", "--force"}},
+		{"krl short flags", []string{"krl", "-f", "krl.bin"}},
+		{"revoke", []string{"revoke", "--host"}},
+		{"version", []string{"version", "--json"}},
+		{"host", []string{"host"}},
+	})
+}
+
+func TestExecute_InvalidFlags(t *testing.T) {
+	tests := []struct {
+		name string
+		args []string
+	}{
+		{"unknown sub-command", []string{"status"}},
+		{"unknown flag", []string{"login", "--unknown"}},
+		{"invalid duration", []string{"login", "--life", "1d"}},
+		// flags removed in previous versions must not return unnoticed
+		{"removed --user", []string{"--user", "user.yml", "login"}},
+		{"removed --keyfile", []string{"--keyfile", "keyfile", "login"}},
+		{"removed login --addr", []string{"login", "--addr", "localhost:3000"}},
+		{"removed show --status", []string{"show", "--status"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := execute(t, append(tt.args, "--help")...); err == nil {
+				t.Errorf("Execute(%q) error = nil, want error", tt.args)
+			}
+		})
+	}
+}
 
 func TestExecute(t *testing.T) {
 	tests := []struct {
@@ -14,29 +99,25 @@ func TestExecute(t *testing.T) {
 		wantErr bool
 	}{
 		{"no args", []string{}, false},
-		{"generate sub-command", []string{"--config", "testdata/system.yml", "generate", "--dryrun"}, false},
-		{"generate sub-command should ignore system config", []string{"--config", "testdata/missing.yml", "generate", "--dryrun"}, false},
-		{"host sub-command with non-existent key", []string{"--config", "testdata/system.yml", "host", "--key", "missing_key"}, true},
-		{"show sub-command", []string{"--config", "testdata/system.yml", "show", "--status"}, false},
-		{"show sub-command should ignore missing system config", []string{"--config", "testdata/missing.yml", "show", "--status"}, false},
-		{"show --private sub-command should error with missing user config", []string{"--user", "missing.yml", "show", "--private"}, true},
-		{"show --public sub-command should error with missing user config", []string{"--user", "missing.yml", "show", "--public"}, true},
-		{"show --certificate sub-command should error with missing user config", []string{"--user", "missing.yml", "show", "--certificate"}, true},
-		{"login sub-command should error with missing system config", []string{"--config", "missing.yml", "login"}, true},
-		{"version sub-command", []string{"version"}, false},
+		{"version", []string{"version"}, false},
+		{"version as json", []string{"version", "--json"}, false},
+		{"generate with missing config", []string{"--config", missingConfig, "generate", "--dryrun"}, true},
+		{"login with missing config", []string{"--config", missingConfig, "login"}, true},
+		{"show with missing config", []string{"--config", missingConfig, "show"}, true},
+		{"krl with missing config", []string{"--config", missingConfig, "krl"}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotErr := cli.Execute(context.Background(), tt.args)
-			if gotErr != nil {
-				if !tt.wantErr {
-					t.Errorf("Execute() failed: %v", gotErr)
-				}
-				return
-			}
-			if tt.wantErr {
-				t.Fatal("Execute() succeeded unexpectedly")
+			err := execute(t, tt.args...)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Execute(%q) error = %v, wantErr %v", tt.args, err, tt.wantErr)
 			}
 		})
 	}
+
+	t.Run("revoke not implemented", func(t *testing.T) {
+		if err := execute(t, "revoke"); !errors.Is(err, cli.ErrCommandNotImplemented) {
+			t.Errorf("Execute() error = %v, want %v", err, cli.ErrCommandNotImplemented)
+		}
+	})
 }

@@ -2,24 +2,26 @@ package cli
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"time"
 
 	"github.com/andrewheberle/simplecommand"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/client"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth/tokenstore"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/keyringstore"
 	"github.com/bep/simplecobra"
 )
 
 type loginCommand struct {
-	skipAgent  bool
-	lifetime   time.Duration
-	listenAddr string
-	add        bool
-	force      bool
+	skipAgent bool
+	lifetime  time.Duration
+	add       bool
+	force     bool
 
-	client *client.LoginHandler
+	cert  *cert.UserCertificate
+	store *keyringstore.Storage
 
 	logger *slog.Logger
 
@@ -34,7 +36,6 @@ func (c *loginCommand) Init(cd *simplecobra.Commandeer) error {
 	cmd := cd.CobraCommand
 	cmd.Flags().BoolVar(&c.skipAgent, "skip-agent", false, "Skip adding SSH key and certificate to ssh-agent")
 	cmd.Flags().DurationVar(&c.lifetime, "life", time.Hour*24, "Lifetime of SSH certificate")
-	cmd.Flags().StringVar(&c.listenAddr, "addr", "localhost:3000", "Listen address for OIDC auth flow")
 	cmd.Flags().BoolVar(&c.add, "add", false, "Add existing certificate to SSH agent")
 	cmd.Flags().BoolVar(&c.force, "force", false, "Force renewal even if current certificate has more than 50% validity left")
 
@@ -61,22 +62,34 @@ func (c *loginCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 		return err
 	}
 
-	// set options
-	opts := []client.LoginHandlerOption{
-		client.WithLifetime(c.lifetime),
-	}
-	if c.skipAgent {
-		opts = append(opts, client.SkipAgent())
-	}
-
-	opts = append(opts, client.WithLogger(c.logger))
-
-	// set up login client
-	lh, err := client.NewLoginHandler(config, opts...)
+	store, err := keyringstore.New(config.CertificateAuthorityPublicKey())
 	if err != nil {
 		return err
 	}
-	c.client = lh
+	c.store = store
+
+	ts, err := tokenstore.NewKeyringStore()
+	if err != nil {
+		return err
+	}
+
+	auth, err := auth.NewOidcHandler(auth.OidcConfig{
+		ClientID:    config.ClientID,
+		Issuer:      config.Issuer,
+		RedirectURL: config.RedirectURL,
+		Scopes:      config.Scopes,
+	}, auth.WithTokenStore(ts), auth.WithLogger(c.logger))
+	if err != nil {
+		return err
+	}
+
+	cert, err := cert.NewUserCertificate(config.CertificateAuthorityURL, c.store)
+	if err != nil {
+		return err
+	}
+	cert.AuthHandler = auth
+	cert.Lifetime = c.lifetime
+	c.cert = cert
 
 	return nil
 }
@@ -85,35 +98,51 @@ func (c *loginCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args
 	// just add if requested
 	if c.add {
 		c.logger.Info("attempting to add current certificate to ssh-agent")
-		return c.client.AddToAgent()
+		return c.store.AddToAgent()
 	}
 
 	// check life is not more than 50% done
-	if time.Now().Add(c.lifetime / 2).Before(c.client.CertificateExpiry()) {
-		if !c.force {
-			c.logger.Info("skipping renewal as current certificate has more than 50% of its lifetime left")
+	if c.store.HasCertificate() {
+		existing, err := c.store.Certificate()
+		if err != nil {
+			c.logger.Error("error getting certificate", "error", err)
 
-			return nil
+			return err
+		}
 
-		} else {
-			c.logger.Info("renewal forced despite current certificate having more than 50% of its lifetime left")
+		// check expiry
+		if !cert.RenewalDue(existing, 0.5, time.Now()) {
+			if !c.force {
+				c.logger.Info("skipping renewal as current certificate has more than 50% of its lifetime left")
+
+				return nil
+
+			} else {
+				c.logger.Info("renewal forced despite current certificate having more than 50% of its lifetime left")
+			}
 		}
 	}
 
-	// try refresh first
-	if err := c.client.Refresh(); err == nil {
-		return nil
-	} else {
-		c.logger.Warn("error during refresh", "error", err)
-		if errors.Is(err, client.ErrAddingToAgent) || errors.Is(err, client.ErrConnectingToAgent) {
-			c.logger.Info("skipping interactive login flow as error was related to SSH agent")
+	// this blocks until any interactive login completes, times out or is
+	// cancelled (CTRL-C)
+	reqErr := c.cert.RequestContext(ctx)
+
+	if reqErr != nil {
+		if ctx.Err() != nil {
+			c.logger.Info("login cancelled")
 		}
 
+		return reqErr
 	}
 
-	// otherwise do interactive login
-	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
-	defer cancel()
+	c.logger.Info("obtained new certificate")
 
-	return c.client.ExecuteLoginWithContext(ctx, c.listenAddr)
+	if !c.skipAgent {
+		c.logger.Info("attempting to add certificate to ssh-agent")
+		if err := c.store.AddToAgent(); err != nil {
+			return fmt.Errorf("could not add certificate to ssh-agent: %w", err)
+		}
+	}
+
+	return nil
 }
