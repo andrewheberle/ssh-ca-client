@@ -8,7 +8,7 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 - `cmd/` - entrypoints for commands; should only include minimal code then call Execute of the relevant package
 - `docs/` - documentation of commands
 - `internal/pkg/` - application packages; not importable by other modules
-- `internal/pkg/api/` - generated OpenAPI primitives to interact with the server implementation. Do not edit `api.get.go` or `openapi.json`.
+- `internal/pkg/api/` - generated OpenAPI primitives to interact with the server implementation. Do not edit `api.gen.go` or `openapi.json`.
 - `internal/pkg/cli/` - primary package used by the CLI
 - `internal/pkg/gui/` - primary package used by the GUI
 - `pkg/` - application packages; importable by others
