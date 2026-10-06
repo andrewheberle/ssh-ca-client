@@ -25,7 +25,10 @@ func TestCredentialManager(t *testing.T) {
 	large := value(10 * 1024)
 
 	t.Run("single entry limit", func(t *testing.T) {
-		// confirms values over the limit cannot be stored in one entry
+		// confirms values over the limit cannot be stored in one entry. This
+		// also fails if go-keyring was mocked (keyring.MockInit), which must
+		// not happen in this package's Windows tests as the mock replaces the
+		// real Credential Manager for the whole test binary.
 		err := keyring.Set(svc, user, value(windowsLimit+1))
 		if !errors.Is(err, keyring.ErrSetDataTooBig) {
 			_ = keyring.Delete(svc, user)
