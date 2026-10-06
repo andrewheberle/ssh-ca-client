@@ -18,6 +18,8 @@ github.com/andrewheberle/simplecommand v0.5.1 h1:zgTPMj2hf5baFE09fW/qb4VNhZL8v7T
 github.com/andrewheberle/simplecommand v0.5.1/go.mod h1:XQOLdO2a9/ZQMl5+MuBTeBzct2vsR3nIrJD3fRJlNmI=
 github.com/andrewheberle/sshagent v1.0.0 h1:fqyiiEJGHc2nxDAhtQnYYeh+nxlKGLjSphAVU/YDH7Y=
 github.com/andrewheberle/sshagent v1.0.0/go.mod h1:n/xAqd896rpytmQnumHk7qVPN2yixUbfgq6fsEP/nBU=
+github.com/andrewheberle/sshagent v1.1.0 h1:UUKJ7LSGdnRZgso4NRwX+93eN0HJ4gl+WQAd+FqdRmc=
+github.com/andrewheberle/sshagent v1.1.0/go.mod h1:5XBxii3k4fbw1wt2i2P/WqVwb48WMKoOWEwx8WU4DNc=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0 h1:axGnT1gRIfimI7gJifB699GoE/oq+F2MU7Dml6nw9rQ=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0/go.mod h1:lvDnEdqiQrp0O42VQGgmlKpxL1AP2+08jFMw88y4klk=
 github.com/bep/simplecobra v0.7.0 h1:kG8ZPwEc1o96hlIVGXcrrvwC8RornBqvMD3+pS0Z7y0=
