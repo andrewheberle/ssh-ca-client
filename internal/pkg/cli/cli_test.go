@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cli"
@@ -22,7 +21,7 @@ func execute(t *testing.T, args ...string) error {
 	if err != nil {
 		t.Fatalf("could not open %s: %v", os.DevNull, err)
 	}
-	defer devnull.Close()
+	defer func() { _ = devnull.Close() }()
 
 	stdout := os.Stdout
 	os.Stdout = devnull
@@ -90,18 +89,6 @@ func TestExecute_InvalidFlags(t *testing.T) {
 				t.Errorf("Execute(%q) error = nil, want error", tt.args)
 			}
 		})
-	}
-}
-
-// runMutuallyExclusive checks args are rejected as mutually exclusive. Flag
-// groups are only checked after the command's PreRun, so args must include a
-// config that loads. Nothing is run, so there are no side effects.
-func runMutuallyExclusive(t *testing.T, args []string) {
-	t.Helper()
-
-	err := execute(t, args...)
-	if err == nil || !strings.Contains(err.Error(), "none of the others can be") {
-		t.Errorf("Execute(%q) error = %v, want mutually exclusive flags error", args, err)
 	}
 }
 

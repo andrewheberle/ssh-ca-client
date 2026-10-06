@@ -1278,7 +1278,7 @@ func TestOidcHandler_GetTokensContext_NonInteractive(t *testing.T) {
 		if err != nil {
 			t.Errorf("login server address in use: %v", err)
 		} else {
-			ln.Close()
+			_ = ln.Close()
 		}
 	})
 

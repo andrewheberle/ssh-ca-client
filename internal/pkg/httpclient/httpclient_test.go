@@ -40,7 +40,7 @@ func TestNew(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Do() error = %v", err)
 	}
-	res.Body.Close()
+	_ = res.Body.Close()
 
 	if want := GenerateUserAgent(UserAgent); got != want {
 		t.Errorf("User-Agent = %q, want %q", got, want)
