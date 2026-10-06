@@ -8,8 +8,11 @@ import (
 	"path/filepath"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
 	"golang.org/x/crypto/ssh"
-	"sigs.k8s.io/yaml"
+	yamlparser "sigs.k8s.io/yaml"
 )
 
 func LogDir() (string, error) {
@@ -44,7 +47,7 @@ func loadSystemConfig(name string) (SystemConfig, error) {
 	}
 
 	var config SystemConfig
-	if err := yaml.UnmarshalStrict(y, &config); err != nil {
+	if err := yamlparser.UnmarshalStrict(y, &config); err != nil {
 		return SystemConfig{}, fmt.Errorf("problem parsing system config: %w", err)
 	}
 
@@ -58,4 +61,17 @@ func loadSystemConfig(name string) (SystemConfig, error) {
 	}
 
 	return config, nil
+}
+
+func loadClientConfig(configpath string) (*koanf.Koanf, error) {
+	k := koanf.New(".")
+	if err := k.Load(file.Provider(configpath), yaml.Parser()); err != nil {
+		return nil, fmt.Errorf("could not load config: %w", err)
+	}
+
+	return k, nil
+}
+
+func ConfigPath() string {
+	return filepath.Join("/etc", names.AppName, "config.yml")
 }

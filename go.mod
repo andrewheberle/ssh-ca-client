@@ -8,7 +8,7 @@ require (
 	github.com/allan-simon/go-singleinstance v0.0.0-20210120080615-d0997106ab37
 	github.com/andrewheberle/opener v1.0.2
 	github.com/andrewheberle/simplecommand v0.5.1
-	github.com/andrewheberle/sshagent v1.0.0
+	github.com/andrewheberle/sshagent v1.1.0
 	github.com/bep/simplecobra v0.7.0
 	github.com/coreos/go-oidc/v3 v3.21.0
 	github.com/forfuncsake/krl v0.1.0
@@ -16,8 +16,12 @@ require (
 	github.com/gorilla/securecookie v1.1.2
 	github.com/gorilla/sessions v1.4.0
 	github.com/hiddeco/sshsig v0.2.0
+	github.com/knadh/koanf/parsers/yaml v1.1.1
+	github.com/knadh/koanf/providers/file v1.2.1
+	github.com/knadh/koanf/v2 v2.3.7
 	github.com/ndbeals/winssh-pageant v0.0.0-20230609194536-9f88b630ebec
 	github.com/oapi-codegen/runtime v1.7.0
+	github.com/pda0/koanf-winreg/v2 v2.0.0
 	github.com/spf13/pflag v1.0.10
 	github.com/zalando/go-keyring v0.2.8
 	golang.org/x/crypto v0.55.0
@@ -38,19 +42,24 @@ require (
 	github.com/danieljoos/wincred v1.2.3 // indirect
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
 	github.com/esiqveland/notify v0.13.3 // indirect
+	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/getkin/kin-openapi v0.142.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-openapi/jsonpointer v0.23.1 // indirect
 	github.com/go-openapi/swag/jsonname v0.26.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/gohugoio/gift v0.2.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackmordaunt/icns/v3 v3.0.1 // indirect
+	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/mattn/go-zglob v0.0.6 // indirect
 	github.com/mh-cbon/go-msi v0.0.0-20230202123407-9625c3dd3939 // indirect
 	github.com/mh-cbon/stringexec v0.0.0-20160727103857-5a080a1a4118 // indirect
+	github.com/mitchellh/copystructure v1.2.0 // indirect
+	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/oapi-codegen/oapi-codegen/v2 v2.8.0 // indirect
 	github.com/oasdiff/yaml v0.1.1 // indirect

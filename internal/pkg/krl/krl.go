@@ -24,7 +24,7 @@ var (
 	ErrUnexpectedSection = errors.New("encountered unexpected section type in krl")
 )
 
-func Get(server string, certificatetype api.GetRevocationListEndpointParamsCertificateType, opts ...api.ClientOption) (*Response, error) {
+func Get(server string, certificatetype api.GetCertificateTypeKrlParamsCertificateType, opts ...api.ClientOption) (*Response, error) {
 	if opts == nil {
 		opts = append(opts, api.WithHTTPClient(client.NewHttpClient()))
 	}
@@ -33,7 +33,7 @@ func Get(server string, certificatetype api.GetRevocationListEndpointParamsCerti
 		return nil, err
 	}
 
-	res, err := client.GetRevocationListEndpointWithResponse(context.TODO(), certificatetype)
+	res, err := client.GetCertificateTypeKrlWithResponse(context.TODO(), certificatetype)
 	if err != nil {
 		return nil, err
 	}

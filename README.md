@@ -70,7 +70,6 @@ client_id: OIDC Client ID
 scopes: ["openid", "email", "profile"]
 redirect_url: http://localhost:3000/auth/callback
 ca_url: https://ca.example.com/
-# optional (but highly recommended) SSH public key of CA
 trusted_ca: ecdsa-sha2-nistp256 AAAAE2VjZ...
 ```
 

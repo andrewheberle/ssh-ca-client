@@ -1,5 +1,5 @@
-// The sshcert package provides a convenient function for parsing a
-// SSH certificate.
+// The sshcert package provides convenience functions for dealing with SSH
+// certificates
 package sshcert
 
 import (

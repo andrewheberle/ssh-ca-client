@@ -550,9 +550,9 @@ func (lh *LoginHandler) doSigningRequest(access, id string) (*api.CertificateRes
 	)
 
 	// do request
-	res, err := lh.client.PostUserCertificateRequestEndpointWithResponse(
+	res, err := lh.client.PostUserCertificateWithResponse(
 		context.TODO(),
-		&api.PostUserCertificateRequestEndpointParams{
+		&api.PostUserCertificateParams{
 			Authorization: "Bearer " + access,
 		},
 		payload,
@@ -611,15 +611,15 @@ func (lh *LoginHandler) generateProofOfPossession() (*proof.Proof, error) {
 	return proof.Generate(signer)
 }
 
-// ExecuteLogin performs [*LoginHandler.Start()], attempts to open the users
-// browser to start the OIDC auth flow, followed by [*LoginHandler.Wait()]
+// ExecuteLogin performs [LoginHandler.Start], attempts to open the users
+// browser to start the OIDC auth flow, followed by [LoginHandler.Wait]
 func (lh *LoginHandler) ExecuteLogin(addr string) error {
 	return lh.executeLogin(context.Background(), addr)
 }
 
-// ExecuteLoginWithContext is identitical to [*LoginHandler.ExecuteLogin()]
+// ExecuteLoginWithContext is identitical to [LoginHandler.ExecuteLogin]
 // however the provided context is used rather than the default of
-// [context.Background()]
+// [context.Background]
 func (lh *LoginHandler) ExecuteLoginWithContext(ctx context.Context, addr string) error {
 	return lh.executeLogin(ctx, addr)
 }

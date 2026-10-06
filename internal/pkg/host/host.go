@@ -53,15 +53,6 @@ var (
 	DefaultLogger = slog.Default()
 )
 
-type CertificateSignerPayload struct {
-	Lifetime          int      `json:"lifetime"`
-	Principals        []string `json:"principals,omitempty"`
-	PublicKey         []byte   `json:"public_key"`
-	Certificate       []byte   `json:"certificate,omitempty"`
-	ProofOfPossession string   `json:"proof"`
-	Identity          string   `json:"identity,omitempty"`
-}
-
 type LoginHandler struct {
 	keys         []sshKey
 	principals   []string
@@ -433,7 +424,7 @@ func (lh *LoginHandler) doSigningRequest(key ssh.Signer, cert []byte, token *oau
 			"certificate", cert,
 		)
 
-		res, err := lh.client.PostHostCertificateRenewEndpointWithResponse(
+		res, err := lh.client.PostHostRenewWithResponse(
 			context.TODO(),
 			payload,
 		)
@@ -479,9 +470,9 @@ func (lh *LoginHandler) doSigningRequest(key ssh.Signer, cert []byte, token *oau
 		"identity", payload.Identity,
 	)
 
-	res, err := lh.client.PostHostCertificateRequestEndpointWithResponse(
+	res, err := lh.client.PostHostCertificateWithResponse(
 		context.TODO(),
-		&api.PostHostCertificateRequestEndpointParams{
+		&api.PostHostCertificateParams{
 			Authorization: "Bearer " + token.AccessToken,
 		},
 		payload,

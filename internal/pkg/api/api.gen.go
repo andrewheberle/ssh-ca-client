@@ -17,651 +17,381 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
-// Defines values for GetCaPublicKeyEndpointV2500JSONResponseBodySuccess.
+// Defines values for GetCa500JSONResponseBodySuccess.
 const (
-	GetCaPublicKeyEndpointV2500JSONResponseBodySuccessFalse GetCaPublicKeyEndpointV2500JSONResponseBodySuccess = false
+	GetCa500JSONResponseBodySuccessFalse GetCa500JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the GetCaPublicKeyEndpointV2500JSONResponseBodySuccess enum.
-func (e GetCaPublicKeyEndpointV2500JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the GetCa500JSONResponseBodySuccess enum.
+func (e GetCa500JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case GetCaPublicKeyEndpointV2500JSONResponseBodySuccessFalse:
+	case GetCa500JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostCertificateRequestEndpointV2400JSONResponseBodySuccess.
+// Defines values for PostHostCertificate400JSONResponseBodySuccess.
 const (
-	PostCertificateRequestEndpointV2400JSONResponseBodySuccessFalse PostCertificateRequestEndpointV2400JSONResponseBodySuccess = false
+	PostHostCertificate400JSONResponseBodySuccessFalse PostHostCertificate400JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostCertificateRequestEndpointV2400JSONResponseBodySuccess enum.
-func (e PostCertificateRequestEndpointV2400JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostHostCertificate400JSONResponseBodySuccess enum.
+func (e PostHostCertificate400JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostCertificateRequestEndpointV2400JSONResponseBodySuccessFalse:
+	case PostHostCertificate400JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostCertificateRequestEndpointV2401JSONResponseBodyError.
+// Defines values for PostHostCertificate401JSONResponseBodySuccess.
 const (
-	PostCertificateRequestEndpointV2401JSONResponseBodyErrorUnauthorized PostCertificateRequestEndpointV2401JSONResponseBodyError = "Unauthorized"
+	PostHostCertificate401JSONResponseBodySuccessFalse PostHostCertificate401JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostCertificateRequestEndpointV2401JSONResponseBodyError enum.
-func (e PostCertificateRequestEndpointV2401JSONResponseBodyError) Valid() bool {
+// Valid indicates whether the value is a known member of the PostHostCertificate401JSONResponseBodySuccess enum.
+func (e PostHostCertificate401JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostCertificateRequestEndpointV2401JSONResponseBodyErrorUnauthorized:
+	case PostHostCertificate401JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostCertificateRequestEndpointV2403JSONResponseBodySuccess.
+// Defines values for PostHostCertificate403JSONResponseBodySuccess.
 const (
-	PostCertificateRequestEndpointV2403JSONResponseBodySuccessFalse PostCertificateRequestEndpointV2403JSONResponseBodySuccess = false
+	PostHostCertificate403JSONResponseBodySuccessFalse PostHostCertificate403JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostCertificateRequestEndpointV2403JSONResponseBodySuccess enum.
-func (e PostCertificateRequestEndpointV2403JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostHostCertificate403JSONResponseBodySuccess enum.
+func (e PostHostCertificate403JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostCertificateRequestEndpointV2403JSONResponseBodySuccessFalse:
+	case PostHostCertificate403JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostCertificateRequestEndpointV2422JSONResponseBodySuccess.
+// Defines values for PostHostCertificate422JSONResponseBodySuccess.
 const (
-	PostCertificateRequestEndpointV2422JSONResponseBodySuccessFalse PostCertificateRequestEndpointV2422JSONResponseBodySuccess = false
+	PostHostCertificate422JSONResponseBodySuccessFalse PostHostCertificate422JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostCertificateRequestEndpointV2422JSONResponseBodySuccess enum.
-func (e PostCertificateRequestEndpointV2422JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostHostCertificate422JSONResponseBodySuccess enum.
+func (e PostHostCertificate422JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostCertificateRequestEndpointV2422JSONResponseBodySuccessFalse:
+	case PostHostCertificate422JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostCertificateRequestEndpointV2500JSONResponseBodySuccess.
+// Defines values for PostHostCertificate500JSONResponseBodySuccess.
 const (
-	PostCertificateRequestEndpointV2500JSONResponseBodySuccessFalse PostCertificateRequestEndpointV2500JSONResponseBodySuccess = false
+	PostHostCertificate500JSONResponseBodySuccessFalse PostHostCertificate500JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostCertificateRequestEndpointV2500JSONResponseBodySuccess enum.
-func (e PostCertificateRequestEndpointV2500JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostHostCertificate500JSONResponseBodySuccess enum.
+func (e PostHostCertificate500JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostCertificateRequestEndpointV2500JSONResponseBodySuccessFalse:
+	case PostHostCertificate500JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRenewEndpointV2400JSONResponseBodySuccess.
+// Defines values for PostHostRenew400JSONResponseBodySuccess.
 const (
-	PostHostCertificateRenewEndpointV2400JSONResponseBodySuccessFalse PostHostCertificateRenewEndpointV2400JSONResponseBodySuccess = false
+	PostHostRenew400JSONResponseBodySuccessFalse PostHostRenew400JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRenewEndpointV2400JSONResponseBodySuccess enum.
-func (e PostHostCertificateRenewEndpointV2400JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostHostRenew400JSONResponseBodySuccess enum.
+func (e PostHostRenew400JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRenewEndpointV2400JSONResponseBodySuccessFalse:
+	case PostHostRenew400JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRenewEndpointV2401JSONResponseBodyError.
+// Defines values for PostHostRenew401JSONResponseBodySuccess.
 const (
-	PostHostCertificateRenewEndpointV2401JSONResponseBodyErrorUnauthorized PostHostCertificateRenewEndpointV2401JSONResponseBodyError = "Unauthorized"
+	PostHostRenew401JSONResponseBodySuccessFalse PostHostRenew401JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRenewEndpointV2401JSONResponseBodyError enum.
-func (e PostHostCertificateRenewEndpointV2401JSONResponseBodyError) Valid() bool {
+// Valid indicates whether the value is a known member of the PostHostRenew401JSONResponseBodySuccess enum.
+func (e PostHostRenew401JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRenewEndpointV2401JSONResponseBodyErrorUnauthorized:
+	case PostHostRenew401JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRenewEndpointV2401JSONResponseBodyStatus.
+// Defines values for PostHostRenew403JSONResponseBodySuccess.
 const (
-	PostHostCertificateRenewEndpointV2401JSONResponseBodyStatusN401 PostHostCertificateRenewEndpointV2401JSONResponseBodyStatus = 401
+	PostHostRenew403JSONResponseBodySuccessFalse PostHostRenew403JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRenewEndpointV2401JSONResponseBodyStatus enum.
-func (e PostHostCertificateRenewEndpointV2401JSONResponseBodyStatus) Valid() bool {
+// Valid indicates whether the value is a known member of the PostHostRenew403JSONResponseBodySuccess enum.
+func (e PostHostRenew403JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRenewEndpointV2401JSONResponseBodyStatusN401:
+	case PostHostRenew403JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRenewEndpointV2403JSONResponseBodySuccess.
+// Defines values for PostHostRenew422JSONResponseBodySuccess.
 const (
-	PostHostCertificateRenewEndpointV2403JSONResponseBodySuccessFalse PostHostCertificateRenewEndpointV2403JSONResponseBodySuccess = false
+	PostHostRenew422JSONResponseBodySuccessFalse PostHostRenew422JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRenewEndpointV2403JSONResponseBodySuccess enum.
-func (e PostHostCertificateRenewEndpointV2403JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostHostRenew422JSONResponseBodySuccess enum.
+func (e PostHostRenew422JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRenewEndpointV2403JSONResponseBodySuccessFalse:
+	case PostHostRenew422JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRenewEndpointV2422JSONResponseBodySuccess.
+// Defines values for PostHostRenew500JSONResponseBodySuccess.
 const (
-	PostHostCertificateRenewEndpointV2422JSONResponseBodySuccessFalse PostHostCertificateRenewEndpointV2422JSONResponseBodySuccess = false
+	PostHostRenew500JSONResponseBodySuccessFalse PostHostRenew500JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRenewEndpointV2422JSONResponseBodySuccess enum.
-func (e PostHostCertificateRenewEndpointV2422JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostHostRenew500JSONResponseBodySuccess enum.
+func (e PostHostRenew500JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRenewEndpointV2422JSONResponseBodySuccessFalse:
+	case PostHostRenew500JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRenewEndpointV2500JSONResponseBodySuccess.
+// Defines values for PostUserCertificate400JSONResponseBodySuccess.
 const (
-	PostHostCertificateRenewEndpointV2500JSONResponseBodySuccessFalse PostHostCertificateRenewEndpointV2500JSONResponseBodySuccess = false
+	PostUserCertificate400JSONResponseBodySuccessFalse PostUserCertificate400JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRenewEndpointV2500JSONResponseBodySuccess enum.
-func (e PostHostCertificateRenewEndpointV2500JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostUserCertificate400JSONResponseBodySuccess enum.
+func (e PostUserCertificate400JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRenewEndpointV2500JSONResponseBodySuccessFalse:
+	case PostUserCertificate400JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRequestEndpointV2400JSONResponseBodySuccess.
+// Defines values for PostUserCertificate401JSONResponseBodySuccess.
 const (
-	PostHostCertificateRequestEndpointV2400JSONResponseBodySuccessFalse PostHostCertificateRequestEndpointV2400JSONResponseBodySuccess = false
+	PostUserCertificate401JSONResponseBodySuccessFalse PostUserCertificate401JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRequestEndpointV2400JSONResponseBodySuccess enum.
-func (e PostHostCertificateRequestEndpointV2400JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostUserCertificate401JSONResponseBodySuccess enum.
+func (e PostUserCertificate401JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRequestEndpointV2400JSONResponseBodySuccessFalse:
+	case PostUserCertificate401JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRequestEndpointV2401JSONResponseBodyError.
+// Defines values for PostUserCertificate403JSONResponseBodySuccess.
 const (
-	PostHostCertificateRequestEndpointV2401JSONResponseBodyErrorUnauthorized PostHostCertificateRequestEndpointV2401JSONResponseBodyError = "Unauthorized"
+	PostUserCertificate403JSONResponseBodySuccessFalse PostUserCertificate403JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRequestEndpointV2401JSONResponseBodyError enum.
-func (e PostHostCertificateRequestEndpointV2401JSONResponseBodyError) Valid() bool {
+// Valid indicates whether the value is a known member of the PostUserCertificate403JSONResponseBodySuccess enum.
+func (e PostUserCertificate403JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRequestEndpointV2401JSONResponseBodyErrorUnauthorized:
+	case PostUserCertificate403JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRequestEndpointV2401JSONResponseBodyStatus.
+// Defines values for PostUserCertificate422JSONResponseBodySuccess.
 const (
-	PostHostCertificateRequestEndpointV2401JSONResponseBodyStatusN401 PostHostCertificateRequestEndpointV2401JSONResponseBodyStatus = 401
+	PostUserCertificate422JSONResponseBodySuccessFalse PostUserCertificate422JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRequestEndpointV2401JSONResponseBodyStatus enum.
-func (e PostHostCertificateRequestEndpointV2401JSONResponseBodyStatus) Valid() bool {
+// Valid indicates whether the value is a known member of the PostUserCertificate422JSONResponseBodySuccess enum.
+func (e PostUserCertificate422JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRequestEndpointV2401JSONResponseBodyStatusN401:
+	case PostUserCertificate422JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRequestEndpointV2403JSONResponseBodySuccess.
+// Defines values for PostUserCertificate500JSONResponseBodySuccess.
 const (
-	PostHostCertificateRequestEndpointV2403JSONResponseBodySuccessFalse PostHostCertificateRequestEndpointV2403JSONResponseBodySuccess = false
+	PostUserCertificate500JSONResponseBodySuccessFalse PostUserCertificate500JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRequestEndpointV2403JSONResponseBodySuccess enum.
-func (e PostHostCertificateRequestEndpointV2403JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostUserCertificate500JSONResponseBodySuccess enum.
+func (e PostUserCertificate500JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRequestEndpointV2403JSONResponseBodySuccessFalse:
+	case PostUserCertificate500JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRequestEndpointV2422JSONResponseBodySuccess.
+// Defines values for GetCertificateTypeKrlParamsCertificateType.
 const (
-	PostHostCertificateRequestEndpointV2422JSONResponseBodySuccessFalse PostHostCertificateRequestEndpointV2422JSONResponseBodySuccess = false
+	GetCertificateTypeKrlParamsCertificateTypeHost GetCertificateTypeKrlParamsCertificateType = "host"
+	GetCertificateTypeKrlParamsCertificateTypeUser GetCertificateTypeKrlParamsCertificateType = "user"
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRequestEndpointV2422JSONResponseBodySuccess enum.
-func (e PostHostCertificateRequestEndpointV2422JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the GetCertificateTypeKrlParamsCertificateType enum.
+func (e GetCertificateTypeKrlParamsCertificateType) Valid() bool {
 	switch e {
-	case PostHostCertificateRequestEndpointV2422JSONResponseBodySuccessFalse:
+	case GetCertificateTypeKrlParamsCertificateTypeHost:
+		return true
+	case GetCertificateTypeKrlParamsCertificateTypeUser:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRequestEndpointV2500JSONResponseBodySuccess.
+// Defines values for GetCertificateTypeKrl500JSONResponseBodySuccess.
 const (
-	PostHostCertificateRequestEndpointV2500JSONResponseBodySuccessFalse PostHostCertificateRequestEndpointV2500JSONResponseBodySuccess = false
+	GetCertificateTypeKrl500JSONResponseBodySuccessFalse GetCertificateTypeKrl500JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRequestEndpointV2500JSONResponseBodySuccess enum.
-func (e PostHostCertificateRequestEndpointV2500JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the GetCertificateTypeKrl500JSONResponseBodySuccess enum.
+func (e GetCertificateTypeKrl500JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRequestEndpointV2500JSONResponseBodySuccessFalse:
+	case GetCertificateTypeKrl500JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for GetCaPublicKeyEndpoint500JSONResponseBodySuccess.
+// Defines values for PostCertificateTypeRevokeParamsCertificateType.
 const (
-	GetCaPublicKeyEndpoint500JSONResponseBodySuccessFalse GetCaPublicKeyEndpoint500JSONResponseBodySuccess = false
+	PostCertificateTypeRevokeParamsCertificateTypeHost PostCertificateTypeRevokeParamsCertificateType = "host"
+	PostCertificateTypeRevokeParamsCertificateTypeUser PostCertificateTypeRevokeParamsCertificateType = "user"
 )
 
-// Valid indicates whether the value is a known member of the GetCaPublicKeyEndpoint500JSONResponseBodySuccess enum.
-func (e GetCaPublicKeyEndpoint500JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostCertificateTypeRevokeParamsCertificateType enum.
+func (e PostCertificateTypeRevokeParamsCertificateType) Valid() bool {
 	switch e {
-	case GetCaPublicKeyEndpoint500JSONResponseBodySuccessFalse:
+	case PostCertificateTypeRevokeParamsCertificateTypeHost:
+		return true
+	case PostCertificateTypeRevokeParamsCertificateTypeUser:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRequestEndpoint400JSONResponseBodySuccess.
+// Defines values for PostCertificateTypeRevoke400JSONResponseBodySuccess.
 const (
-	PostHostCertificateRequestEndpoint400JSONResponseBodySuccessFalse PostHostCertificateRequestEndpoint400JSONResponseBodySuccess = false
+	PostCertificateTypeRevoke400JSONResponseBodySuccessFalse PostCertificateTypeRevoke400JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRequestEndpoint400JSONResponseBodySuccess enum.
-func (e PostHostCertificateRequestEndpoint400JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke400JSONResponseBodySuccess enum.
+func (e PostCertificateTypeRevoke400JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRequestEndpoint400JSONResponseBodySuccessFalse:
+	case PostCertificateTypeRevoke400JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRequestEndpoint401JSONResponseBodySuccess.
+// Defines values for PostCertificateTypeRevoke401JSONResponseBodySuccess.
 const (
-	PostHostCertificateRequestEndpoint401JSONResponseBodySuccessFalse PostHostCertificateRequestEndpoint401JSONResponseBodySuccess = false
+	PostCertificateTypeRevoke401JSONResponseBodySuccessFalse PostCertificateTypeRevoke401JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRequestEndpoint401JSONResponseBodySuccess enum.
-func (e PostHostCertificateRequestEndpoint401JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke401JSONResponseBodySuccess enum.
+func (e PostCertificateTypeRevoke401JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRequestEndpoint401JSONResponseBodySuccessFalse:
+	case PostCertificateTypeRevoke401JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRequestEndpoint403JSONResponseBodySuccess.
+// Defines values for PostCertificateTypeRevoke403JSONResponseBodySuccess.
 const (
-	PostHostCertificateRequestEndpoint403JSONResponseBodySuccessFalse PostHostCertificateRequestEndpoint403JSONResponseBodySuccess = false
+	PostCertificateTypeRevoke403JSONResponseBodySuccessFalse PostCertificateTypeRevoke403JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRequestEndpoint403JSONResponseBodySuccess enum.
-func (e PostHostCertificateRequestEndpoint403JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke403JSONResponseBodySuccess enum.
+func (e PostCertificateTypeRevoke403JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRequestEndpoint403JSONResponseBodySuccessFalse:
+	case PostCertificateTypeRevoke403JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRequestEndpoint422JSONResponseBodySuccess.
+// Defines values for PostCertificateTypeRevoke409JSONResponseBodySuccess.
 const (
-	PostHostCertificateRequestEndpoint422JSONResponseBodySuccessFalse PostHostCertificateRequestEndpoint422JSONResponseBodySuccess = false
+	PostCertificateTypeRevoke409JSONResponseBodySuccessFalse PostCertificateTypeRevoke409JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRequestEndpoint422JSONResponseBodySuccess enum.
-func (e PostHostCertificateRequestEndpoint422JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke409JSONResponseBodySuccess enum.
+func (e PostCertificateTypeRevoke409JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRequestEndpoint422JSONResponseBodySuccessFalse:
+	case PostCertificateTypeRevoke409JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRequestEndpoint500JSONResponseBodySuccess.
+// Defines values for PostCertificateTypeRevoke422JSONResponseBodySuccess.
 const (
-	PostHostCertificateRequestEndpoint500JSONResponseBodySuccessFalse PostHostCertificateRequestEndpoint500JSONResponseBodySuccess = false
+	PostCertificateTypeRevoke422JSONResponseBodySuccessFalse PostCertificateTypeRevoke422JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRequestEndpoint500JSONResponseBodySuccess enum.
-func (e PostHostCertificateRequestEndpoint500JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke422JSONResponseBodySuccess enum.
+func (e PostCertificateTypeRevoke422JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRequestEndpoint500JSONResponseBodySuccessFalse:
+	case PostCertificateTypeRevoke422JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostHostCertificateRenewEndpoint400JSONResponseBodySuccess.
+// Defines values for PostCertificateTypeRevoke500JSONResponseBodySuccess.
 const (
-	PostHostCertificateRenewEndpoint400JSONResponseBodySuccessFalse PostHostCertificateRenewEndpoint400JSONResponseBodySuccess = false
+	PostCertificateTypeRevoke500JSONResponseBodySuccessFalse PostCertificateTypeRevoke500JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostHostCertificateRenewEndpoint400JSONResponseBodySuccess enum.
-func (e PostHostCertificateRenewEndpoint400JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke500JSONResponseBodySuccess enum.
+func (e PostCertificateTypeRevoke500JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostHostCertificateRenewEndpoint400JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostHostCertificateRenewEndpoint401JSONResponseBodySuccess.
-const (
-	PostHostCertificateRenewEndpoint401JSONResponseBodySuccessFalse PostHostCertificateRenewEndpoint401JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostHostCertificateRenewEndpoint401JSONResponseBodySuccess enum.
-func (e PostHostCertificateRenewEndpoint401JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostHostCertificateRenewEndpoint401JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostHostCertificateRenewEndpoint403JSONResponseBodySuccess.
-const (
-	PostHostCertificateRenewEndpoint403JSONResponseBodySuccessFalse PostHostCertificateRenewEndpoint403JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostHostCertificateRenewEndpoint403JSONResponseBodySuccess enum.
-func (e PostHostCertificateRenewEndpoint403JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostHostCertificateRenewEndpoint403JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostHostCertificateRenewEndpoint422JSONResponseBodySuccess.
-const (
-	PostHostCertificateRenewEndpoint422JSONResponseBodySuccessFalse PostHostCertificateRenewEndpoint422JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostHostCertificateRenewEndpoint422JSONResponseBodySuccess enum.
-func (e PostHostCertificateRenewEndpoint422JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostHostCertificateRenewEndpoint422JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostHostCertificateRenewEndpoint500JSONResponseBodySuccess.
-const (
-	PostHostCertificateRenewEndpoint500JSONResponseBodySuccessFalse PostHostCertificateRenewEndpoint500JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostHostCertificateRenewEndpoint500JSONResponseBodySuccess enum.
-func (e PostHostCertificateRenewEndpoint500JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostHostCertificateRenewEndpoint500JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostUserCertificateRequestEndpoint400JSONResponseBodySuccess.
-const (
-	PostUserCertificateRequestEndpoint400JSONResponseBodySuccessFalse PostUserCertificateRequestEndpoint400JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostUserCertificateRequestEndpoint400JSONResponseBodySuccess enum.
-func (e PostUserCertificateRequestEndpoint400JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostUserCertificateRequestEndpoint400JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostUserCertificateRequestEndpoint401JSONResponseBodySuccess.
-const (
-	PostUserCertificateRequestEndpoint401JSONResponseBodySuccessFalse PostUserCertificateRequestEndpoint401JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostUserCertificateRequestEndpoint401JSONResponseBodySuccess enum.
-func (e PostUserCertificateRequestEndpoint401JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostUserCertificateRequestEndpoint401JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostUserCertificateRequestEndpoint403JSONResponseBodySuccess.
-const (
-	PostUserCertificateRequestEndpoint403JSONResponseBodySuccessFalse PostUserCertificateRequestEndpoint403JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostUserCertificateRequestEndpoint403JSONResponseBodySuccess enum.
-func (e PostUserCertificateRequestEndpoint403JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostUserCertificateRequestEndpoint403JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostUserCertificateRequestEndpoint422JSONResponseBodySuccess.
-const (
-	PostUserCertificateRequestEndpoint422JSONResponseBodySuccessFalse PostUserCertificateRequestEndpoint422JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostUserCertificateRequestEndpoint422JSONResponseBodySuccess enum.
-func (e PostUserCertificateRequestEndpoint422JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostUserCertificateRequestEndpoint422JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostUserCertificateRequestEndpoint500JSONResponseBodySuccess.
-const (
-	PostUserCertificateRequestEndpoint500JSONResponseBodySuccessFalse PostUserCertificateRequestEndpoint500JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostUserCertificateRequestEndpoint500JSONResponseBodySuccess enum.
-func (e PostUserCertificateRequestEndpoint500JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostUserCertificateRequestEndpoint500JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for GetRevocationListEndpointParamsCertificateType.
-const (
-	GetRevocationListEndpointParamsCertificateTypeHost GetRevocationListEndpointParamsCertificateType = "host"
-	GetRevocationListEndpointParamsCertificateTypeUser GetRevocationListEndpointParamsCertificateType = "user"
-)
-
-// Valid indicates whether the value is a known member of the GetRevocationListEndpointParamsCertificateType enum.
-func (e GetRevocationListEndpointParamsCertificateType) Valid() bool {
-	switch e {
-	case GetRevocationListEndpointParamsCertificateTypeHost:
-		return true
-	case GetRevocationListEndpointParamsCertificateTypeUser:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for GetRevocationListEndpoint500JSONResponseBodySuccess.
-const (
-	GetRevocationListEndpoint500JSONResponseBodySuccessFalse GetRevocationListEndpoint500JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the GetRevocationListEndpoint500JSONResponseBodySuccess enum.
-func (e GetRevocationListEndpoint500JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case GetRevocationListEndpoint500JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostRevokeCertificateEndpointParamsCertificateType.
-const (
-	PostRevokeCertificateEndpointParamsCertificateTypeHost PostRevokeCertificateEndpointParamsCertificateType = "host"
-	PostRevokeCertificateEndpointParamsCertificateTypeUser PostRevokeCertificateEndpointParamsCertificateType = "user"
-)
-
-// Valid indicates whether the value is a known member of the PostRevokeCertificateEndpointParamsCertificateType enum.
-func (e PostRevokeCertificateEndpointParamsCertificateType) Valid() bool {
-	switch e {
-	case PostRevokeCertificateEndpointParamsCertificateTypeHost:
-		return true
-	case PostRevokeCertificateEndpointParamsCertificateTypeUser:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostRevokeCertificateEndpoint400JSONResponseBodySuccess.
-const (
-	PostRevokeCertificateEndpoint400JSONResponseBodySuccessFalse PostRevokeCertificateEndpoint400JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostRevokeCertificateEndpoint400JSONResponseBodySuccess enum.
-func (e PostRevokeCertificateEndpoint400JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostRevokeCertificateEndpoint400JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostRevokeCertificateEndpoint401JSONResponseBodySuccess.
-const (
-	PostRevokeCertificateEndpoint401JSONResponseBodySuccessFalse PostRevokeCertificateEndpoint401JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostRevokeCertificateEndpoint401JSONResponseBodySuccess enum.
-func (e PostRevokeCertificateEndpoint401JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostRevokeCertificateEndpoint401JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostRevokeCertificateEndpoint403JSONResponseBodySuccess.
-const (
-	PostRevokeCertificateEndpoint403JSONResponseBodySuccessFalse PostRevokeCertificateEndpoint403JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostRevokeCertificateEndpoint403JSONResponseBodySuccess enum.
-func (e PostRevokeCertificateEndpoint403JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostRevokeCertificateEndpoint403JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostRevokeCertificateEndpoint409JSONResponseBodySuccess.
-const (
-	PostRevokeCertificateEndpoint409JSONResponseBodySuccessFalse PostRevokeCertificateEndpoint409JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostRevokeCertificateEndpoint409JSONResponseBodySuccess enum.
-func (e PostRevokeCertificateEndpoint409JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostRevokeCertificateEndpoint409JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostRevokeCertificateEndpoint422JSONResponseBodySuccess.
-const (
-	PostRevokeCertificateEndpoint422JSONResponseBodySuccessFalse PostRevokeCertificateEndpoint422JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostRevokeCertificateEndpoint422JSONResponseBodySuccess enum.
-func (e PostRevokeCertificateEndpoint422JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostRevokeCertificateEndpoint422JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostRevokeCertificateEndpoint500JSONResponseBodySuccess.
-const (
-	PostRevokeCertificateEndpoint500JSONResponseBodySuccessFalse PostRevokeCertificateEndpoint500JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostRevokeCertificateEndpoint500JSONResponseBodySuccess enum.
-func (e PostRevokeCertificateEndpoint500JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostRevokeCertificateEndpoint500JSONResponseBodySuccessFalse:
+	case PostCertificateTypeRevoke500JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
@@ -749,233 +479,104 @@ type UserCertificateRequest struct {
 	PublicKey []byte `json:"public_key"`
 }
 
-// GetCaPublicKeyEndpointV2500JSONResponseBodySuccess defines parameters for GetCaPublicKeyEndpointV2.
-type GetCaPublicKeyEndpointV2500JSONResponseBodySuccess bool
+// GetCa500JSONResponseBodySuccess defines parameters for GetCa.
+type GetCa500JSONResponseBodySuccess bool
 
-// PostCertificateRequestEndpointV2JSONBody defines parameters for PostCertificateRequestEndpointV2.
-type PostCertificateRequestEndpointV2JSONBody struct {
-	// Extensions Extensions to include in issued SSH certificate in seconds
-	Extensions *[]string `json:"extensions,omitempty"`
-
-	// Identity Identity Token JWT from OIDC IdP
-	Identity string `json:"identity"`
-
-	// Lifetime Lifetime of issued SSH certificate
-	Lifetime *float32 `json:"lifetime,omitempty"`
-
-	// Nonce Proof of possession comprising of ${timestamp}.${fingerprint}.${format}:${signature}
-	Nonce string `json:"nonce"`
-
-	// PublicKey SSH public key to sign
-	PublicKey string `json:"public_key"`
-}
-
-// PostCertificateRequestEndpointV2Params defines parameters for PostCertificateRequestEndpointV2.
-type PostCertificateRequestEndpointV2Params struct {
+// PostHostCertificateParams defines parameters for PostHostCertificate.
+type PostHostCertificateParams struct {
 	// Authorization Access Token JWT from OIDC IdP
 	Authorization string `json:"Authorization"`
 }
 
-// PostCertificateRequestEndpointV2400JSONResponseBodySuccess defines parameters for PostCertificateRequestEndpointV2.
-type PostCertificateRequestEndpointV2400JSONResponseBodySuccess bool
+// PostHostCertificate400JSONResponseBodySuccess defines parameters for PostHostCertificate.
+type PostHostCertificate400JSONResponseBodySuccess bool
 
-// PostCertificateRequestEndpointV2401JSONResponseBodyError defines parameters for PostCertificateRequestEndpointV2.
-type PostCertificateRequestEndpointV2401JSONResponseBodyError string
+// PostHostCertificate401JSONResponseBodySuccess defines parameters for PostHostCertificate.
+type PostHostCertificate401JSONResponseBodySuccess bool
 
-// PostCertificateRequestEndpointV2403JSONResponseBodySuccess defines parameters for PostCertificateRequestEndpointV2.
-type PostCertificateRequestEndpointV2403JSONResponseBodySuccess bool
+// PostHostCertificate403JSONResponseBodySuccess defines parameters for PostHostCertificate.
+type PostHostCertificate403JSONResponseBodySuccess bool
 
-// PostCertificateRequestEndpointV2422JSONResponseBodySuccess defines parameters for PostCertificateRequestEndpointV2.
-type PostCertificateRequestEndpointV2422JSONResponseBodySuccess bool
+// PostHostCertificate422JSONResponseBodySuccess defines parameters for PostHostCertificate.
+type PostHostCertificate422JSONResponseBodySuccess bool
 
-// PostCertificateRequestEndpointV2500JSONResponseBodySuccess defines parameters for PostCertificateRequestEndpointV2.
-type PostCertificateRequestEndpointV2500JSONResponseBodySuccess bool
+// PostHostCertificate500JSONResponseBodySuccess defines parameters for PostHostCertificate.
+type PostHostCertificate500JSONResponseBodySuccess bool
 
-// PostHostCertificateRenewEndpointV2JSONBody defines parameters for PostHostCertificateRenewEndpointV2.
-type PostHostCertificateRenewEndpointV2JSONBody struct {
-	// Certificate SSH certificate to renew
-	Certificate string `json:"certificate"`
+// PostHostRenew400JSONResponseBodySuccess defines parameters for PostHostRenew.
+type PostHostRenew400JSONResponseBodySuccess bool
 
-	// Lifetime Lifetime of renewed Host SSH certificate
-	Lifetime *float32 `json:"lifetime,omitempty"`
+// PostHostRenew401JSONResponseBodySuccess defines parameters for PostHostRenew.
+type PostHostRenew401JSONResponseBodySuccess bool
 
-	// Nonce Proof of possession comprising of ${timestamp}.${keyfingerprint}.${format}:${signature}
-	Nonce string `json:"nonce"`
+// PostHostRenew403JSONResponseBodySuccess defines parameters for PostHostRenew.
+type PostHostRenew403JSONResponseBodySuccess bool
 
-	// PublicKey SSH public key of certificate to be renewed
-	PublicKey string `json:"public_key"`
-}
+// PostHostRenew422JSONResponseBodySuccess defines parameters for PostHostRenew.
+type PostHostRenew422JSONResponseBodySuccess bool
 
-// PostHostCertificateRenewEndpointV2400JSONResponseBodySuccess defines parameters for PostHostCertificateRenewEndpointV2.
-type PostHostCertificateRenewEndpointV2400JSONResponseBodySuccess bool
+// PostHostRenew500JSONResponseBodySuccess defines parameters for PostHostRenew.
+type PostHostRenew500JSONResponseBodySuccess bool
 
-// PostHostCertificateRenewEndpointV2401JSONResponseBodyError defines parameters for PostHostCertificateRenewEndpointV2.
-type PostHostCertificateRenewEndpointV2401JSONResponseBodyError string
-
-// PostHostCertificateRenewEndpointV2401JSONResponseBodyStatus defines parameters for PostHostCertificateRenewEndpointV2.
-type PostHostCertificateRenewEndpointV2401JSONResponseBodyStatus float32
-
-// PostHostCertificateRenewEndpointV2403JSONResponseBodySuccess defines parameters for PostHostCertificateRenewEndpointV2.
-type PostHostCertificateRenewEndpointV2403JSONResponseBodySuccess bool
-
-// PostHostCertificateRenewEndpointV2422JSONResponseBodySuccess defines parameters for PostHostCertificateRenewEndpointV2.
-type PostHostCertificateRenewEndpointV2422JSONResponseBodySuccess bool
-
-// PostHostCertificateRenewEndpointV2500JSONResponseBodySuccess defines parameters for PostHostCertificateRenewEndpointV2.
-type PostHostCertificateRenewEndpointV2500JSONResponseBodySuccess bool
-
-// PostHostCertificateRequestEndpointV2JSONBody defines parameters for PostHostCertificateRequestEndpointV2.
-type PostHostCertificateRequestEndpointV2JSONBody struct {
-	// Lifetime Lifetime of issued Host SSH certificate
-	Lifetime *float32 `json:"lifetime,omitempty"`
-
-	// Nonce Proof of possession comprising of ${timestamp}.${fingerprint}.${format}:${signature}
-	Nonce string `json:"nonce"`
-
-	// Principals List of principals to include on the issued certificate
-	Principals []string `json:"principals"`
-
-	// PublicKey SSH public key to sign
-	PublicKey string `json:"public_key"`
-}
-
-// PostHostCertificateRequestEndpointV2Params defines parameters for PostHostCertificateRequestEndpointV2.
-type PostHostCertificateRequestEndpointV2Params struct {
+// PostUserCertificateParams defines parameters for PostUserCertificate.
+type PostUserCertificateParams struct {
 	// Authorization Access Token JWT from OIDC IdP
 	Authorization string `json:"Authorization"`
 }
 
-// PostHostCertificateRequestEndpointV2400JSONResponseBodySuccess defines parameters for PostHostCertificateRequestEndpointV2.
-type PostHostCertificateRequestEndpointV2400JSONResponseBodySuccess bool
+// PostUserCertificate400JSONResponseBodySuccess defines parameters for PostUserCertificate.
+type PostUserCertificate400JSONResponseBodySuccess bool
 
-// PostHostCertificateRequestEndpointV2401JSONResponseBodyError defines parameters for PostHostCertificateRequestEndpointV2.
-type PostHostCertificateRequestEndpointV2401JSONResponseBodyError string
+// PostUserCertificate401JSONResponseBodySuccess defines parameters for PostUserCertificate.
+type PostUserCertificate401JSONResponseBodySuccess bool
 
-// PostHostCertificateRequestEndpointV2401JSONResponseBodyStatus defines parameters for PostHostCertificateRequestEndpointV2.
-type PostHostCertificateRequestEndpointV2401JSONResponseBodyStatus float32
+// PostUserCertificate403JSONResponseBodySuccess defines parameters for PostUserCertificate.
+type PostUserCertificate403JSONResponseBodySuccess bool
 
-// PostHostCertificateRequestEndpointV2403JSONResponseBodySuccess defines parameters for PostHostCertificateRequestEndpointV2.
-type PostHostCertificateRequestEndpointV2403JSONResponseBodySuccess bool
+// PostUserCertificate422JSONResponseBodySuccess defines parameters for PostUserCertificate.
+type PostUserCertificate422JSONResponseBodySuccess bool
 
-// PostHostCertificateRequestEndpointV2422JSONResponseBodySuccess defines parameters for PostHostCertificateRequestEndpointV2.
-type PostHostCertificateRequestEndpointV2422JSONResponseBodySuccess bool
+// PostUserCertificate500JSONResponseBodySuccess defines parameters for PostUserCertificate.
+type PostUserCertificate500JSONResponseBodySuccess bool
 
-// PostHostCertificateRequestEndpointV2500JSONResponseBodySuccess defines parameters for PostHostCertificateRequestEndpointV2.
-type PostHostCertificateRequestEndpointV2500JSONResponseBodySuccess bool
+// GetCertificateTypeKrlParamsCertificateType defines parameters for GetCertificateTypeKrl.
+type GetCertificateTypeKrlParamsCertificateType string
 
-// GetCaPublicKeyEndpoint500JSONResponseBodySuccess defines parameters for GetCaPublicKeyEndpoint.
-type GetCaPublicKeyEndpoint500JSONResponseBodySuccess bool
+// GetCertificateTypeKrl500JSONResponseBodySuccess defines parameters for GetCertificateTypeKrl.
+type GetCertificateTypeKrl500JSONResponseBodySuccess bool
 
-// PostHostCertificateRequestEndpointParams defines parameters for PostHostCertificateRequestEndpoint.
-type PostHostCertificateRequestEndpointParams struct {
-	// Authorization Access Token JWT from OIDC IdP
-	Authorization string `json:"Authorization"`
-}
+// PostCertificateTypeRevokeParamsCertificateType defines parameters for PostCertificateTypeRevoke.
+type PostCertificateTypeRevokeParamsCertificateType string
 
-// PostHostCertificateRequestEndpoint400JSONResponseBodySuccess defines parameters for PostHostCertificateRequestEndpoint.
-type PostHostCertificateRequestEndpoint400JSONResponseBodySuccess bool
+// PostCertificateTypeRevoke400JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
+type PostCertificateTypeRevoke400JSONResponseBodySuccess bool
 
-// PostHostCertificateRequestEndpoint401JSONResponseBodySuccess defines parameters for PostHostCertificateRequestEndpoint.
-type PostHostCertificateRequestEndpoint401JSONResponseBodySuccess bool
+// PostCertificateTypeRevoke401JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
+type PostCertificateTypeRevoke401JSONResponseBodySuccess bool
 
-// PostHostCertificateRequestEndpoint403JSONResponseBodySuccess defines parameters for PostHostCertificateRequestEndpoint.
-type PostHostCertificateRequestEndpoint403JSONResponseBodySuccess bool
+// PostCertificateTypeRevoke403JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
+type PostCertificateTypeRevoke403JSONResponseBodySuccess bool
 
-// PostHostCertificateRequestEndpoint422JSONResponseBodySuccess defines parameters for PostHostCertificateRequestEndpoint.
-type PostHostCertificateRequestEndpoint422JSONResponseBodySuccess bool
+// PostCertificateTypeRevoke409JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
+type PostCertificateTypeRevoke409JSONResponseBodySuccess bool
 
-// PostHostCertificateRequestEndpoint500JSONResponseBodySuccess defines parameters for PostHostCertificateRequestEndpoint.
-type PostHostCertificateRequestEndpoint500JSONResponseBodySuccess bool
+// PostCertificateTypeRevoke422JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
+type PostCertificateTypeRevoke422JSONResponseBodySuccess bool
 
-// PostHostCertificateRenewEndpoint400JSONResponseBodySuccess defines parameters for PostHostCertificateRenewEndpoint.
-type PostHostCertificateRenewEndpoint400JSONResponseBodySuccess bool
+// PostCertificateTypeRevoke500JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
+type PostCertificateTypeRevoke500JSONResponseBodySuccess bool
 
-// PostHostCertificateRenewEndpoint401JSONResponseBodySuccess defines parameters for PostHostCertificateRenewEndpoint.
-type PostHostCertificateRenewEndpoint401JSONResponseBodySuccess bool
+// PostHostCertificateJSONRequestBody defines body for PostHostCertificate for application/json ContentType.
+type PostHostCertificateJSONRequestBody = HostCertificateRequest
 
-// PostHostCertificateRenewEndpoint403JSONResponseBodySuccess defines parameters for PostHostCertificateRenewEndpoint.
-type PostHostCertificateRenewEndpoint403JSONResponseBodySuccess bool
+// PostHostRenewJSONRequestBody defines body for PostHostRenew for application/json ContentType.
+type PostHostRenewJSONRequestBody = HostCertificateRenew
 
-// PostHostCertificateRenewEndpoint422JSONResponseBodySuccess defines parameters for PostHostCertificateRenewEndpoint.
-type PostHostCertificateRenewEndpoint422JSONResponseBodySuccess bool
+// PostUserCertificateJSONRequestBody defines body for PostUserCertificate for application/json ContentType.
+type PostUserCertificateJSONRequestBody = UserCertificateRequest
 
-// PostHostCertificateRenewEndpoint500JSONResponseBodySuccess defines parameters for PostHostCertificateRenewEndpoint.
-type PostHostCertificateRenewEndpoint500JSONResponseBodySuccess bool
-
-// PostUserCertificateRequestEndpointParams defines parameters for PostUserCertificateRequestEndpoint.
-type PostUserCertificateRequestEndpointParams struct {
-	// Authorization Access Token JWT from OIDC IdP
-	Authorization string `json:"Authorization"`
-}
-
-// PostUserCertificateRequestEndpoint400JSONResponseBodySuccess defines parameters for PostUserCertificateRequestEndpoint.
-type PostUserCertificateRequestEndpoint400JSONResponseBodySuccess bool
-
-// PostUserCertificateRequestEndpoint401JSONResponseBodySuccess defines parameters for PostUserCertificateRequestEndpoint.
-type PostUserCertificateRequestEndpoint401JSONResponseBodySuccess bool
-
-// PostUserCertificateRequestEndpoint403JSONResponseBodySuccess defines parameters for PostUserCertificateRequestEndpoint.
-type PostUserCertificateRequestEndpoint403JSONResponseBodySuccess bool
-
-// PostUserCertificateRequestEndpoint422JSONResponseBodySuccess defines parameters for PostUserCertificateRequestEndpoint.
-type PostUserCertificateRequestEndpoint422JSONResponseBodySuccess bool
-
-// PostUserCertificateRequestEndpoint500JSONResponseBodySuccess defines parameters for PostUserCertificateRequestEndpoint.
-type PostUserCertificateRequestEndpoint500JSONResponseBodySuccess bool
-
-// GetRevocationListEndpointParamsCertificateType defines parameters for GetRevocationListEndpoint.
-type GetRevocationListEndpointParamsCertificateType string
-
-// GetRevocationListEndpoint500JSONResponseBodySuccess defines parameters for GetRevocationListEndpoint.
-type GetRevocationListEndpoint500JSONResponseBodySuccess bool
-
-// PostRevokeCertificateEndpointParamsCertificateType defines parameters for PostRevokeCertificateEndpoint.
-type PostRevokeCertificateEndpointParamsCertificateType string
-
-// PostRevokeCertificateEndpoint400JSONResponseBodySuccess defines parameters for PostRevokeCertificateEndpoint.
-type PostRevokeCertificateEndpoint400JSONResponseBodySuccess bool
-
-// PostRevokeCertificateEndpoint401JSONResponseBodySuccess defines parameters for PostRevokeCertificateEndpoint.
-type PostRevokeCertificateEndpoint401JSONResponseBodySuccess bool
-
-// PostRevokeCertificateEndpoint403JSONResponseBodySuccess defines parameters for PostRevokeCertificateEndpoint.
-type PostRevokeCertificateEndpoint403JSONResponseBodySuccess bool
-
-// PostRevokeCertificateEndpoint409JSONResponseBodySuccess defines parameters for PostRevokeCertificateEndpoint.
-type PostRevokeCertificateEndpoint409JSONResponseBodySuccess bool
-
-// PostRevokeCertificateEndpoint422JSONResponseBodySuccess defines parameters for PostRevokeCertificateEndpoint.
-type PostRevokeCertificateEndpoint422JSONResponseBodySuccess bool
-
-// PostRevokeCertificateEndpoint500JSONResponseBodySuccess defines parameters for PostRevokeCertificateEndpoint.
-type PostRevokeCertificateEndpoint500JSONResponseBodySuccess bool
-
-// PostCertificateRequestEndpointV2JSONRequestBody defines body for PostCertificateRequestEndpointV2 for application/json ContentType.
-//
-// Deprecated: this type has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-type PostCertificateRequestEndpointV2JSONRequestBody PostCertificateRequestEndpointV2JSONBody
-
-// PostHostCertificateRenewEndpointV2JSONRequestBody defines body for PostHostCertificateRenewEndpointV2 for application/json ContentType.
-//
-// Deprecated: this type has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-type PostHostCertificateRenewEndpointV2JSONRequestBody PostHostCertificateRenewEndpointV2JSONBody
-
-// PostHostCertificateRequestEndpointV2JSONRequestBody defines body for PostHostCertificateRequestEndpointV2 for application/json ContentType.
-//
-// Deprecated: this type has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-type PostHostCertificateRequestEndpointV2JSONRequestBody PostHostCertificateRequestEndpointV2JSONBody
-
-// PostHostCertificateRequestEndpointJSONRequestBody defines body for PostHostCertificateRequestEndpoint for application/json ContentType.
-type PostHostCertificateRequestEndpointJSONRequestBody = HostCertificateRequest
-
-// PostHostCertificateRenewEndpointJSONRequestBody defines body for PostHostCertificateRenewEndpoint for application/json ContentType.
-type PostHostCertificateRenewEndpointJSONRequestBody = HostCertificateRenew
-
-// PostUserCertificateRequestEndpointJSONRequestBody defines body for PostUserCertificateRequestEndpoint for application/json ContentType.
-type PostUserCertificateRequestEndpointJSONRequestBody = UserCertificateRequest
-
-// PostRevokeCertificateEndpointJSONRequestBody defines body for PostRevokeCertificateEndpoint for application/json ContentType.
-type PostRevokeCertificateEndpointJSONRequestBody = CertificateRevocation
+// PostCertificateTypeRevokeJSONRequestBody defines body for PostCertificateTypeRevoke for application/json ContentType.
+type PostCertificateTypeRevokeJSONRequestBody = CertificateRevocation
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -1051,90 +652,48 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 // The interface specification for the client above.
 type ClientInterface interface {
 
-	// GetCaPublicKeyEndpointV2 performs a GET /api/v2/ca (the `GetCaPublicKeyEndpointV2` operationId) request.
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	GetCaPublicKeyEndpointV2(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetCa performs a GET /api/v3/ca (the `GetCa` operationId) request.
+	GetCa(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostCertificateRequestEndpointV2WithBody performs a POST /api/v2/certificate (the `PostCertificateRequestEndpointV2` operationId) request,
+	// PostHostCertificateWithBody performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request,
 	// with any type of body and a specified content type.
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostCertificateRequestEndpointV2WithBody(ctx context.Context, params *PostCertificateRequestEndpointV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostHostCertificateWithBody(ctx context.Context, params *PostHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostCertificateRequestEndpointV2 performs a POST /api/v2/certificate (the `PostCertificateRequestEndpointV2` operationId) request.
+	// PostHostCertificate performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request.
 	// Takes a body of the `application/json` content type.
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostCertificateRequestEndpointV2(ctx context.Context, params *PostCertificateRequestEndpointV2Params, body PostCertificateRequestEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostHostCertificate(ctx context.Context, params *PostHostCertificateParams, body PostHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostHostCertificateRenewEndpointV2WithBody performs a POST /api/v2/host/renew (the `PostHostCertificateRenewEndpointV2` operationId) request,
+	// PostHostRenewWithBody performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
 	// with any type of body and a specified content type.
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostHostCertificateRenewEndpointV2WithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostHostRenewWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostHostCertificateRenewEndpointV2 performs a POST /api/v2/host/renew (the `PostHostCertificateRenewEndpointV2` operationId) request.
+	// PostHostRenew performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request.
 	// Takes a body of the `application/json` content type.
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostHostCertificateRenewEndpointV2(ctx context.Context, body PostHostCertificateRenewEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostHostRenew(ctx context.Context, body PostHostRenewJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostHostCertificateRequestEndpointV2WithBody performs a POST /api/v2/host/request (the `PostHostCertificateRequestEndpointV2` operationId) request,
+	// PostUserCertificateWithBody performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request,
 	// with any type of body and a specified content type.
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostHostCertificateRequestEndpointV2WithBody(ctx context.Context, params *PostHostCertificateRequestEndpointV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostUserCertificateWithBody(ctx context.Context, params *PostUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostHostCertificateRequestEndpointV2 performs a POST /api/v2/host/request (the `PostHostCertificateRequestEndpointV2` operationId) request.
+	// PostUserCertificate performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request.
 	// Takes a body of the `application/json` content type.
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostHostCertificateRequestEndpointV2(ctx context.Context, params *PostHostCertificateRequestEndpointV2Params, body PostHostCertificateRequestEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostUserCertificate(ctx context.Context, params *PostUserCertificateParams, body PostUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetCaPublicKeyEndpoint performs a GET /api/v3/ca (the `GetCaPublicKeyEndpoint` operationId) request.
-	GetCaPublicKeyEndpoint(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetCertificateTypeKrl performs a GET /api/v3/{certificateType}/krl (the `GetCertificateTypeKrl` operationId) request.
+	GetCertificateTypeKrl(ctx context.Context, certificateType GetCertificateTypeKrlParamsCertificateType, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostHostCertificateRequestEndpointWithBody performs a POST /api/v3/host/certificate (the `PostHostCertificateRequestEndpoint` operationId) request,
+	// PostCertificateTypeRevokeWithBody performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request,
 	// with any type of body and a specified content type.
-	PostHostCertificateRequestEndpointWithBody(ctx context.Context, params *PostHostCertificateRequestEndpointParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostCertificateTypeRevokeWithBody(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostHostCertificateRequestEndpoint performs a POST /api/v3/host/certificate (the `PostHostCertificateRequestEndpoint` operationId) request.
+	// PostCertificateTypeRevoke performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request.
 	// Takes a body of the `application/json` content type.
-	PostHostCertificateRequestEndpoint(ctx context.Context, params *PostHostCertificateRequestEndpointParams, body PostHostCertificateRequestEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PostHostCertificateRenewEndpointWithBody performs a POST /api/v3/host/renew (the `PostHostCertificateRenewEndpoint` operationId) request,
-	// with any type of body and a specified content type.
-	PostHostCertificateRenewEndpointWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PostHostCertificateRenewEndpoint performs a POST /api/v3/host/renew (the `PostHostCertificateRenewEndpoint` operationId) request.
-	// Takes a body of the `application/json` content type.
-	PostHostCertificateRenewEndpoint(ctx context.Context, body PostHostCertificateRenewEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PostUserCertificateRequestEndpointWithBody performs a POST /api/v3/user/certificate (the `PostUserCertificateRequestEndpoint` operationId) request,
-	// with any type of body and a specified content type.
-	PostUserCertificateRequestEndpointWithBody(ctx context.Context, params *PostUserCertificateRequestEndpointParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PostUserCertificateRequestEndpoint performs a POST /api/v3/user/certificate (the `PostUserCertificateRequestEndpoint` operationId) request.
-	// Takes a body of the `application/json` content type.
-	PostUserCertificateRequestEndpoint(ctx context.Context, params *PostUserCertificateRequestEndpointParams, body PostUserCertificateRequestEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetRevocationListEndpoint performs a GET /api/v3/{certificateType}/krl (the `GetRevocationListEndpoint` operationId) request.
-	GetRevocationListEndpoint(ctx context.Context, certificateType GetRevocationListEndpointParamsCertificateType, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PostRevokeCertificateEndpointWithBody performs a POST /api/v3/{certificateType}/revoke (the `PostRevokeCertificateEndpoint` operationId) request,
-	// with any type of body and a specified content type.
-	PostRevokeCertificateEndpointWithBody(ctx context.Context, certificateType PostRevokeCertificateEndpointParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PostRevokeCertificateEndpoint performs a POST /api/v3/{certificateType}/revoke (the `PostRevokeCertificateEndpoint` operationId) request.
-	// Takes a body of the `application/json` content type.
-	PostRevokeCertificateEndpoint(ctx context.Context, certificateType PostRevokeCertificateEndpointParamsCertificateType, body PostRevokeCertificateEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostCertificateTypeRevoke(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, body PostCertificateTypeRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-// GetCaPublicKeyEndpointV2 performs a GET /api/v2/ca (the `GetCaPublicKeyEndpointV2` operationId) request.
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *Client) GetCaPublicKeyEndpointV2(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetCaPublicKeyEndpointV2Request(c.Server)
+// GetCa performs a GET /api/v3/ca (the `GetCa` operationId) request.
+func (c *Client) GetCa(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetCaRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -1145,11 +704,10 @@ func (c *Client) GetCaPublicKeyEndpointV2(ctx context.Context, reqEditors ...Req
 	return c.Client.Do(req)
 }
 
-// PostCertificateRequestEndpointV2WithBody performs a POST /api/v2/certificate (the `PostCertificateRequestEndpointV2` operationId) request,
+// PostHostCertificateWithBody performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request,
 // with any type of body and a specified content type.
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *Client) PostCertificateRequestEndpointV2WithBody(ctx context.Context, params *PostCertificateRequestEndpointV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostCertificateRequestEndpointV2RequestWithBody(c.Server, params, contentType, body)
+func (c *Client) PostHostCertificateWithBody(ctx context.Context, params *PostHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostHostCertificateRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1160,11 +718,10 @@ func (c *Client) PostCertificateRequestEndpointV2WithBody(ctx context.Context, p
 	return c.Client.Do(req)
 }
 
-// PostCertificateRequestEndpointV2 performs a POST /api/v2/certificate (the `PostCertificateRequestEndpointV2` operationId) request.
+// PostHostCertificate performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request.
 // Takes a body of the `application/json` content type.
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *Client) PostCertificateRequestEndpointV2(ctx context.Context, params *PostCertificateRequestEndpointV2Params, body PostCertificateRequestEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostCertificateRequestEndpointV2Request(c.Server, params, body)
+func (c *Client) PostHostCertificate(ctx context.Context, params *PostHostCertificateParams, body PostHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostHostCertificateRequest(c.Server, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1175,11 +732,10 @@ func (c *Client) PostCertificateRequestEndpointV2(ctx context.Context, params *P
 	return c.Client.Do(req)
 }
 
-// PostHostCertificateRenewEndpointV2WithBody performs a POST /api/v2/host/renew (the `PostHostCertificateRenewEndpointV2` operationId) request,
+// PostHostRenewWithBody performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
 // with any type of body and a specified content type.
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *Client) PostHostCertificateRenewEndpointV2WithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostHostCertificateRenewEndpointV2RequestWithBody(c.Server, contentType, body)
+func (c *Client) PostHostRenewWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostHostRenewRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1190,11 +746,10 @@ func (c *Client) PostHostCertificateRenewEndpointV2WithBody(ctx context.Context,
 	return c.Client.Do(req)
 }
 
-// PostHostCertificateRenewEndpointV2 performs a POST /api/v2/host/renew (the `PostHostCertificateRenewEndpointV2` operationId) request.
+// PostHostRenew performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request.
 // Takes a body of the `application/json` content type.
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *Client) PostHostCertificateRenewEndpointV2(ctx context.Context, body PostHostCertificateRenewEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostHostCertificateRenewEndpointV2Request(c.Server, body)
+func (c *Client) PostHostRenew(ctx context.Context, body PostHostRenewJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostHostRenewRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1205,11 +760,10 @@ func (c *Client) PostHostCertificateRenewEndpointV2(ctx context.Context, body Po
 	return c.Client.Do(req)
 }
 
-// PostHostCertificateRequestEndpointV2WithBody performs a POST /api/v2/host/request (the `PostHostCertificateRequestEndpointV2` operationId) request,
+// PostUserCertificateWithBody performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request,
 // with any type of body and a specified content type.
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *Client) PostHostCertificateRequestEndpointV2WithBody(ctx context.Context, params *PostHostCertificateRequestEndpointV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostHostCertificateRequestEndpointV2RequestWithBody(c.Server, params, contentType, body)
+func (c *Client) PostUserCertificateWithBody(ctx context.Context, params *PostUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostUserCertificateRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1220,11 +774,10 @@ func (c *Client) PostHostCertificateRequestEndpointV2WithBody(ctx context.Contex
 	return c.Client.Do(req)
 }
 
-// PostHostCertificateRequestEndpointV2 performs a POST /api/v2/host/request (the `PostHostCertificateRequestEndpointV2` operationId) request.
+// PostUserCertificate performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request.
 // Takes a body of the `application/json` content type.
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *Client) PostHostCertificateRequestEndpointV2(ctx context.Context, params *PostHostCertificateRequestEndpointV2Params, body PostHostCertificateRequestEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostHostCertificateRequestEndpointV2Request(c.Server, params, body)
+func (c *Client) PostUserCertificate(ctx context.Context, params *PostUserCertificateParams, body PostUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostUserCertificateRequest(c.Server, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1235,9 +788,9 @@ func (c *Client) PostHostCertificateRequestEndpointV2(ctx context.Context, param
 	return c.Client.Do(req)
 }
 
-// GetCaPublicKeyEndpoint performs a GET /api/v3/ca (the `GetCaPublicKeyEndpoint` operationId) request.
-func (c *Client) GetCaPublicKeyEndpoint(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetCaPublicKeyEndpointRequest(c.Server)
+// GetCertificateTypeKrl performs a GET /api/v3/{certificateType}/krl (the `GetCertificateTypeKrl` operationId) request.
+func (c *Client) GetCertificateTypeKrl(ctx context.Context, certificateType GetCertificateTypeKrlParamsCertificateType, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetCertificateTypeKrlRequest(c.Server, certificateType)
 	if err != nil {
 		return nil, err
 	}
@@ -1248,10 +801,10 @@ func (c *Client) GetCaPublicKeyEndpoint(ctx context.Context, reqEditors ...Reque
 	return c.Client.Do(req)
 }
 
-// PostHostCertificateRequestEndpointWithBody performs a POST /api/v3/host/certificate (the `PostHostCertificateRequestEndpoint` operationId) request,
+// PostCertificateTypeRevokeWithBody performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request,
 // with any type of body and a specified content type.
-func (c *Client) PostHostCertificateRequestEndpointWithBody(ctx context.Context, params *PostHostCertificateRequestEndpointParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostHostCertificateRequestEndpointRequestWithBody(c.Server, params, contentType, body)
+func (c *Client) PostCertificateTypeRevokeWithBody(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCertificateTypeRevokeRequestWithBody(c.Server, certificateType, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1262,10 +815,10 @@ func (c *Client) PostHostCertificateRequestEndpointWithBody(ctx context.Context,
 	return c.Client.Do(req)
 }
 
-// PostHostCertificateRequestEndpoint performs a POST /api/v3/host/certificate (the `PostHostCertificateRequestEndpoint` operationId) request.
+// PostCertificateTypeRevoke performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request.
 // Takes a body of the `application/json` content type.
-func (c *Client) PostHostCertificateRequestEndpoint(ctx context.Context, params *PostHostCertificateRequestEndpointParams, body PostHostCertificateRequestEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostHostCertificateRequestEndpointRequest(c.Server, params, body)
+func (c *Client) PostCertificateTypeRevoke(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, body PostCertificateTypeRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCertificateTypeRevokeRequest(c.Server, certificateType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1276,278 +829,8 @@ func (c *Client) PostHostCertificateRequestEndpoint(ctx context.Context, params 
 	return c.Client.Do(req)
 }
 
-// PostHostCertificateRenewEndpointWithBody performs a POST /api/v3/host/renew (the `PostHostCertificateRenewEndpoint` operationId) request,
-// with any type of body and a specified content type.
-func (c *Client) PostHostCertificateRenewEndpointWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostHostCertificateRenewEndpointRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// PostHostCertificateRenewEndpoint performs a POST /api/v3/host/renew (the `PostHostCertificateRenewEndpoint` operationId) request.
-// Takes a body of the `application/json` content type.
-func (c *Client) PostHostCertificateRenewEndpoint(ctx context.Context, body PostHostCertificateRenewEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostHostCertificateRenewEndpointRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// PostUserCertificateRequestEndpointWithBody performs a POST /api/v3/user/certificate (the `PostUserCertificateRequestEndpoint` operationId) request,
-// with any type of body and a specified content type.
-func (c *Client) PostUserCertificateRequestEndpointWithBody(ctx context.Context, params *PostUserCertificateRequestEndpointParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostUserCertificateRequestEndpointRequestWithBody(c.Server, params, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// PostUserCertificateRequestEndpoint performs a POST /api/v3/user/certificate (the `PostUserCertificateRequestEndpoint` operationId) request.
-// Takes a body of the `application/json` content type.
-func (c *Client) PostUserCertificateRequestEndpoint(ctx context.Context, params *PostUserCertificateRequestEndpointParams, body PostUserCertificateRequestEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostUserCertificateRequestEndpointRequest(c.Server, params, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// GetRevocationListEndpoint performs a GET /api/v3/{certificateType}/krl (the `GetRevocationListEndpoint` operationId) request.
-func (c *Client) GetRevocationListEndpoint(ctx context.Context, certificateType GetRevocationListEndpointParamsCertificateType, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetRevocationListEndpointRequest(c.Server, certificateType)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// PostRevokeCertificateEndpointWithBody performs a POST /api/v3/{certificateType}/revoke (the `PostRevokeCertificateEndpoint` operationId) request,
-// with any type of body and a specified content type.
-func (c *Client) PostRevokeCertificateEndpointWithBody(ctx context.Context, certificateType PostRevokeCertificateEndpointParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostRevokeCertificateEndpointRequestWithBody(c.Server, certificateType, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// PostRevokeCertificateEndpoint performs a POST /api/v3/{certificateType}/revoke (the `PostRevokeCertificateEndpoint` operationId) request.
-// Takes a body of the `application/json` content type.
-func (c *Client) PostRevokeCertificateEndpoint(ctx context.Context, certificateType PostRevokeCertificateEndpointParamsCertificateType, body PostRevokeCertificateEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostRevokeCertificateEndpointRequest(c.Server, certificateType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// NewGetCaPublicKeyEndpointV2Request constructs an http.Request for the GetCaPublicKeyEndpointV2 method
-func NewGetCaPublicKeyEndpointV2Request(server string) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v2/ca")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewPostCertificateRequestEndpointV2Request calls the generic PostCertificateRequestEndpointV2 builder with application/json body
-func NewPostCertificateRequestEndpointV2Request(server string, params *PostCertificateRequestEndpointV2Params, body PostCertificateRequestEndpointV2JSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPostCertificateRequestEndpointV2RequestWithBody(server, params, "application/json", bodyReader)
-}
-
-// NewPostCertificateRequestEndpointV2RequestWithBody constructs an http.Request for the PostCertificateRequestEndpointV2 method, with any body, and a specified content type
-func NewPostCertificateRequestEndpointV2RequestWithBody(server string, params *PostCertificateRequestEndpointV2Params, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v2/certificate")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "Authorization", params.Authorization, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("Authorization", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewPostHostCertificateRenewEndpointV2Request calls the generic PostHostCertificateRenewEndpointV2 builder with application/json body
-func NewPostHostCertificateRenewEndpointV2Request(server string, body PostHostCertificateRenewEndpointV2JSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPostHostCertificateRenewEndpointV2RequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewPostHostCertificateRenewEndpointV2RequestWithBody constructs an http.Request for the PostHostCertificateRenewEndpointV2 method, with any body, and a specified content type
-func NewPostHostCertificateRenewEndpointV2RequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v2/host/renew")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewPostHostCertificateRequestEndpointV2Request calls the generic PostHostCertificateRequestEndpointV2 builder with application/json body
-func NewPostHostCertificateRequestEndpointV2Request(server string, params *PostHostCertificateRequestEndpointV2Params, body PostHostCertificateRequestEndpointV2JSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPostHostCertificateRequestEndpointV2RequestWithBody(server, params, "application/json", bodyReader)
-}
-
-// NewPostHostCertificateRequestEndpointV2RequestWithBody constructs an http.Request for the PostHostCertificateRequestEndpointV2 method, with any body, and a specified content type
-func NewPostHostCertificateRequestEndpointV2RequestWithBody(server string, params *PostHostCertificateRequestEndpointV2Params, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v2/host/request")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "Authorization", params.Authorization, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("Authorization", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetCaPublicKeyEndpointRequest constructs an http.Request for the GetCaPublicKeyEndpoint method
-func NewGetCaPublicKeyEndpointRequest(server string) (*http.Request, error) {
+// NewGetCaRequest constructs an http.Request for the GetCa method
+func NewGetCaRequest(server string) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1573,19 +856,19 @@ func NewGetCaPublicKeyEndpointRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewPostHostCertificateRequestEndpointRequest calls the generic PostHostCertificateRequestEndpoint builder with application/json body
-func NewPostHostCertificateRequestEndpointRequest(server string, params *PostHostCertificateRequestEndpointParams, body PostHostCertificateRequestEndpointJSONRequestBody) (*http.Request, error) {
+// NewPostHostCertificateRequest calls the generic PostHostCertificate builder with application/json body
+func NewPostHostCertificateRequest(server string, params *PostHostCertificateParams, body PostHostCertificateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostHostCertificateRequestEndpointRequestWithBody(server, params, "application/json", bodyReader)
+	return NewPostHostCertificateRequestWithBody(server, params, "application/json", bodyReader)
 }
 
-// NewPostHostCertificateRequestEndpointRequestWithBody constructs an http.Request for the PostHostCertificateRequestEndpoint method, with any body, and a specified content type
-func NewPostHostCertificateRequestEndpointRequestWithBody(server string, params *PostHostCertificateRequestEndpointParams, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostHostCertificateRequestWithBody constructs an http.Request for the PostHostCertificate method, with any body, and a specified content type
+func NewPostHostCertificateRequestWithBody(server string, params *PostHostCertificateParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1626,19 +909,19 @@ func NewPostHostCertificateRequestEndpointRequestWithBody(server string, params 
 	return req, nil
 }
 
-// NewPostHostCertificateRenewEndpointRequest calls the generic PostHostCertificateRenewEndpoint builder with application/json body
-func NewPostHostCertificateRenewEndpointRequest(server string, body PostHostCertificateRenewEndpointJSONRequestBody) (*http.Request, error) {
+// NewPostHostRenewRequest calls the generic PostHostRenew builder with application/json body
+func NewPostHostRenewRequest(server string, body PostHostRenewJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostHostCertificateRenewEndpointRequestWithBody(server, "application/json", bodyReader)
+	return NewPostHostRenewRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewPostHostCertificateRenewEndpointRequestWithBody constructs an http.Request for the PostHostCertificateRenewEndpoint method, with any body, and a specified content type
-func NewPostHostCertificateRenewEndpointRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostHostRenewRequestWithBody constructs an http.Request for the PostHostRenew method, with any body, and a specified content type
+func NewPostHostRenewRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1666,19 +949,19 @@ func NewPostHostCertificateRenewEndpointRequestWithBody(server string, contentTy
 	return req, nil
 }
 
-// NewPostUserCertificateRequestEndpointRequest calls the generic PostUserCertificateRequestEndpoint builder with application/json body
-func NewPostUserCertificateRequestEndpointRequest(server string, params *PostUserCertificateRequestEndpointParams, body PostUserCertificateRequestEndpointJSONRequestBody) (*http.Request, error) {
+// NewPostUserCertificateRequest calls the generic PostUserCertificate builder with application/json body
+func NewPostUserCertificateRequest(server string, params *PostUserCertificateParams, body PostUserCertificateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostUserCertificateRequestEndpointRequestWithBody(server, params, "application/json", bodyReader)
+	return NewPostUserCertificateRequestWithBody(server, params, "application/json", bodyReader)
 }
 
-// NewPostUserCertificateRequestEndpointRequestWithBody constructs an http.Request for the PostUserCertificateRequestEndpoint method, with any body, and a specified content type
-func NewPostUserCertificateRequestEndpointRequestWithBody(server string, params *PostUserCertificateRequestEndpointParams, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostUserCertificateRequestWithBody constructs an http.Request for the PostUserCertificate method, with any body, and a specified content type
+func NewPostUserCertificateRequestWithBody(server string, params *PostUserCertificateParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1719,8 +1002,8 @@ func NewPostUserCertificateRequestEndpointRequestWithBody(server string, params 
 	return req, nil
 }
 
-// NewGetRevocationListEndpointRequest constructs an http.Request for the GetRevocationListEndpoint method
-func NewGetRevocationListEndpointRequest(server string, certificateType GetRevocationListEndpointParamsCertificateType) (*http.Request, error) {
+// NewGetCertificateTypeKrlRequest constructs an http.Request for the GetCertificateTypeKrl method
+func NewGetCertificateTypeKrlRequest(server string, certificateType GetCertificateTypeKrlParamsCertificateType) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1753,19 +1036,19 @@ func NewGetRevocationListEndpointRequest(server string, certificateType GetRevoc
 	return req, nil
 }
 
-// NewPostRevokeCertificateEndpointRequest calls the generic PostRevokeCertificateEndpoint builder with application/json body
-func NewPostRevokeCertificateEndpointRequest(server string, certificateType PostRevokeCertificateEndpointParamsCertificateType, body PostRevokeCertificateEndpointJSONRequestBody) (*http.Request, error) {
+// NewPostCertificateTypeRevokeRequest calls the generic PostCertificateTypeRevoke builder with application/json body
+func NewPostCertificateTypeRevokeRequest(server string, certificateType PostCertificateTypeRevokeParamsCertificateType, body PostCertificateTypeRevokeJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostRevokeCertificateEndpointRequestWithBody(server, certificateType, "application/json", bodyReader)
+	return NewPostCertificateTypeRevokeRequestWithBody(server, certificateType, "application/json", bodyReader)
 }
 
-// NewPostRevokeCertificateEndpointRequestWithBody constructs an http.Request for the PostRevokeCertificateEndpoint method, with any body, and a specified content type
-func NewPostRevokeCertificateEndpointRequestWithBody(server string, certificateType PostRevokeCertificateEndpointParamsCertificateType, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostCertificateTypeRevokeRequestWithBody constructs an http.Request for the PostCertificateTypeRevoke method, with any body, and a specified content type
+func NewPostCertificateTypeRevokeRequestWithBody(server string, certificateType PostCertificateTypeRevokeParamsCertificateType, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1844,107 +1127,58 @@ func WithBaseURL(baseURL string) ClientOption {
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
 
-	// GetCaPublicKeyEndpointV2WithResponse performs a GET /api/v2/ca (the `GetCaPublicKeyEndpointV2` operationId) request.
+	// GetCaWithResponse performs a GET /api/v3/ca (the `GetCa` operationId) request.
 	//
 	// Returns a wrapper object for the known response body format(s).
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	GetCaPublicKeyEndpointV2WithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCaPublicKeyEndpointV2Response, error)
+	GetCaWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCaResponse, error)
 
-	// PostCertificateRequestEndpointV2WithBodyWithResponse performs a POST /api/v2/certificate (the `PostCertificateRequestEndpointV2` operationId) request,
+	// PostHostCertificateWithBodyWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request,
 	// with any type of body and a specified content type.
 	//
 	// Returns a wrapper object for the known response body format(s).
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostCertificateRequestEndpointV2WithBodyWithResponse(ctx context.Context, params *PostCertificateRequestEndpointV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCertificateRequestEndpointV2Response, error)
+	PostHostCertificateWithBodyWithResponse(ctx context.Context, params *PostHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateResponse, error)
 
-	// PostCertificateRequestEndpointV2WithResponse performs a POST /api/v2/certificate (the `PostCertificateRequestEndpointV2` operationId) request.
+	// PostHostCertificateWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostCertificateRequestEndpointV2WithResponse(ctx context.Context, params *PostCertificateRequestEndpointV2Params, body PostCertificateRequestEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostCertificateRequestEndpointV2Response, error)
+	PostHostCertificateWithResponse(ctx context.Context, params *PostHostCertificateParams, body PostHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateResponse, error)
 
-	// PostHostCertificateRenewEndpointV2WithBodyWithResponse performs a POST /api/v2/host/renew (the `PostHostCertificateRenewEndpointV2` operationId) request,
+	// PostHostRenewWithBodyWithResponse performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
 	// with any type of body and a specified content type.
 	//
 	// Returns a wrapper object for the known response body format(s).
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostHostCertificateRenewEndpointV2WithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateRenewEndpointV2Response, error)
+	PostHostRenewWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostRenewResponse, error)
 
-	// PostHostCertificateRenewEndpointV2WithResponse performs a POST /api/v2/host/renew (the `PostHostCertificateRenewEndpointV2` operationId) request.
+	// PostHostRenewWithResponse performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostHostCertificateRenewEndpointV2WithResponse(ctx context.Context, body PostHostCertificateRenewEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateRenewEndpointV2Response, error)
+	PostHostRenewWithResponse(ctx context.Context, body PostHostRenewJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostRenewResponse, error)
 
-	// PostHostCertificateRequestEndpointV2WithBodyWithResponse performs a POST /api/v2/host/request (the `PostHostCertificateRequestEndpointV2` operationId) request,
+	// PostUserCertificateWithBodyWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request,
 	// with any type of body and a specified content type.
 	//
 	// Returns a wrapper object for the known response body format(s).
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostHostCertificateRequestEndpointV2WithBodyWithResponse(ctx context.Context, params *PostHostCertificateRequestEndpointV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateRequestEndpointV2Response, error)
+	PostUserCertificateWithBodyWithResponse(ctx context.Context, params *PostUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostUserCertificateResponse, error)
 
-	// PostHostCertificateRequestEndpointV2WithResponse performs a POST /api/v2/host/request (the `PostHostCertificateRequestEndpointV2` operationId) request.
+	// PostUserCertificateWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-	//
-	// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	PostHostCertificateRequestEndpointV2WithResponse(ctx context.Context, params *PostHostCertificateRequestEndpointV2Params, body PostHostCertificateRequestEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateRequestEndpointV2Response, error)
+	PostUserCertificateWithResponse(ctx context.Context, params *PostUserCertificateParams, body PostUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUserCertificateResponse, error)
 
-	// GetCaPublicKeyEndpointWithResponse performs a GET /api/v3/ca (the `GetCaPublicKeyEndpoint` operationId) request.
+	// GetCertificateTypeKrlWithResponse performs a GET /api/v3/{certificateType}/krl (the `GetCertificateTypeKrl` operationId) request.
 	//
 	// Returns a wrapper object for the known response body format(s).
-	GetCaPublicKeyEndpointWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCaPublicKeyEndpointResponse, error)
+	GetCertificateTypeKrlWithResponse(ctx context.Context, certificateType GetCertificateTypeKrlParamsCertificateType, reqEditors ...RequestEditorFn) (*GetCertificateTypeKrlResponse, error)
 
-	// PostHostCertificateRequestEndpointWithBodyWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificateRequestEndpoint` operationId) request,
+	// PostCertificateTypeRevokeWithBodyWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request,
 	// with any type of body and a specified content type.
 	//
 	// Returns a wrapper object for the known response body format(s).
-	PostHostCertificateRequestEndpointWithBodyWithResponse(ctx context.Context, params *PostHostCertificateRequestEndpointParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateRequestEndpointResponse, error)
+	PostCertificateTypeRevokeWithBodyWithResponse(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCertificateTypeRevokeResponse, error)
 
-	// PostHostCertificateRequestEndpointWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificateRequestEndpoint` operationId) request.
+	// PostCertificateTypeRevokeWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-	PostHostCertificateRequestEndpointWithResponse(ctx context.Context, params *PostHostCertificateRequestEndpointParams, body PostHostCertificateRequestEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateRequestEndpointResponse, error)
-
-	// PostHostCertificateRenewEndpointWithBodyWithResponse performs a POST /api/v3/host/renew (the `PostHostCertificateRenewEndpoint` operationId) request,
-	// with any type of body and a specified content type.
-	//
-	// Returns a wrapper object for the known response body format(s).
-	PostHostCertificateRenewEndpointWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateRenewEndpointResponse, error)
-
-	// PostHostCertificateRenewEndpointWithResponse performs a POST /api/v3/host/renew (the `PostHostCertificateRenewEndpoint` operationId) request.
-	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-	PostHostCertificateRenewEndpointWithResponse(ctx context.Context, body PostHostCertificateRenewEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateRenewEndpointResponse, error)
-
-	// PostUserCertificateRequestEndpointWithBodyWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificateRequestEndpoint` operationId) request,
-	// with any type of body and a specified content type.
-	//
-	// Returns a wrapper object for the known response body format(s).
-	PostUserCertificateRequestEndpointWithBodyWithResponse(ctx context.Context, params *PostUserCertificateRequestEndpointParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostUserCertificateRequestEndpointResponse, error)
-
-	// PostUserCertificateRequestEndpointWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificateRequestEndpoint` operationId) request.
-	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-	PostUserCertificateRequestEndpointWithResponse(ctx context.Context, params *PostUserCertificateRequestEndpointParams, body PostUserCertificateRequestEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUserCertificateRequestEndpointResponse, error)
-
-	// GetRevocationListEndpointWithResponse performs a GET /api/v3/{certificateType}/krl (the `GetRevocationListEndpoint` operationId) request.
-	//
-	// Returns a wrapper object for the known response body format(s).
-	GetRevocationListEndpointWithResponse(ctx context.Context, certificateType GetRevocationListEndpointParamsCertificateType, reqEditors ...RequestEditorFn) (*GetRevocationListEndpointResponse, error)
-
-	// PostRevokeCertificateEndpointWithBodyWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostRevokeCertificateEndpoint` operationId) request,
-	// with any type of body and a specified content type.
-	//
-	// Returns a wrapper object for the known response body format(s).
-	PostRevokeCertificateEndpointWithBodyWithResponse(ctx context.Context, certificateType PostRevokeCertificateEndpointParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostRevokeCertificateEndpointResponse, error)
-
-	// PostRevokeCertificateEndpointWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostRevokeCertificateEndpoint` operationId) request.
-	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-	PostRevokeCertificateEndpointWithResponse(ctx context.Context, certificateType PostRevokeCertificateEndpointParamsCertificateType, body PostRevokeCertificateEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRevokeCertificateEndpointResponse, error)
+	PostCertificateTypeRevokeWithResponse(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, body PostCertificateTypeRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCertificateTypeRevokeResponse, error)
 }
 
-type GetCaPublicKeyEndpointV2Response struct {
+type GetCaResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON500 the response for an HTTP 500 `application/json` response
@@ -1953,28 +1187,28 @@ type GetCaPublicKeyEndpointV2Response struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success GetCaPublicKeyEndpointV2500JSONResponseBodySuccess `json:"success"`
+		Success GetCa500JSONResponseBodySuccess `json:"success"`
 	}
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r GetCaPublicKeyEndpointV2Response) GetJSON500() *struct {
+func (r GetCaResponse) GetJSON500() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success GetCaPublicKeyEndpointV2500JSONResponseBodySuccess `json:"success"`
+	Success GetCa500JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON500
 }
 
 // GetBody returns the raw response body bytes
-func (r GetCaPublicKeyEndpointV2Response) GetBody() []byte {
+func (r GetCaResponse) GetBody() []byte {
 	return r.Body
 }
 
 // Status returns HTTPResponse.Status
-func (r GetCaPublicKeyEndpointV2Response) Status() string {
+func (r GetCaResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1982,7 +1216,7 @@ func (r GetCaPublicKeyEndpointV2Response) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetCaPublicKeyEndpointV2Response) StatusCode() int {
+func (r GetCaResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1990,479 +1224,14 @@ func (r GetCaPublicKeyEndpointV2Response) StatusCode() int {
 }
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r GetCaPublicKeyEndpointV2Response) ContentType() string {
+func (r GetCaResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
 	return ""
 }
 
-type PostCertificateRequestEndpointV2Response struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *struct {
-		Certificate string `json:"certificate"`
-	}
-	// JSON400 the response for an HTTP 400 `application/json` response
-	JSON400 *struct {
-		Errors []struct {
-			Code    float32  `json:"code"`
-			Message string   `json:"message"`
-			Path    []string `json:"path"`
-		} `json:"errors"`
-		Success PostCertificateRequestEndpointV2400JSONResponseBodySuccess `json:"success"`
-	}
-	// JSON401 the response for an HTTP 401 `application/json` response
-	JSON401 *struct {
-		Error PostCertificateRequestEndpointV2401JSONResponseBodyError `json:"error"`
-	}
-	// JSON403 the response for an HTTP 403 `application/json` response
-	JSON403 *struct {
-		Errors []struct {
-			Code    float32 `json:"code"`
-			Message string  `json:"message"`
-		} `json:"errors"`
-		Success PostCertificateRequestEndpointV2403JSONResponseBodySuccess `json:"success"`
-	}
-	// JSON422 the response for an HTTP 422 `application/json` response
-	JSON422 *struct {
-		Errors []struct {
-			Code    float32  `json:"code"`
-			Message string   `json:"message"`
-			Path    []string `json:"path"`
-		} `json:"errors"`
-		Success PostCertificateRequestEndpointV2422JSONResponseBodySuccess `json:"success"`
-	}
-	// JSON500 the response for an HTTP 500 `application/json` response
-	JSON500 *struct {
-		Errors []struct {
-			Code    float32 `json:"code"`
-			Message string  `json:"message"`
-		} `json:"errors"`
-		Success PostCertificateRequestEndpointV2500JSONResponseBodySuccess `json:"success"`
-	}
-}
-
-// GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r PostCertificateRequestEndpointV2Response) GetJSON200() *struct {
-	Certificate string `json:"certificate"`
-} {
-	return r.JSON200
-}
-
-// GetJSON400 returns the response for an HTTP 400 `application/json` response
-func (r PostCertificateRequestEndpointV2Response) GetJSON400() *struct {
-	Errors []struct {
-		Code    float32  `json:"code"`
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Success PostCertificateRequestEndpointV2400JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON400
-}
-
-// GetJSON401 returns the response for an HTTP 401 `application/json` response
-func (r PostCertificateRequestEndpointV2Response) GetJSON401() *struct {
-	Error PostCertificateRequestEndpointV2401JSONResponseBodyError `json:"error"`
-} {
-	return r.JSON401
-}
-
-// GetJSON403 returns the response for an HTTP 403 `application/json` response
-func (r PostCertificateRequestEndpointV2Response) GetJSON403() *struct {
-	Errors []struct {
-		Code    float32 `json:"code"`
-		Message string  `json:"message"`
-	} `json:"errors"`
-	Success PostCertificateRequestEndpointV2403JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON403
-}
-
-// GetJSON422 returns the response for an HTTP 422 `application/json` response
-func (r PostCertificateRequestEndpointV2Response) GetJSON422() *struct {
-	Errors []struct {
-		Code    float32  `json:"code"`
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Success PostCertificateRequestEndpointV2422JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON422
-}
-
-// GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r PostCertificateRequestEndpointV2Response) GetJSON500() *struct {
-	Errors []struct {
-		Code    float32 `json:"code"`
-		Message string  `json:"message"`
-	} `json:"errors"`
-	Success PostCertificateRequestEndpointV2500JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON500
-}
-
-// GetBody returns the raw response body bytes
-func (r PostCertificateRequestEndpointV2Response) GetBody() []byte {
-	return r.Body
-}
-
-// Status returns HTTPResponse.Status
-func (r PostCertificateRequestEndpointV2Response) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r PostCertificateRequestEndpointV2Response) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r PostCertificateRequestEndpointV2Response) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
-type PostHostCertificateRenewEndpointV2Response struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *struct {
-		Certificate string `json:"certificate"`
-	}
-	// JSON400 the response for an HTTP 400 `application/json` response
-	JSON400 *struct {
-		Errors []struct {
-			Code    float32  `json:"code"`
-			Message string   `json:"message"`
-			Path    []string `json:"path"`
-		} `json:"errors"`
-		Success PostHostCertificateRenewEndpointV2400JSONResponseBodySuccess `json:"success"`
-	}
-	// JSON401 the response for an HTTP 401 `application/json` response
-	JSON401 *struct {
-		Error  PostHostCertificateRenewEndpointV2401JSONResponseBodyError  `json:"error"`
-		Status PostHostCertificateRenewEndpointV2401JSONResponseBodyStatus `json:"status"`
-	}
-	// JSON403 the response for an HTTP 403 `application/json` response
-	JSON403 *struct {
-		Errors []struct {
-			Code    float32 `json:"code"`
-			Message string  `json:"message"`
-		} `json:"errors"`
-		Success PostHostCertificateRenewEndpointV2403JSONResponseBodySuccess `json:"success"`
-	}
-	// JSON422 the response for an HTTP 422 `application/json` response
-	JSON422 *struct {
-		Errors []struct {
-			Code    float32  `json:"code"`
-			Message string   `json:"message"`
-			Path    []string `json:"path"`
-		} `json:"errors"`
-		Success PostHostCertificateRenewEndpointV2422JSONResponseBodySuccess `json:"success"`
-	}
-	// JSON500 the response for an HTTP 500 `application/json` response
-	JSON500 *struct {
-		Errors []struct {
-			Code    float32 `json:"code"`
-			Message string  `json:"message"`
-		} `json:"errors"`
-		Success PostHostCertificateRenewEndpointV2500JSONResponseBodySuccess `json:"success"`
-	}
-}
-
-// GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r PostHostCertificateRenewEndpointV2Response) GetJSON200() *struct {
-	Certificate string `json:"certificate"`
-} {
-	return r.JSON200
-}
-
-// GetJSON400 returns the response for an HTTP 400 `application/json` response
-func (r PostHostCertificateRenewEndpointV2Response) GetJSON400() *struct {
-	Errors []struct {
-		Code    float32  `json:"code"`
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Success PostHostCertificateRenewEndpointV2400JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON400
-}
-
-// GetJSON401 returns the response for an HTTP 401 `application/json` response
-func (r PostHostCertificateRenewEndpointV2Response) GetJSON401() *struct {
-	Error  PostHostCertificateRenewEndpointV2401JSONResponseBodyError  `json:"error"`
-	Status PostHostCertificateRenewEndpointV2401JSONResponseBodyStatus `json:"status"`
-} {
-	return r.JSON401
-}
-
-// GetJSON403 returns the response for an HTTP 403 `application/json` response
-func (r PostHostCertificateRenewEndpointV2Response) GetJSON403() *struct {
-	Errors []struct {
-		Code    float32 `json:"code"`
-		Message string  `json:"message"`
-	} `json:"errors"`
-	Success PostHostCertificateRenewEndpointV2403JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON403
-}
-
-// GetJSON422 returns the response for an HTTP 422 `application/json` response
-func (r PostHostCertificateRenewEndpointV2Response) GetJSON422() *struct {
-	Errors []struct {
-		Code    float32  `json:"code"`
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Success PostHostCertificateRenewEndpointV2422JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON422
-}
-
-// GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r PostHostCertificateRenewEndpointV2Response) GetJSON500() *struct {
-	Errors []struct {
-		Code    float32 `json:"code"`
-		Message string  `json:"message"`
-	} `json:"errors"`
-	Success PostHostCertificateRenewEndpointV2500JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON500
-}
-
-// GetBody returns the raw response body bytes
-func (r PostHostCertificateRenewEndpointV2Response) GetBody() []byte {
-	return r.Body
-}
-
-// Status returns HTTPResponse.Status
-func (r PostHostCertificateRenewEndpointV2Response) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r PostHostCertificateRenewEndpointV2Response) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r PostHostCertificateRenewEndpointV2Response) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
-type PostHostCertificateRequestEndpointV2Response struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *struct {
-		Certificate string `json:"certificate"`
-	}
-	// JSON400 the response for an HTTP 400 `application/json` response
-	JSON400 *struct {
-		Errors []struct {
-			Code    float32  `json:"code"`
-			Message string   `json:"message"`
-			Path    []string `json:"path"`
-		} `json:"errors"`
-		Success PostHostCertificateRequestEndpointV2400JSONResponseBodySuccess `json:"success"`
-	}
-	// JSON401 the response for an HTTP 401 `application/json` response
-	JSON401 *struct {
-		Error  PostHostCertificateRequestEndpointV2401JSONResponseBodyError  `json:"error"`
-		Status PostHostCertificateRequestEndpointV2401JSONResponseBodyStatus `json:"status"`
-	}
-	// JSON403 the response for an HTTP 403 `application/json` response
-	JSON403 *struct {
-		Errors []struct {
-			Code    float32 `json:"code"`
-			Message string  `json:"message"`
-		} `json:"errors"`
-		Success PostHostCertificateRequestEndpointV2403JSONResponseBodySuccess `json:"success"`
-	}
-	// JSON422 the response for an HTTP 422 `application/json` response
-	JSON422 *struct {
-		Errors []struct {
-			Code    float32  `json:"code"`
-			Message string   `json:"message"`
-			Path    []string `json:"path"`
-		} `json:"errors"`
-		Success PostHostCertificateRequestEndpointV2422JSONResponseBodySuccess `json:"success"`
-	}
-	// JSON500 the response for an HTTP 500 `application/json` response
-	JSON500 *struct {
-		Errors []struct {
-			Code    float32 `json:"code"`
-			Message string  `json:"message"`
-		} `json:"errors"`
-		Success PostHostCertificateRequestEndpointV2500JSONResponseBodySuccess `json:"success"`
-	}
-}
-
-// GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r PostHostCertificateRequestEndpointV2Response) GetJSON200() *struct {
-	Certificate string `json:"certificate"`
-} {
-	return r.JSON200
-}
-
-// GetJSON400 returns the response for an HTTP 400 `application/json` response
-func (r PostHostCertificateRequestEndpointV2Response) GetJSON400() *struct {
-	Errors []struct {
-		Code    float32  `json:"code"`
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Success PostHostCertificateRequestEndpointV2400JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON400
-}
-
-// GetJSON401 returns the response for an HTTP 401 `application/json` response
-func (r PostHostCertificateRequestEndpointV2Response) GetJSON401() *struct {
-	Error  PostHostCertificateRequestEndpointV2401JSONResponseBodyError  `json:"error"`
-	Status PostHostCertificateRequestEndpointV2401JSONResponseBodyStatus `json:"status"`
-} {
-	return r.JSON401
-}
-
-// GetJSON403 returns the response for an HTTP 403 `application/json` response
-func (r PostHostCertificateRequestEndpointV2Response) GetJSON403() *struct {
-	Errors []struct {
-		Code    float32 `json:"code"`
-		Message string  `json:"message"`
-	} `json:"errors"`
-	Success PostHostCertificateRequestEndpointV2403JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON403
-}
-
-// GetJSON422 returns the response for an HTTP 422 `application/json` response
-func (r PostHostCertificateRequestEndpointV2Response) GetJSON422() *struct {
-	Errors []struct {
-		Code    float32  `json:"code"`
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Success PostHostCertificateRequestEndpointV2422JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON422
-}
-
-// GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r PostHostCertificateRequestEndpointV2Response) GetJSON500() *struct {
-	Errors []struct {
-		Code    float32 `json:"code"`
-		Message string  `json:"message"`
-	} `json:"errors"`
-	Success PostHostCertificateRequestEndpointV2500JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON500
-}
-
-// GetBody returns the raw response body bytes
-func (r PostHostCertificateRequestEndpointV2Response) GetBody() []byte {
-	return r.Body
-}
-
-// Status returns HTTPResponse.Status
-func (r PostHostCertificateRequestEndpointV2Response) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r PostHostCertificateRequestEndpointV2Response) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r PostHostCertificateRequestEndpointV2Response) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
-type GetCaPublicKeyEndpointResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	// JSON500 the response for an HTTP 500 `application/json` response
-	JSON500 *struct {
-		Errors []struct {
-			Code    float32 `json:"code"`
-			Message string  `json:"message"`
-		} `json:"errors"`
-		Success GetCaPublicKeyEndpoint500JSONResponseBodySuccess `json:"success"`
-	}
-}
-
-// GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r GetCaPublicKeyEndpointResponse) GetJSON500() *struct {
-	Errors []struct {
-		Code    float32 `json:"code"`
-		Message string  `json:"message"`
-	} `json:"errors"`
-	Success GetCaPublicKeyEndpoint500JSONResponseBodySuccess `json:"success"`
-} {
-	return r.JSON500
-}
-
-// GetBody returns the raw response body bytes
-func (r GetCaPublicKeyEndpointResponse) GetBody() []byte {
-	return r.Body
-}
-
-// Status returns HTTPResponse.Status
-func (r GetCaPublicKeyEndpointResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetCaPublicKeyEndpointResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r GetCaPublicKeyEndpointResponse) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
-type PostHostCertificateRequestEndpointResponse struct {
+type PostHostCertificateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
@@ -2474,7 +1243,7 @@ type PostHostCertificateRequestEndpointResponse struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		} `json:"errors"`
-		Success PostHostCertificateRequestEndpoint400JSONResponseBodySuccess `json:"success"`
+		Success PostHostCertificate400JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON401 the response for an HTTP 401 `application/json` response
 	JSON401 *struct {
@@ -2482,7 +1251,7 @@ type PostHostCertificateRequestEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostHostCertificateRequestEndpoint401JSONResponseBodySuccess `json:"success"`
+		Success PostHostCertificate401JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON403 the response for an HTTP 403 `application/json` response
 	JSON403 *struct {
@@ -2490,7 +1259,7 @@ type PostHostCertificateRequestEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostHostCertificateRequestEndpoint403JSONResponseBodySuccess `json:"success"`
+		Success PostHostCertificate403JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *struct {
@@ -2499,7 +1268,7 @@ type PostHostCertificateRequestEndpointResponse struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		} `json:"errors"`
-		Success PostHostCertificateRequestEndpoint422JSONResponseBodySuccess `json:"success"`
+		Success PostHostCertificate422JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
@@ -2507,79 +1276,79 @@ type PostHostCertificateRequestEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostHostCertificateRequestEndpoint500JSONResponseBodySuccess `json:"success"`
+		Success PostHostCertificate500JSONResponseBodySuccess `json:"success"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r PostHostCertificateRequestEndpointResponse) GetJSON200() *CertificateResponse {
+func (r PostHostCertificateResponse) GetJSON200() *CertificateResponse {
 	return r.JSON200
 }
 
 // GetJSON400 returns the response for an HTTP 400 `application/json` response
-func (r PostHostCertificateRequestEndpointResponse) GetJSON400() *struct {
+func (r PostHostCertificateResponse) GetJSON400() *struct {
 	Errors []struct {
 		Code    float32  `json:"code"`
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Success PostHostCertificateRequestEndpoint400JSONResponseBodySuccess `json:"success"`
+	Success PostHostCertificate400JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON400
 }
 
 // GetJSON401 returns the response for an HTTP 401 `application/json` response
-func (r PostHostCertificateRequestEndpointResponse) GetJSON401() *struct {
+func (r PostHostCertificateResponse) GetJSON401() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostHostCertificateRequestEndpoint401JSONResponseBodySuccess `json:"success"`
+	Success PostHostCertificate401JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON401
 }
 
 // GetJSON403 returns the response for an HTTP 403 `application/json` response
-func (r PostHostCertificateRequestEndpointResponse) GetJSON403() *struct {
+func (r PostHostCertificateResponse) GetJSON403() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostHostCertificateRequestEndpoint403JSONResponseBodySuccess `json:"success"`
+	Success PostHostCertificate403JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON403
 }
 
 // GetJSON422 returns the response for an HTTP 422 `application/json` response
-func (r PostHostCertificateRequestEndpointResponse) GetJSON422() *struct {
+func (r PostHostCertificateResponse) GetJSON422() *struct {
 	Errors []struct {
 		Code    float32  `json:"code"`
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Success PostHostCertificateRequestEndpoint422JSONResponseBodySuccess `json:"success"`
+	Success PostHostCertificate422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r PostHostCertificateRequestEndpointResponse) GetJSON500() *struct {
+func (r PostHostCertificateResponse) GetJSON500() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostHostCertificateRequestEndpoint500JSONResponseBodySuccess `json:"success"`
+	Success PostHostCertificate500JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON500
 }
 
 // GetBody returns the raw response body bytes
-func (r PostHostCertificateRequestEndpointResponse) GetBody() []byte {
+func (r PostHostCertificateResponse) GetBody() []byte {
 	return r.Body
 }
 
 // Status returns HTTPResponse.Status
-func (r PostHostCertificateRequestEndpointResponse) Status() string {
+func (r PostHostCertificateResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2587,7 +1356,7 @@ func (r PostHostCertificateRequestEndpointResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostHostCertificateRequestEndpointResponse) StatusCode() int {
+func (r PostHostCertificateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2595,14 +1364,14 @@ func (r PostHostCertificateRequestEndpointResponse) StatusCode() int {
 }
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r PostHostCertificateRequestEndpointResponse) ContentType() string {
+func (r PostHostCertificateResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
 	return ""
 }
 
-type PostHostCertificateRenewEndpointResponse struct {
+type PostHostRenewResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
@@ -2614,7 +1383,7 @@ type PostHostCertificateRenewEndpointResponse struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		} `json:"errors"`
-		Success PostHostCertificateRenewEndpoint400JSONResponseBodySuccess `json:"success"`
+		Success PostHostRenew400JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON401 the response for an HTTP 401 `application/json` response
 	JSON401 *struct {
@@ -2622,7 +1391,7 @@ type PostHostCertificateRenewEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostHostCertificateRenewEndpoint401JSONResponseBodySuccess `json:"success"`
+		Success PostHostRenew401JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON403 the response for an HTTP 403 `application/json` response
 	JSON403 *struct {
@@ -2630,7 +1399,7 @@ type PostHostCertificateRenewEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostHostCertificateRenewEndpoint403JSONResponseBodySuccess `json:"success"`
+		Success PostHostRenew403JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *struct {
@@ -2639,7 +1408,7 @@ type PostHostCertificateRenewEndpointResponse struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		} `json:"errors"`
-		Success PostHostCertificateRenewEndpoint422JSONResponseBodySuccess `json:"success"`
+		Success PostHostRenew422JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
@@ -2647,79 +1416,79 @@ type PostHostCertificateRenewEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostHostCertificateRenewEndpoint500JSONResponseBodySuccess `json:"success"`
+		Success PostHostRenew500JSONResponseBodySuccess `json:"success"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r PostHostCertificateRenewEndpointResponse) GetJSON200() *CertificateResponse {
+func (r PostHostRenewResponse) GetJSON200() *CertificateResponse {
 	return r.JSON200
 }
 
 // GetJSON400 returns the response for an HTTP 400 `application/json` response
-func (r PostHostCertificateRenewEndpointResponse) GetJSON400() *struct {
+func (r PostHostRenewResponse) GetJSON400() *struct {
 	Errors []struct {
 		Code    float32  `json:"code"`
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Success PostHostCertificateRenewEndpoint400JSONResponseBodySuccess `json:"success"`
+	Success PostHostRenew400JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON400
 }
 
 // GetJSON401 returns the response for an HTTP 401 `application/json` response
-func (r PostHostCertificateRenewEndpointResponse) GetJSON401() *struct {
+func (r PostHostRenewResponse) GetJSON401() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostHostCertificateRenewEndpoint401JSONResponseBodySuccess `json:"success"`
+	Success PostHostRenew401JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON401
 }
 
 // GetJSON403 returns the response for an HTTP 403 `application/json` response
-func (r PostHostCertificateRenewEndpointResponse) GetJSON403() *struct {
+func (r PostHostRenewResponse) GetJSON403() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostHostCertificateRenewEndpoint403JSONResponseBodySuccess `json:"success"`
+	Success PostHostRenew403JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON403
 }
 
 // GetJSON422 returns the response for an HTTP 422 `application/json` response
-func (r PostHostCertificateRenewEndpointResponse) GetJSON422() *struct {
+func (r PostHostRenewResponse) GetJSON422() *struct {
 	Errors []struct {
 		Code    float32  `json:"code"`
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Success PostHostCertificateRenewEndpoint422JSONResponseBodySuccess `json:"success"`
+	Success PostHostRenew422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r PostHostCertificateRenewEndpointResponse) GetJSON500() *struct {
+func (r PostHostRenewResponse) GetJSON500() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostHostCertificateRenewEndpoint500JSONResponseBodySuccess `json:"success"`
+	Success PostHostRenew500JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON500
 }
 
 // GetBody returns the raw response body bytes
-func (r PostHostCertificateRenewEndpointResponse) GetBody() []byte {
+func (r PostHostRenewResponse) GetBody() []byte {
 	return r.Body
 }
 
 // Status returns HTTPResponse.Status
-func (r PostHostCertificateRenewEndpointResponse) Status() string {
+func (r PostHostRenewResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2727,7 +1496,7 @@ func (r PostHostCertificateRenewEndpointResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostHostCertificateRenewEndpointResponse) StatusCode() int {
+func (r PostHostRenewResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2735,14 +1504,14 @@ func (r PostHostCertificateRenewEndpointResponse) StatusCode() int {
 }
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r PostHostCertificateRenewEndpointResponse) ContentType() string {
+func (r PostHostRenewResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
 	return ""
 }
 
-type PostUserCertificateRequestEndpointResponse struct {
+type PostUserCertificateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
@@ -2754,7 +1523,7 @@ type PostUserCertificateRequestEndpointResponse struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		} `json:"errors"`
-		Success PostUserCertificateRequestEndpoint400JSONResponseBodySuccess `json:"success"`
+		Success PostUserCertificate400JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON401 the response for an HTTP 401 `application/json` response
 	JSON401 *struct {
@@ -2762,7 +1531,7 @@ type PostUserCertificateRequestEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostUserCertificateRequestEndpoint401JSONResponseBodySuccess `json:"success"`
+		Success PostUserCertificate401JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON403 the response for an HTTP 403 `application/json` response
 	JSON403 *struct {
@@ -2770,7 +1539,7 @@ type PostUserCertificateRequestEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostUserCertificateRequestEndpoint403JSONResponseBodySuccess `json:"success"`
+		Success PostUserCertificate403JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *struct {
@@ -2779,7 +1548,7 @@ type PostUserCertificateRequestEndpointResponse struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		} `json:"errors"`
-		Success PostUserCertificateRequestEndpoint422JSONResponseBodySuccess `json:"success"`
+		Success PostUserCertificate422JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
@@ -2787,79 +1556,79 @@ type PostUserCertificateRequestEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostUserCertificateRequestEndpoint500JSONResponseBodySuccess `json:"success"`
+		Success PostUserCertificate500JSONResponseBodySuccess `json:"success"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r PostUserCertificateRequestEndpointResponse) GetJSON200() *CertificateResponse {
+func (r PostUserCertificateResponse) GetJSON200() *CertificateResponse {
 	return r.JSON200
 }
 
 // GetJSON400 returns the response for an HTTP 400 `application/json` response
-func (r PostUserCertificateRequestEndpointResponse) GetJSON400() *struct {
+func (r PostUserCertificateResponse) GetJSON400() *struct {
 	Errors []struct {
 		Code    float32  `json:"code"`
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Success PostUserCertificateRequestEndpoint400JSONResponseBodySuccess `json:"success"`
+	Success PostUserCertificate400JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON400
 }
 
 // GetJSON401 returns the response for an HTTP 401 `application/json` response
-func (r PostUserCertificateRequestEndpointResponse) GetJSON401() *struct {
+func (r PostUserCertificateResponse) GetJSON401() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostUserCertificateRequestEndpoint401JSONResponseBodySuccess `json:"success"`
+	Success PostUserCertificate401JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON401
 }
 
 // GetJSON403 returns the response for an HTTP 403 `application/json` response
-func (r PostUserCertificateRequestEndpointResponse) GetJSON403() *struct {
+func (r PostUserCertificateResponse) GetJSON403() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostUserCertificateRequestEndpoint403JSONResponseBodySuccess `json:"success"`
+	Success PostUserCertificate403JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON403
 }
 
 // GetJSON422 returns the response for an HTTP 422 `application/json` response
-func (r PostUserCertificateRequestEndpointResponse) GetJSON422() *struct {
+func (r PostUserCertificateResponse) GetJSON422() *struct {
 	Errors []struct {
 		Code    float32  `json:"code"`
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Success PostUserCertificateRequestEndpoint422JSONResponseBodySuccess `json:"success"`
+	Success PostUserCertificate422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r PostUserCertificateRequestEndpointResponse) GetJSON500() *struct {
+func (r PostUserCertificateResponse) GetJSON500() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostUserCertificateRequestEndpoint500JSONResponseBodySuccess `json:"success"`
+	Success PostUserCertificate500JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON500
 }
 
 // GetBody returns the raw response body bytes
-func (r PostUserCertificateRequestEndpointResponse) GetBody() []byte {
+func (r PostUserCertificateResponse) GetBody() []byte {
 	return r.Body
 }
 
 // Status returns HTTPResponse.Status
-func (r PostUserCertificateRequestEndpointResponse) Status() string {
+func (r PostUserCertificateResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2867,7 +1636,7 @@ func (r PostUserCertificateRequestEndpointResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostUserCertificateRequestEndpointResponse) StatusCode() int {
+func (r PostUserCertificateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2875,14 +1644,14 @@ func (r PostUserCertificateRequestEndpointResponse) StatusCode() int {
 }
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r PostUserCertificateRequestEndpointResponse) ContentType() string {
+func (r PostUserCertificateResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
 	return ""
 }
 
-type GetRevocationListEndpointResponse struct {
+type GetCertificateTypeKrlResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
@@ -2893,33 +1662,33 @@ type GetRevocationListEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success GetRevocationListEndpoint500JSONResponseBodySuccess `json:"success"`
+		Success GetCertificateTypeKrl500JSONResponseBodySuccess `json:"success"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r GetRevocationListEndpointResponse) GetJSON200() *KeyRevocationListResponse {
+func (r GetCertificateTypeKrlResponse) GetJSON200() *KeyRevocationListResponse {
 	return r.JSON200
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r GetRevocationListEndpointResponse) GetJSON500() *struct {
+func (r GetCertificateTypeKrlResponse) GetJSON500() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success GetRevocationListEndpoint500JSONResponseBodySuccess `json:"success"`
+	Success GetCertificateTypeKrl500JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON500
 }
 
 // GetBody returns the raw response body bytes
-func (r GetRevocationListEndpointResponse) GetBody() []byte {
+func (r GetCertificateTypeKrlResponse) GetBody() []byte {
 	return r.Body
 }
 
 // Status returns HTTPResponse.Status
-func (r GetRevocationListEndpointResponse) Status() string {
+func (r GetCertificateTypeKrlResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2927,7 +1696,7 @@ func (r GetRevocationListEndpointResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetRevocationListEndpointResponse) StatusCode() int {
+func (r GetCertificateTypeKrlResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2935,14 +1704,14 @@ func (r GetRevocationListEndpointResponse) StatusCode() int {
 }
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r GetRevocationListEndpointResponse) ContentType() string {
+func (r GetCertificateTypeKrlResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
 	return ""
 }
 
-type PostRevokeCertificateEndpointResponse struct {
+type PostCertificateTypeRevokeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
@@ -2954,7 +1723,7 @@ type PostRevokeCertificateEndpointResponse struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		} `json:"errors"`
-		Success PostRevokeCertificateEndpoint400JSONResponseBodySuccess `json:"success"`
+		Success PostCertificateTypeRevoke400JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON401 the response for an HTTP 401 `application/json` response
 	JSON401 *struct {
@@ -2962,7 +1731,7 @@ type PostRevokeCertificateEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostRevokeCertificateEndpoint401JSONResponseBodySuccess `json:"success"`
+		Success PostCertificateTypeRevoke401JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON403 the response for an HTTP 403 `application/json` response
 	JSON403 *struct {
@@ -2970,7 +1739,7 @@ type PostRevokeCertificateEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostRevokeCertificateEndpoint403JSONResponseBodySuccess `json:"success"`
+		Success PostCertificateTypeRevoke403JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON409 the response for an HTTP 409 `application/json` response
 	JSON409 *struct {
@@ -2978,7 +1747,7 @@ type PostRevokeCertificateEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostRevokeCertificateEndpoint409JSONResponseBodySuccess `json:"success"`
+		Success PostCertificateTypeRevoke409JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *struct {
@@ -2987,7 +1756,7 @@ type PostRevokeCertificateEndpointResponse struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		} `json:"errors"`
-		Success PostRevokeCertificateEndpoint422JSONResponseBodySuccess `json:"success"`
+		Success PostCertificateTypeRevoke422JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
@@ -2995,90 +1764,90 @@ type PostRevokeCertificateEndpointResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostRevokeCertificateEndpoint500JSONResponseBodySuccess `json:"success"`
+		Success PostCertificateTypeRevoke500JSONResponseBodySuccess `json:"success"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r PostRevokeCertificateEndpointResponse) GetJSON200() *RevocationResponse {
+func (r PostCertificateTypeRevokeResponse) GetJSON200() *RevocationResponse {
 	return r.JSON200
 }
 
 // GetJSON400 returns the response for an HTTP 400 `application/json` response
-func (r PostRevokeCertificateEndpointResponse) GetJSON400() *struct {
+func (r PostCertificateTypeRevokeResponse) GetJSON400() *struct {
 	Errors []struct {
 		Code    float32  `json:"code"`
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Success PostRevokeCertificateEndpoint400JSONResponseBodySuccess `json:"success"`
+	Success PostCertificateTypeRevoke400JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON400
 }
 
 // GetJSON401 returns the response for an HTTP 401 `application/json` response
-func (r PostRevokeCertificateEndpointResponse) GetJSON401() *struct {
+func (r PostCertificateTypeRevokeResponse) GetJSON401() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostRevokeCertificateEndpoint401JSONResponseBodySuccess `json:"success"`
+	Success PostCertificateTypeRevoke401JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON401
 }
 
 // GetJSON403 returns the response for an HTTP 403 `application/json` response
-func (r PostRevokeCertificateEndpointResponse) GetJSON403() *struct {
+func (r PostCertificateTypeRevokeResponse) GetJSON403() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostRevokeCertificateEndpoint403JSONResponseBodySuccess `json:"success"`
+	Success PostCertificateTypeRevoke403JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON403
 }
 
 // GetJSON409 returns the response for an HTTP 409 `application/json` response
-func (r PostRevokeCertificateEndpointResponse) GetJSON409() *struct {
+func (r PostCertificateTypeRevokeResponse) GetJSON409() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostRevokeCertificateEndpoint409JSONResponseBodySuccess `json:"success"`
+	Success PostCertificateTypeRevoke409JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON409
 }
 
 // GetJSON422 returns the response for an HTTP 422 `application/json` response
-func (r PostRevokeCertificateEndpointResponse) GetJSON422() *struct {
+func (r PostCertificateTypeRevokeResponse) GetJSON422() *struct {
 	Errors []struct {
 		Code    float32  `json:"code"`
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Success PostRevokeCertificateEndpoint422JSONResponseBodySuccess `json:"success"`
+	Success PostCertificateTypeRevoke422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r PostRevokeCertificateEndpointResponse) GetJSON500() *struct {
+func (r PostCertificateTypeRevokeResponse) GetJSON500() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostRevokeCertificateEndpoint500JSONResponseBodySuccess `json:"success"`
+	Success PostCertificateTypeRevoke500JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON500
 }
 
 // GetBody returns the raw response body bytes
-func (r PostRevokeCertificateEndpointResponse) GetBody() []byte {
+func (r PostCertificateTypeRevokeResponse) GetBody() []byte {
 	return r.Body
 }
 
 // Status returns HTTPResponse.Status
-func (r PostRevokeCertificateEndpointResponse) Status() string {
+func (r PostCertificateTypeRevokeResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -3086,7 +1855,7 @@ func (r PostRevokeCertificateEndpointResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostRevokeCertificateEndpointResponse) StatusCode() int {
+func (r PostCertificateTypeRevokeResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -3094,220 +1863,132 @@ func (r PostRevokeCertificateEndpointResponse) StatusCode() int {
 }
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r PostRevokeCertificateEndpointResponse) ContentType() string {
+func (r PostCertificateTypeRevokeResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
 	return ""
 }
 
-// GetCaPublicKeyEndpointV2WithResponse performs a GET /api/v2/ca (the `GetCaPublicKeyEndpointV2` operationId) request.
+// GetCaWithResponse performs a GET /api/v3/ca (the `GetCa` operationId) request.
 //
 // Returns a wrapper object for the known response body format(s).
-//
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *ClientWithResponses) GetCaPublicKeyEndpointV2WithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCaPublicKeyEndpointV2Response, error) {
-	rsp, err := c.GetCaPublicKeyEndpointV2(ctx, reqEditors...)
+func (c *ClientWithResponses) GetCaWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCaResponse, error) {
+	rsp, err := c.GetCa(ctx, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetCaPublicKeyEndpointV2Response(rsp)
+	return ParseGetCaResponse(rsp)
 }
 
-// PostCertificateRequestEndpointV2WithBodyWithResponse performs a POST /api/v2/certificate (the `PostCertificateRequestEndpointV2` operationId) request,
+// PostHostCertificateWithBodyWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request,
 // with any type of body and a specified content type.
 //
 // Returns a wrapper object for the known response body format(s).
-//
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *ClientWithResponses) PostCertificateRequestEndpointV2WithBodyWithResponse(ctx context.Context, params *PostCertificateRequestEndpointV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCertificateRequestEndpointV2Response, error) {
-	rsp, err := c.PostCertificateRequestEndpointV2WithBody(ctx, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) PostHostCertificateWithBodyWithResponse(ctx context.Context, params *PostHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateResponse, error) {
+	rsp, err := c.PostHostCertificateWithBody(ctx, params, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostCertificateRequestEndpointV2Response(rsp)
+	return ParsePostHostCertificateResponse(rsp)
 }
 
-// PostCertificateRequestEndpointV2WithResponse performs a POST /api/v2/certificate (the `PostCertificateRequestEndpointV2` operationId) request.
+// PostHostCertificateWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *ClientWithResponses) PostCertificateRequestEndpointV2WithResponse(ctx context.Context, params *PostCertificateRequestEndpointV2Params, body PostCertificateRequestEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostCertificateRequestEndpointV2Response, error) {
-	rsp, err := c.PostCertificateRequestEndpointV2(ctx, params, body, reqEditors...)
+func (c *ClientWithResponses) PostHostCertificateWithResponse(ctx context.Context, params *PostHostCertificateParams, body PostHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateResponse, error) {
+	rsp, err := c.PostHostCertificate(ctx, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostCertificateRequestEndpointV2Response(rsp)
+	return ParsePostHostCertificateResponse(rsp)
 }
 
-// PostHostCertificateRenewEndpointV2WithBodyWithResponse performs a POST /api/v2/host/renew (the `PostHostCertificateRenewEndpointV2` operationId) request,
+// PostHostRenewWithBodyWithResponse performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
 // with any type of body and a specified content type.
 //
 // Returns a wrapper object for the known response body format(s).
-//
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *ClientWithResponses) PostHostCertificateRenewEndpointV2WithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateRenewEndpointV2Response, error) {
-	rsp, err := c.PostHostCertificateRenewEndpointV2WithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) PostHostRenewWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostRenewResponse, error) {
+	rsp, err := c.PostHostRenewWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostHostCertificateRenewEndpointV2Response(rsp)
+	return ParsePostHostRenewResponse(rsp)
 }
 
-// PostHostCertificateRenewEndpointV2WithResponse performs a POST /api/v2/host/renew (the `PostHostCertificateRenewEndpointV2` operationId) request.
+// PostHostRenewWithResponse performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *ClientWithResponses) PostHostCertificateRenewEndpointV2WithResponse(ctx context.Context, body PostHostCertificateRenewEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateRenewEndpointV2Response, error) {
-	rsp, err := c.PostHostCertificateRenewEndpointV2(ctx, body, reqEditors...)
+func (c *ClientWithResponses) PostHostRenewWithResponse(ctx context.Context, body PostHostRenewJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostRenewResponse, error) {
+	rsp, err := c.PostHostRenew(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostHostCertificateRenewEndpointV2Response(rsp)
+	return ParsePostHostRenewResponse(rsp)
 }
 
-// PostHostCertificateRequestEndpointV2WithBodyWithResponse performs a POST /api/v2/host/request (the `PostHostCertificateRequestEndpointV2` operationId) request,
+// PostUserCertificateWithBodyWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request,
 // with any type of body and a specified content type.
 //
 // Returns a wrapper object for the known response body format(s).
-//
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *ClientWithResponses) PostHostCertificateRequestEndpointV2WithBodyWithResponse(ctx context.Context, params *PostHostCertificateRequestEndpointV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateRequestEndpointV2Response, error) {
-	rsp, err := c.PostHostCertificateRequestEndpointV2WithBody(ctx, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) PostUserCertificateWithBodyWithResponse(ctx context.Context, params *PostUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostUserCertificateResponse, error) {
+	rsp, err := c.PostUserCertificateWithBody(ctx, params, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostHostCertificateRequestEndpointV2Response(rsp)
+	return ParsePostUserCertificateResponse(rsp)
 }
 
-// PostHostCertificateRequestEndpointV2WithResponse performs a POST /api/v2/host/request (the `PostHostCertificateRequestEndpointV2` operationId) request.
+// PostUserCertificateWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-// Deprecated: this operation has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-func (c *ClientWithResponses) PostHostCertificateRequestEndpointV2WithResponse(ctx context.Context, params *PostHostCertificateRequestEndpointV2Params, body PostHostCertificateRequestEndpointV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateRequestEndpointV2Response, error) {
-	rsp, err := c.PostHostCertificateRequestEndpointV2(ctx, params, body, reqEditors...)
+func (c *ClientWithResponses) PostUserCertificateWithResponse(ctx context.Context, params *PostUserCertificateParams, body PostUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUserCertificateResponse, error) {
+	rsp, err := c.PostUserCertificate(ctx, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostHostCertificateRequestEndpointV2Response(rsp)
+	return ParsePostUserCertificateResponse(rsp)
 }
 
-// GetCaPublicKeyEndpointWithResponse performs a GET /api/v3/ca (the `GetCaPublicKeyEndpoint` operationId) request.
+// GetCertificateTypeKrlWithResponse performs a GET /api/v3/{certificateType}/krl (the `GetCertificateTypeKrl` operationId) request.
 //
 // Returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) GetCaPublicKeyEndpointWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCaPublicKeyEndpointResponse, error) {
-	rsp, err := c.GetCaPublicKeyEndpoint(ctx, reqEditors...)
+func (c *ClientWithResponses) GetCertificateTypeKrlWithResponse(ctx context.Context, certificateType GetCertificateTypeKrlParamsCertificateType, reqEditors ...RequestEditorFn) (*GetCertificateTypeKrlResponse, error) {
+	rsp, err := c.GetCertificateTypeKrl(ctx, certificateType, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetCaPublicKeyEndpointResponse(rsp)
+	return ParseGetCertificateTypeKrlResponse(rsp)
 }
 
-// PostHostCertificateRequestEndpointWithBodyWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificateRequestEndpoint` operationId) request,
+// PostCertificateTypeRevokeWithBodyWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request,
 // with any type of body and a specified content type.
 //
 // Returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) PostHostCertificateRequestEndpointWithBodyWithResponse(ctx context.Context, params *PostHostCertificateRequestEndpointParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateRequestEndpointResponse, error) {
-	rsp, err := c.PostHostCertificateRequestEndpointWithBody(ctx, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) PostCertificateTypeRevokeWithBodyWithResponse(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCertificateTypeRevokeResponse, error) {
+	rsp, err := c.PostCertificateTypeRevokeWithBody(ctx, certificateType, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostHostCertificateRequestEndpointResponse(rsp)
+	return ParsePostCertificateTypeRevokeResponse(rsp)
 }
 
-// PostHostCertificateRequestEndpointWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificateRequestEndpoint` operationId) request.
+// PostCertificateTypeRevokeWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) PostHostCertificateRequestEndpointWithResponse(ctx context.Context, params *PostHostCertificateRequestEndpointParams, body PostHostCertificateRequestEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateRequestEndpointResponse, error) {
-	rsp, err := c.PostHostCertificateRequestEndpoint(ctx, params, body, reqEditors...)
+func (c *ClientWithResponses) PostCertificateTypeRevokeWithResponse(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, body PostCertificateTypeRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCertificateTypeRevokeResponse, error) {
+	rsp, err := c.PostCertificateTypeRevoke(ctx, certificateType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostHostCertificateRequestEndpointResponse(rsp)
+	return ParsePostCertificateTypeRevokeResponse(rsp)
 }
 
-// PostHostCertificateRenewEndpointWithBodyWithResponse performs a POST /api/v3/host/renew (the `PostHostCertificateRenewEndpoint` operationId) request,
-// with any type of body and a specified content type.
-//
-// Returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) PostHostCertificateRenewEndpointWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateRenewEndpointResponse, error) {
-	rsp, err := c.PostHostCertificateRenewEndpointWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostHostCertificateRenewEndpointResponse(rsp)
-}
-
-// PostHostCertificateRenewEndpointWithResponse performs a POST /api/v3/host/renew (the `PostHostCertificateRenewEndpoint` operationId) request.
-// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) PostHostCertificateRenewEndpointWithResponse(ctx context.Context, body PostHostCertificateRenewEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateRenewEndpointResponse, error) {
-	rsp, err := c.PostHostCertificateRenewEndpoint(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostHostCertificateRenewEndpointResponse(rsp)
-}
-
-// PostUserCertificateRequestEndpointWithBodyWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificateRequestEndpoint` operationId) request,
-// with any type of body and a specified content type.
-//
-// Returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) PostUserCertificateRequestEndpointWithBodyWithResponse(ctx context.Context, params *PostUserCertificateRequestEndpointParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostUserCertificateRequestEndpointResponse, error) {
-	rsp, err := c.PostUserCertificateRequestEndpointWithBody(ctx, params, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostUserCertificateRequestEndpointResponse(rsp)
-}
-
-// PostUserCertificateRequestEndpointWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificateRequestEndpoint` operationId) request.
-// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) PostUserCertificateRequestEndpointWithResponse(ctx context.Context, params *PostUserCertificateRequestEndpointParams, body PostUserCertificateRequestEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUserCertificateRequestEndpointResponse, error) {
-	rsp, err := c.PostUserCertificateRequestEndpoint(ctx, params, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostUserCertificateRequestEndpointResponse(rsp)
-}
-
-// GetRevocationListEndpointWithResponse performs a GET /api/v3/{certificateType}/krl (the `GetRevocationListEndpoint` operationId) request.
-//
-// Returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) GetRevocationListEndpointWithResponse(ctx context.Context, certificateType GetRevocationListEndpointParamsCertificateType, reqEditors ...RequestEditorFn) (*GetRevocationListEndpointResponse, error) {
-	rsp, err := c.GetRevocationListEndpoint(ctx, certificateType, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetRevocationListEndpointResponse(rsp)
-}
-
-// PostRevokeCertificateEndpointWithBodyWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostRevokeCertificateEndpoint` operationId) request,
-// with any type of body and a specified content type.
-//
-// Returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) PostRevokeCertificateEndpointWithBodyWithResponse(ctx context.Context, certificateType PostRevokeCertificateEndpointParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostRevokeCertificateEndpointResponse, error) {
-	rsp, err := c.PostRevokeCertificateEndpointWithBody(ctx, certificateType, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostRevokeCertificateEndpointResponse(rsp)
-}
-
-// PostRevokeCertificateEndpointWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostRevokeCertificateEndpoint` operationId) request.
-// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) PostRevokeCertificateEndpointWithResponse(ctx context.Context, certificateType PostRevokeCertificateEndpointParamsCertificateType, body PostRevokeCertificateEndpointJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRevokeCertificateEndpointResponse, error) {
-	rsp, err := c.PostRevokeCertificateEndpoint(ctx, certificateType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostRevokeCertificateEndpointResponse(rsp)
-}
-
-// ParseGetCaPublicKeyEndpointV2Response parses an HTTP response from a GetCaPublicKeyEndpointV2WithResponse call
-func ParseGetCaPublicKeyEndpointV2Response(rsp *http.Response) (*GetCaPublicKeyEndpointV2Response, error) {
+// ParseGetCaResponse parses an HTTP response from a GetCaWithResponse call
+func ParseGetCaResponse(rsp *http.Response) (*GetCaResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetCaPublicKeyEndpointV2Response{
+	response := &GetCaResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3319,7 +2000,7 @@ func ParseGetCaPublicKeyEndpointV2Response(rsp *http.Response) (*GetCaPublicKeyE
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success GetCaPublicKeyEndpointV2500JSONResponseBodySuccess `json:"success"`
+			Success GetCa500JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3331,322 +2012,15 @@ func ParseGetCaPublicKeyEndpointV2Response(rsp *http.Response) (*GetCaPublicKeyE
 	return response, nil
 }
 
-// ParsePostCertificateRequestEndpointV2Response parses an HTTP response from a PostCertificateRequestEndpointV2WithResponse call
-func ParsePostCertificateRequestEndpointV2Response(rsp *http.Response) (*PostCertificateRequestEndpointV2Response, error) {
+// ParsePostHostCertificateResponse parses an HTTP response from a PostHostCertificateWithResponse call
+func ParsePostHostCertificateResponse(rsp *http.Response) (*PostHostCertificateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostCertificateRequestEndpointV2Response{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Certificate string `json:"certificate"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest struct {
-			Errors []struct {
-				Code    float32  `json:"code"`
-				Message string   `json:"message"`
-				Path    []string `json:"path"`
-			} `json:"errors"`
-			Success PostCertificateRequestEndpointV2400JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest struct {
-			Error PostCertificateRequestEndpointV2401JSONResponseBodyError `json:"error"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest struct {
-			Errors []struct {
-				Code    float32 `json:"code"`
-				Message string  `json:"message"`
-			} `json:"errors"`
-			Success PostCertificateRequestEndpointV2403JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest struct {
-			Errors []struct {
-				Code    float32  `json:"code"`
-				Message string   `json:"message"`
-				Path    []string `json:"path"`
-			} `json:"errors"`
-			Success PostCertificateRequestEndpointV2422JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest struct {
-			Errors []struct {
-				Code    float32 `json:"code"`
-				Message string  `json:"message"`
-			} `json:"errors"`
-			Success PostCertificateRequestEndpointV2500JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParsePostHostCertificateRenewEndpointV2Response parses an HTTP response from a PostHostCertificateRenewEndpointV2WithResponse call
-func ParsePostHostCertificateRenewEndpointV2Response(rsp *http.Response) (*PostHostCertificateRenewEndpointV2Response, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &PostHostCertificateRenewEndpointV2Response{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Certificate string `json:"certificate"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest struct {
-			Errors []struct {
-				Code    float32  `json:"code"`
-				Message string   `json:"message"`
-				Path    []string `json:"path"`
-			} `json:"errors"`
-			Success PostHostCertificateRenewEndpointV2400JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest struct {
-			Error  PostHostCertificateRenewEndpointV2401JSONResponseBodyError  `json:"error"`
-			Status PostHostCertificateRenewEndpointV2401JSONResponseBodyStatus `json:"status"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest struct {
-			Errors []struct {
-				Code    float32 `json:"code"`
-				Message string  `json:"message"`
-			} `json:"errors"`
-			Success PostHostCertificateRenewEndpointV2403JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest struct {
-			Errors []struct {
-				Code    float32  `json:"code"`
-				Message string   `json:"message"`
-				Path    []string `json:"path"`
-			} `json:"errors"`
-			Success PostHostCertificateRenewEndpointV2422JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest struct {
-			Errors []struct {
-				Code    float32 `json:"code"`
-				Message string  `json:"message"`
-			} `json:"errors"`
-			Success PostHostCertificateRenewEndpointV2500JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParsePostHostCertificateRequestEndpointV2Response parses an HTTP response from a PostHostCertificateRequestEndpointV2WithResponse call
-func ParsePostHostCertificateRequestEndpointV2Response(rsp *http.Response) (*PostHostCertificateRequestEndpointV2Response, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &PostHostCertificateRequestEndpointV2Response{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Certificate string `json:"certificate"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest struct {
-			Errors []struct {
-				Code    float32  `json:"code"`
-				Message string   `json:"message"`
-				Path    []string `json:"path"`
-			} `json:"errors"`
-			Success PostHostCertificateRequestEndpointV2400JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest struct {
-			Error  PostHostCertificateRequestEndpointV2401JSONResponseBodyError  `json:"error"`
-			Status PostHostCertificateRequestEndpointV2401JSONResponseBodyStatus `json:"status"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest struct {
-			Errors []struct {
-				Code    float32 `json:"code"`
-				Message string  `json:"message"`
-			} `json:"errors"`
-			Success PostHostCertificateRequestEndpointV2403JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest struct {
-			Errors []struct {
-				Code    float32  `json:"code"`
-				Message string   `json:"message"`
-				Path    []string `json:"path"`
-			} `json:"errors"`
-			Success PostHostCertificateRequestEndpointV2422JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest struct {
-			Errors []struct {
-				Code    float32 `json:"code"`
-				Message string  `json:"message"`
-			} `json:"errors"`
-			Success PostHostCertificateRequestEndpointV2500JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetCaPublicKeyEndpointResponse parses an HTTP response from a GetCaPublicKeyEndpointWithResponse call
-func ParseGetCaPublicKeyEndpointResponse(rsp *http.Response) (*GetCaPublicKeyEndpointResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetCaPublicKeyEndpointResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest struct {
-			Errors []struct {
-				Code    float32 `json:"code"`
-				Message string  `json:"message"`
-			} `json:"errors"`
-			Success GetCaPublicKeyEndpoint500JSONResponseBodySuccess `json:"success"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParsePostHostCertificateRequestEndpointResponse parses an HTTP response from a PostHostCertificateRequestEndpointWithResponse call
-func ParsePostHostCertificateRequestEndpointResponse(rsp *http.Response) (*PostHostCertificateRequestEndpointResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &PostHostCertificateRequestEndpointResponse{
+	response := &PostHostCertificateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3666,7 +2040,7 @@ func ParsePostHostCertificateRequestEndpointResponse(rsp *http.Response) (*PostH
 				Message string   `json:"message"`
 				Path    []string `json:"path"`
 			} `json:"errors"`
-			Success PostHostCertificateRequestEndpoint400JSONResponseBodySuccess `json:"success"`
+			Success PostHostCertificate400JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3679,7 +2053,7 @@ func ParsePostHostCertificateRequestEndpointResponse(rsp *http.Response) (*PostH
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostHostCertificateRequestEndpoint401JSONResponseBodySuccess `json:"success"`
+			Success PostHostCertificate401JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3692,7 +2066,7 @@ func ParsePostHostCertificateRequestEndpointResponse(rsp *http.Response) (*PostH
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostHostCertificateRequestEndpoint403JSONResponseBodySuccess `json:"success"`
+			Success PostHostCertificate403JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3706,7 +2080,7 @@ func ParsePostHostCertificateRequestEndpointResponse(rsp *http.Response) (*PostH
 				Message string   `json:"message"`
 				Path    []string `json:"path"`
 			} `json:"errors"`
-			Success PostHostCertificateRequestEndpoint422JSONResponseBodySuccess `json:"success"`
+			Success PostHostCertificate422JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3719,7 +2093,7 @@ func ParsePostHostCertificateRequestEndpointResponse(rsp *http.Response) (*PostH
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostHostCertificateRequestEndpoint500JSONResponseBodySuccess `json:"success"`
+			Success PostHostCertificate500JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3731,15 +2105,15 @@ func ParsePostHostCertificateRequestEndpointResponse(rsp *http.Response) (*PostH
 	return response, nil
 }
 
-// ParsePostHostCertificateRenewEndpointResponse parses an HTTP response from a PostHostCertificateRenewEndpointWithResponse call
-func ParsePostHostCertificateRenewEndpointResponse(rsp *http.Response) (*PostHostCertificateRenewEndpointResponse, error) {
+// ParsePostHostRenewResponse parses an HTTP response from a PostHostRenewWithResponse call
+func ParsePostHostRenewResponse(rsp *http.Response) (*PostHostRenewResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostHostCertificateRenewEndpointResponse{
+	response := &PostHostRenewResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3759,7 +2133,7 @@ func ParsePostHostCertificateRenewEndpointResponse(rsp *http.Response) (*PostHos
 				Message string   `json:"message"`
 				Path    []string `json:"path"`
 			} `json:"errors"`
-			Success PostHostCertificateRenewEndpoint400JSONResponseBodySuccess `json:"success"`
+			Success PostHostRenew400JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3772,7 +2146,7 @@ func ParsePostHostCertificateRenewEndpointResponse(rsp *http.Response) (*PostHos
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostHostCertificateRenewEndpoint401JSONResponseBodySuccess `json:"success"`
+			Success PostHostRenew401JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3785,7 +2159,7 @@ func ParsePostHostCertificateRenewEndpointResponse(rsp *http.Response) (*PostHos
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostHostCertificateRenewEndpoint403JSONResponseBodySuccess `json:"success"`
+			Success PostHostRenew403JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3799,7 +2173,7 @@ func ParsePostHostCertificateRenewEndpointResponse(rsp *http.Response) (*PostHos
 				Message string   `json:"message"`
 				Path    []string `json:"path"`
 			} `json:"errors"`
-			Success PostHostCertificateRenewEndpoint422JSONResponseBodySuccess `json:"success"`
+			Success PostHostRenew422JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3812,7 +2186,7 @@ func ParsePostHostCertificateRenewEndpointResponse(rsp *http.Response) (*PostHos
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostHostCertificateRenewEndpoint500JSONResponseBodySuccess `json:"success"`
+			Success PostHostRenew500JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3824,15 +2198,15 @@ func ParsePostHostCertificateRenewEndpointResponse(rsp *http.Response) (*PostHos
 	return response, nil
 }
 
-// ParsePostUserCertificateRequestEndpointResponse parses an HTTP response from a PostUserCertificateRequestEndpointWithResponse call
-func ParsePostUserCertificateRequestEndpointResponse(rsp *http.Response) (*PostUserCertificateRequestEndpointResponse, error) {
+// ParsePostUserCertificateResponse parses an HTTP response from a PostUserCertificateWithResponse call
+func ParsePostUserCertificateResponse(rsp *http.Response) (*PostUserCertificateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostUserCertificateRequestEndpointResponse{
+	response := &PostUserCertificateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3852,7 +2226,7 @@ func ParsePostUserCertificateRequestEndpointResponse(rsp *http.Response) (*PostU
 				Message string   `json:"message"`
 				Path    []string `json:"path"`
 			} `json:"errors"`
-			Success PostUserCertificateRequestEndpoint400JSONResponseBodySuccess `json:"success"`
+			Success PostUserCertificate400JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3865,7 +2239,7 @@ func ParsePostUserCertificateRequestEndpointResponse(rsp *http.Response) (*PostU
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostUserCertificateRequestEndpoint401JSONResponseBodySuccess `json:"success"`
+			Success PostUserCertificate401JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3878,7 +2252,7 @@ func ParsePostUserCertificateRequestEndpointResponse(rsp *http.Response) (*PostU
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostUserCertificateRequestEndpoint403JSONResponseBodySuccess `json:"success"`
+			Success PostUserCertificate403JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3892,7 +2266,7 @@ func ParsePostUserCertificateRequestEndpointResponse(rsp *http.Response) (*PostU
 				Message string   `json:"message"`
 				Path    []string `json:"path"`
 			} `json:"errors"`
-			Success PostUserCertificateRequestEndpoint422JSONResponseBodySuccess `json:"success"`
+			Success PostUserCertificate422JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3905,7 +2279,7 @@ func ParsePostUserCertificateRequestEndpointResponse(rsp *http.Response) (*PostU
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostUserCertificateRequestEndpoint500JSONResponseBodySuccess `json:"success"`
+			Success PostUserCertificate500JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3917,15 +2291,15 @@ func ParsePostUserCertificateRequestEndpointResponse(rsp *http.Response) (*PostU
 	return response, nil
 }
 
-// ParseGetRevocationListEndpointResponse parses an HTTP response from a GetRevocationListEndpointWithResponse call
-func ParseGetRevocationListEndpointResponse(rsp *http.Response) (*GetRevocationListEndpointResponse, error) {
+// ParseGetCertificateTypeKrlResponse parses an HTTP response from a GetCertificateTypeKrlWithResponse call
+func ParseGetCertificateTypeKrlResponse(rsp *http.Response) (*GetCertificateTypeKrlResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetRevocationListEndpointResponse{
+	response := &GetCertificateTypeKrlResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3944,7 +2318,7 @@ func ParseGetRevocationListEndpointResponse(rsp *http.Response) (*GetRevocationL
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success GetRevocationListEndpoint500JSONResponseBodySuccess `json:"success"`
+			Success GetCertificateTypeKrl500JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3956,15 +2330,15 @@ func ParseGetRevocationListEndpointResponse(rsp *http.Response) (*GetRevocationL
 	return response, nil
 }
 
-// ParsePostRevokeCertificateEndpointResponse parses an HTTP response from a PostRevokeCertificateEndpointWithResponse call
-func ParsePostRevokeCertificateEndpointResponse(rsp *http.Response) (*PostRevokeCertificateEndpointResponse, error) {
+// ParsePostCertificateTypeRevokeResponse parses an HTTP response from a PostCertificateTypeRevokeWithResponse call
+func ParsePostCertificateTypeRevokeResponse(rsp *http.Response) (*PostCertificateTypeRevokeResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostRevokeCertificateEndpointResponse{
+	response := &PostCertificateTypeRevokeResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3984,7 +2358,7 @@ func ParsePostRevokeCertificateEndpointResponse(rsp *http.Response) (*PostRevoke
 				Message string   `json:"message"`
 				Path    []string `json:"path"`
 			} `json:"errors"`
-			Success PostRevokeCertificateEndpoint400JSONResponseBodySuccess `json:"success"`
+			Success PostCertificateTypeRevoke400JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3997,7 +2371,7 @@ func ParsePostRevokeCertificateEndpointResponse(rsp *http.Response) (*PostRevoke
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostRevokeCertificateEndpoint401JSONResponseBodySuccess `json:"success"`
+			Success PostCertificateTypeRevoke401JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -4010,7 +2384,7 @@ func ParsePostRevokeCertificateEndpointResponse(rsp *http.Response) (*PostRevoke
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostRevokeCertificateEndpoint403JSONResponseBodySuccess `json:"success"`
+			Success PostCertificateTypeRevoke403JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -4023,7 +2397,7 @@ func ParsePostRevokeCertificateEndpointResponse(rsp *http.Response) (*PostRevoke
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostRevokeCertificateEndpoint409JSONResponseBodySuccess `json:"success"`
+			Success PostCertificateTypeRevoke409JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -4037,7 +2411,7 @@ func ParsePostRevokeCertificateEndpointResponse(rsp *http.Response) (*PostRevoke
 				Message string   `json:"message"`
 				Path    []string `json:"path"`
 			} `json:"errors"`
-			Success PostRevokeCertificateEndpoint422JSONResponseBodySuccess `json:"success"`
+			Success PostCertificateTypeRevoke422JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -4050,7 +2424,7 @@ func ParsePostRevokeCertificateEndpointResponse(rsp *http.Response) (*PostRevoke
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostRevokeCertificateEndpoint500JSONResponseBodySuccess `json:"success"`
+			Success PostCertificateTypeRevoke500JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err

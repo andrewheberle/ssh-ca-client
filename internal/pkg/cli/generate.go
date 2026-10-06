@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"os"
 
 	"github.com/andrewheberle/simplecommand"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
-	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/keyringstore"
 	"github.com/bep/simplecobra"
 )
 
@@ -16,7 +15,7 @@ type generateCommand struct {
 	force  bool
 	dryrun bool
 
-	config *config.Config
+	store cert.Storage
 
 	logger *slog.Logger
 
@@ -50,17 +49,22 @@ func (c *generateCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 	c.logger.Debug("attempting load config", "command", this.CobraCommand.Name())
 
 	// load config
-	config, err := loaduserconfig(this)
+	config, err := loadconfig(this)
 	if err != nil {
 		return err
 	}
-	c.config = config
+
+	store, err := keyringstore.New(config.CertificateAuthorityPublicKey())
+	if err != nil {
+		return err
+	}
+	c.store = store
 
 	return nil
 }
 
 func (c *generateCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args []string) error {
-	if c.config.HasPrivateKey() && !c.force {
+	if c.store.HasPrivateKey() && !c.force {
 		if c.dryrun {
 			fmt.Printf("dry run: not overwriting existing private key without force option set")
 
@@ -76,26 +80,5 @@ func (c *generateCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, a
 		return nil
 	}
 
-	// set comment based on user@host if possible
-	user := "nobody"
-	host := "nowhere"
-	if u := os.Getenv("USERNAME"); u != "" {
-		user = u
-	} else if u := os.Getenv("USER"); u != "" {
-		user = u
-	}
-	if h := os.Getenv("COMPUTERNAME"); h != "" {
-		host = h
-	}
-
-	pemBytes, err := sshkey.GenerateKey(user + "@" + host)
-	if err != nil {
-		return err
-	}
-
-	if err := c.config.SetPrivateKeyBytes(pemBytes); err != nil {
-		return err
-	}
-
-	return nil
+	return c.store.GeneratePrivateKey()
 }

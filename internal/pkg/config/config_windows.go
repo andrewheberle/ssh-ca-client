@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
+	"github.com/knadh/koanf/v2"
+	"github.com/pda0/koanf-winreg/v2/winreg"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/sys/windows/registry"
 	"sigs.k8s.io/yaml"
@@ -138,4 +141,33 @@ func loadSystemConfig(name string) (SystemConfig, error) {
 	policy := loadPolicy()
 
 	return mergeConfig(policy, local)
+}
+
+// Loading config on Windows is from the registry so configpath denotes
+// must be either HKLM or HKCU.
+func loadClientConfig(configpath string) (*koanf.Koanf, error) {
+	k := koanf.New(".")
+	switch strings.ToUpper(configpath) {
+	case "HKLM":
+		if err := k.Load(winreg.Provider(winreg.Config{Key: winreg.LOCAL_MACHINE, Path: "SOFTWARE\\Andrew Heberle\\Serverless SSH CA Client", MaxDepth: 2}), nil); err != nil {
+			return nil, fmt.Errorf("could not load machine config: %w", err)
+		}
+	case "HKCU":
+		if err := k.Load(winreg.Provider(winreg.Config{Key: winreg.CURRENT_USER, Path: "SOFTWARE\\Andrew Heberle\\Serverless SSH CA Client", MaxDepth: 2}), nil); err != nil {
+			return nil, fmt.Errorf("could not load user config: %w", err)
+		}
+	default:
+		return nil, fmt.Errorf("only HKLM or HKCU is accepted: %s", configpath)
+	}
+
+	// Load policy second
+	if err := k.Load(winreg.Provider(winreg.Config{Key: winreg.LOCAL_MACHINE, Path: "SOFTWARE\\Policies\\Serverless SSH CA Client", MaxDepth: 2}), nil); err != nil {
+		return nil, fmt.Errorf("could not load policy: %w", err)
+	}
+
+	return k, nil
+}
+
+func ConfigPath() string {
+	return "HLKM"
 }

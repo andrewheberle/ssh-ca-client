@@ -19,9 +19,9 @@ type krlCommand struct {
 	out   string
 	force bool
 
-	config          *config.SystemConfig
+	config          *config.ClientConfig
 	logger          *slog.Logger
-	certificatetype api.GetRevocationListEndpointParamsCertificateType
+	certificatetype api.GetCertificateTypeKrlParamsCertificateType
 
 	*simplecommand.Command
 }
@@ -54,16 +54,16 @@ func (c *krlCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 	c.logger.Debug("attempting load config", "command", this.CobraCommand.Name())
 
 	// load config
-	config, err := loadsystemconfig(this)
+	config, err := loadconfig(this)
 	if err != nil {
 		return err
 	}
 	c.config = config
 
 	if c.host {
-		c.certificatetype = api.GetRevocationListEndpointParamsCertificateTypeHost
+		c.certificatetype = api.GetCertificateTypeKrlParamsCertificateTypeHost
 	} else {
-		c.certificatetype = api.GetRevocationListEndpointParamsCertificateTypeUser
+		c.certificatetype = api.GetCertificateTypeKrlParamsCertificateTypeUser
 	}
 
 	return nil
@@ -76,7 +76,7 @@ func (c *krlCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args [
 		return fmt.Errorf("could not retrieve krl: %w", err)
 	}
 
-	if pub := c.config.CertificateAuthority(); pub != nil {
+	if pub := c.config.CertificateAuthorityPublicKey(); pub != nil {
 		if err := res.VerifyStrict(pub); err != nil {
 			c.logger.Error("verification of krl failed", "error", err)
 			return err
