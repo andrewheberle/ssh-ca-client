@@ -86,6 +86,7 @@ jobs:
           path: dist
       - name: Build MSI
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           version="$(git describe --tags)"
           templates/build-msi.sh "$version" "dist/ssh-ca-client_${version}_amd64.msi"
           cd dist && sha256sum "ssh-ca-client_${version}_amd64.msi" > ssh-ca-client.sha256sum
