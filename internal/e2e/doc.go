@@ -8,8 +8,8 @@
 //
 // The CA is run by the harness in testdata/ca, which provides the parts of
 // the Cloudflare Workers environment the CA relies on. Its npm dependencies
-// are installed (which requires network access) and the harness is bundled
-// automatically when the tests start.
+// are installed automatically when the tests start, which requires network
+// access.
 //
 // [Serverless SSH CA]: https://github.com/andrewheberle/serverless-ssh-ca
 package e2e

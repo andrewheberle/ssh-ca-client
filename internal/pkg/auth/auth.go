@@ -117,7 +117,7 @@ type OidcHandler struct {
 
 	// verifier is set, along with the oauth2Config endpoint, once provider
 	// discovery succeeds. It is guarded by mu.
-	verifier *oidc.IDTokenVerifier
+	verifier     *oidc.IDTokenVerifier
 	refreshToken string
 	callbackPath string
 	loginPath    string
@@ -177,9 +177,9 @@ func NewOidcHandler(config OidcConfig, opts ...OidcHandlerOption) (*OidcHandler,
 	h := &OidcHandler{
 		callbackPath: u.Path,
 		// use a client with a timeout for all requests to the IdP
-		httpClient: &http.Client{Timeout: idpTimeout},
-		issuer:     config.Issuer,
-		listenAddr: listenAddr,
+		httpClient:   &http.Client{Timeout: idpTimeout},
+		issuer:       config.Issuer,
+		listenAddr:   listenAddr,
 		logger:       slog.New(slog.DiscardHandler),
 		loginPath:    config.LoginPath,
 		loginTimeout: DefaultLoginTimeout,

@@ -7,7 +7,7 @@
 //     database
 //   - a Secrets Store binding returning the CA private key
 //
-// Usage: node dist/server.mjs <config.json>
+// Usage: node server.mjs <config.json>
 //
 // The config file is a JSON object with the following properties:
 //   private_key: the CA private key in OpenSSH format

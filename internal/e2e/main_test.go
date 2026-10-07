@@ -18,22 +18,22 @@ var (
 	// nodePath is the path to the node executable
 	nodePath string
 
-	// serverPath is the path to the bundled CA harness
+	// serverPath is the path to the CA harness script
 	serverPath string
 )
 
 func TestMain(m *testing.M) {
-	if err := buildHarness(); err != nil {
-		fmt.Fprintf(os.Stderr, "e2e: could not build CA harness: %v\n", err)
+	if err := setupHarness(); err != nil {
+		fmt.Fprintf(os.Stderr, "e2e: could not set up CA harness: %v\n", err)
 		os.Exit(1)
 	}
 
 	os.Exit(m.Run())
 }
 
-// buildHarness installs the npm dependencies of the CA harness when they are
-// missing or out of date and then bundles it.
-func buildHarness() error {
+// setupHarness installs the npm dependencies of the CA harness when they are
+// missing or out of date.
+func setupHarness() error {
 	var err error
 
 	nodePath, err = exec.LookPath("node")
@@ -62,11 +62,7 @@ func buildHarness() error {
 		}
 	}
 
-	if err := run(dir, nodePath, "build.mjs"); err != nil {
-		return fmt.Errorf("bundling: %w", err)
-	}
-
-	serverPath = filepath.Join(dir, "dist", "server.mjs")
+	serverPath = filepath.Join(dir, "server.mjs")
 
 	return nil
 }
