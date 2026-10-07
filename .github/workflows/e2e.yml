@@ -8,6 +8,28 @@ on:
     branches:
       - 'main'
   pull_request:
+  workflow_dispatch:
+    inputs:
+      ca-ref:
+        description: Git ref of andrewheberle/serverless-ssh-ca to build and test against instead of the pinned npm version
+        type: string
+        default: ''
+      client-ref:
+        description: Git ref of the client to test, or "latest" for the latest release (defaults to the selected branch)
+        type: string
+        default: ''
+  # allows andrewheberle/serverless-ssh-ca to run these tests against
+  # unreleased changes
+  workflow_call:
+    inputs:
+      ca-ref:
+        description: Git ref of andrewheberle/serverless-ssh-ca to build and test against instead of the pinned npm version
+        type: string
+        default: ''
+      client-ref:
+        description: Git ref of the client to test, or "latest" for the latest release
+        type: string
+        default: main
 
 jobs:
   e2e:
@@ -28,9 +50,38 @@ jobs:
     env:
       CGO_ENABLED: ${{ matrix.cgo }}
     steps:
+      - name: Resolve client ref
+        id: client
+        if: ${{ inputs.client-ref }}
+        shell: bash
+        env:
+          CLIENT_REF: ${{ inputs.client-ref }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ref="$CLIENT_REF"
+          if [ "$ref" = "latest" ]; then
+            ref="$(gh release view --repo andrewheberle/ssh-ca-client --json tagName --jq .tagName)"
+          fi
+          echo "Testing client at $ref"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
+      # when called from another repository the client must be named
+      # explicitly, as github.repository is the caller
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          repository: ${{ inputs.client-ref && 'andrewheberle/ssh-ca-client' || github.repository }}
+          ref: ${{ steps.client.outputs.ref }}
+          persist-credentials: false
+
+      - name: Checkout CA
+        if: ${{ inputs.ca-ref }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: andrewheberle/serverless-ssh-ca
+          ref: ${{ inputs.ca-ref }}
+          # leading underscore keeps it out of ./... for the go tool
+          path: _ca
           persist-credentials: false
 
       - name: Set up Go
@@ -46,9 +97,27 @@ jobs:
           cache: npm
           cache-dependency-path: internal/e2e/testdata/ca/package-lock.json
 
+      - name: Build CA package
+        if: ${{ inputs.ca-ref }}
+        working-directory: _ca
+        shell: bash
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build -w packages/core
+          tarball="$(npm pack -w packages/core --pack-destination "$RUNNER_TEMP" | tail -n 1)"
+          echo "CA_TARBALL=$RUNNER_TEMP/$tarball" >> "$GITHUB_ENV"
+
       - name: Install CA dependencies
         working-directory: internal/e2e/testdata/ca
         run: npm ci --no-audit --no-fund
+
+      # done here rather than with E2E_CA_PACKAGE so that client releases
+      # from before it existed can also be tested
+      - name: Install CA package
+        if: ${{ inputs.ca-ref }}
+        working-directory: internal/e2e/testdata/ca
+        shell: bash
+        run: npm install --no-save --no-audit --no-fund "$CA_TARBALL"
 
       - name: Run end-to-end tests
         shell: bash
