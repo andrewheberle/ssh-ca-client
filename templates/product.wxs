@@ -1,198 +1,163 @@
 <?xml version="1.0"?>
 
+<!--
+  Built with wixl from msitools (0.106 or later), see build-msi.sh.
+
+  Required preprocessor variables:
+    Version    - MSI ProductVersion (major.minor.patch)
+    DistDir    - GoReleaser dist directory containing the Windows binaries
+    PolicyDir  - directory containing the Group Policy ADMX/ADML files
+    LicenseRtf - licence converted to RTF for the licence agreement dialog
+-->
+
 <?if $(sys.BUILDARCH)="x86"?>
     <?define Program_Files="ProgramFilesFolder"?>
-<?elseif $(sys.BUILDARCH)="x64"?>
-    <?define Program_Files="ProgramFiles64Folder"?>
 <?else?>
-    <?error Unsupported value of sys.BUILDARCH=$(sys.BUILDARCH)?>
+    <?define Program_Files="ProgramFiles64Folder"?>
 <?endif?>
+
+<?define Product="Serverless SSH CA Client"?>
+<?define Company="Andrew Heberle"?>
+<?define UpgradeCode="75b8e17f-138e-447e-bf35-c093ab5293e8"?>
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-   <Product Id="*" UpgradeCode="{{.UpgradeCode}}"
-            Name="{{.Product}}"
-            Version="{{.VersionOk}}"
-            Manufacturer="{{.Company}}"
+   <Product Id="*" UpgradeCode="$(var.UpgradeCode)"
+            Name="$(var.Product)"
+            Version="$(var.Version)"
+            Manufacturer="$(var.Company)"
             Language="1033">
 
       <Package InstallerVersion="200" Compressed="yes" Comments="Windows Installer Package" InstallScope="perMachine"/>
 
       <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
 
-      <Upgrade Id="{{.UpgradeCode}}">
-         <UpgradeVersion Minimum="{{.VersionOk}}" OnlyDetect="yes" Property="NEWERVERSIONDETECTED"/>
-         <UpgradeVersion Minimum="0.0.0" Maximum="{{.VersionOk}}" IncludeMinimum="yes" IncludeMaximum="no"
+      <Upgrade Id="$(var.UpgradeCode)">
+         <UpgradeVersion Minimum="$(var.Version)" OnlyDetect="yes" Property="NEWERVERSIONDETECTED"/>
+         <UpgradeVersion Minimum="0.0.0" Maximum="$(var.Version)" IncludeMinimum="yes" IncludeMaximum="no"
                          Property="OLDERVERSIONBEINGUPGRADED"/>
       </Upgrade>
       <Condition Message="A newer version of this software is already installed.">NOT NEWERVERSIONDETECTED</Condition>
 
-			<!--
+      <!--
       Properties for install options.
       Both default to enabled (1). Can be overridden on the msiexec command line:
         msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0 START_SSH_AGENT=0
-			-->
-			<Property Id="START_ON_LOGIN" Value="1" Secure="yes" />
-			<Property Id="START_SSH_AGENT" Value="1" Secure="yes" />
+      -->
+      <Property Id="START_ON_LOGIN" Value="1" Secure="yes" />
+      <Property Id="START_SSH_AGENT" Value="1" Secure="yes" />
 
       <Directory Id="TARGETDIR" Name="SourceDir">
 
          <Directory Id="$(var.Program_Files)">
-            <Directory Id="INSTALLDIR" Name="{{.Product}}">
-               {{if gt (.Files.Items | len) 0}}
-               <Component Id="ApplicationFiles" Guid="{{.Files.GUID}}">
-                  {{range $i, $e := .Files.Items}}
-                    <File Id="ApplicationFile{{$i}}" Source="{{$e}}"/>
-                  {{end}}
+            <Directory Id="INSTALLDIR" Name="$(var.Product)">
+               <Component Id="ApplicationFiles" Guid="66807fd7-177d-4462-822a-24211b9fb0f1">
+                  <File Id="ApplicationFile0" Source="$(var.DistDir)/gui_windows_amd64_v1/ssh-ca-client.exe"/>
+                  <File Id="ApplicationFile1" Source="$(var.DistDir)/cli_windows_amd64_v1/ssh-ca-client-cli.exe"/>
                </Component>
-               {{end}}
-               {{if gt (.Directories | len) 0}}
-               {{range $i, $e := .Directories}}
-               <Directory Id="APPDIR{{$i}}" Name="{{$e}}" />
-               {{end}}
-               {{end}}
+
+               <!--
+                 Group Policy templates.
+               -->
+               <Directory Id="APPDIR0" Name="policy">
+                  <Component Id="C.PolicyADMX" Guid="2f0c6f0e-5d2b-4b8e-9a51-6f3d2c7b1a40">
+                     <File Id="PolicyADMX" Source="$(var.PolicyDir)/ServerlessSSHCAClient.admx" KeyPath="yes"/>
+                  </Component>
+                  <Directory Id="APPDIR0_EN_US" Name="en-US">
+                     <Component Id="C.PolicyADML" Guid="8b4e1d3a-7c62-4f05-b9d8-1e5a6c3f2d71">
+                        <File Id="PolicyADML" Source="$(var.PolicyDir)/en-US/ServerlessSSHCAClient.adml" KeyPath="yes"/>
+                     </Component>
+                  </Directory>
+               </Directory>
             </Directory>
 
-						<!--
-							Component: Event Log source registration.
-						-->
-						<Component Id="C.EventLog" Guid="6ccdcec5-b549-4ed1-8f60-65c9e78b05e7">
-							<RegistryValue Root="HKLM"
-														Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
-														Name="EventMessageFile"
-														Type="expandable"
-														Value="%SystemRoot%\System32\EventCreate.exe"
-														KeyPath="yes" />
-							<RegistryValue Root="HKLM"
-														Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
-														Name="TypesSupported"
-														Type="integer"
-														Value="7" />
-						</Component>
+            <!--
+              Component: Event Log source registration.
+            -->
+            <Component Id="C.EventLog" Guid="6ccdcec5-b549-4ed1-8f60-65c9e78b05e7">
+               <RegistryValue Root="HKLM"
+                              Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
+                              Name="EventMessageFile"
+                              Type="expandable"
+                              Value="%SystemRoot%\System32\EventCreate.exe"
+                              KeyPath="yes" />
+               <RegistryValue Root="HKLM"
+                              Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client"
+                              Name="TypesSupported"
+                              Type="integer"
+                              Value="7" />
+            </Component>
 
-						<!--
-							Component: Run on login (HKLM).
-							Condition restricts installation to when START_ON_LOGIN=1.
-							MSI handles removal of the registry value on uninstall automatically.
-						-->
-						<Component Id="C.RunOnLogin" Guid="d4e5f6a7-b8c9-0123-defa-456789012345">
-							<Condition>START_ON_LOGIN = 1</Condition>
-							<RegistryValue Root="HKLM"
-														Key="Software\Microsoft\Windows\CurrentVersion\Run"
-														Name="Serverless SSH CA Client"
-														Type="string"
-														Value="[INSTALLDIR]ssh-ca-client.exe"
-														KeyPath="yes" />
-						</Component>
+            <!--
+              Component: Run on login (HKLM).
+              Condition restricts installation to when START_ON_LOGIN=1.
+              MSI handles removal of the registry value on uninstall automatically.
+            -->
+            <Component Id="C.RunOnLogin" Guid="d4e5f6a7-b8c9-0123-defa-456789012345">
+               <Condition>START_ON_LOGIN = 1</Condition>
+               <RegistryValue Root="HKLM"
+                              Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                              Name="Serverless SSH CA Client"
+                              Type="string"
+                              Value="[INSTALLDIR]ssh-ca-client.exe"
+                              KeyPath="yes" />
+            </Component>
 
-						<!--
-							Component: Start OpenSSH Agent.
-							Condition restricts installation to when START_SSH_AGENT=1.
-							Adds ssh-agent.exe to the HKLM Run key so it starts at login for all
-							users, this requires the OpenSSH Authentication Agent service to be set
-							to "Manual" startup.
-						-->
-						<Component Id="C.SSHAgent" Guid="e5f6a7b8-c9d0-1234-efab-567890123456">
-							<Condition>START_SSH_AGENT = 1</Condition>
-							<RegistryValue Root="HKLM"
-														Key="Software\Microsoft\Windows\CurrentVersion\Run"
-														Name="OpenSSH Authentication Agent"
-														Type="expandable"
-														Value="%SystemRoot%\System32\OpenSSH\ssh-agent.exe"
-														KeyPath="yes" />
-						</Component>
+            <!--
+              Component: Start OpenSSH Agent.
+              Condition restricts installation to when START_SSH_AGENT=1.
+              Adds ssh-agent.exe to the HKLM Run key so it starts at login for all
+              users, this requires the OpenSSH Authentication Agent service to be set
+              to "Manual" startup.
+            -->
+            <Component Id="C.SSHAgent" Guid="e5f6a7b8-c9d0-1234-efab-567890123456">
+               <Condition>START_SSH_AGENT = 1</Condition>
+               <RegistryValue Root="HKLM"
+                              Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                              Name="OpenSSH Authentication Agent"
+                              Type="expandable"
+                              Value="%SystemRoot%\System32\OpenSSH\ssh-agent.exe"
+                              KeyPath="yes" />
+            </Component>
          </Directory>
 
-         {{if gt (.Env.Vars | len) 0}}
-         <Component Id="ENVS" Guid="{{.Env.GUID}}">
-          {{range $i, $e := .Env.Vars}}
-          <Environment Id="ENV{{$i}}"
-            Name="{{$e.Name}}"
-            Value="{{$e.Value}}"
-            Permanent="{{$e.Permanent}}"
-            Part="{{$e.Part}}"
-            Action="{{$e.Action}}"
-            System="{{$e.System}}" />
-          {{end}}
-        </Component>
-        {{end}}
-
-         {{if gt (.Shortcuts.Items | len) 0}}
          <Directory Id="ProgramMenuFolder">
-            <Directory Id="ProgramMenuSubfolder" Name="{{.Product}}">
-               <Component Id="ApplicationShortcuts" Guid="{{.Shortcuts.GUID}}">
-               {{range $i, $e := .Shortcuts.Items}}
-                  <Shortcut Id="ApplicationShortcut{{$i}}"
-                        Name="{{$e.Name}}"
-                        Description="{{$e.Description}}"
-                        Target="{{$e.Target}}"
-                        WorkingDirectory="{{$e.WDir}}"
-                        {{if gt ($e.Arguments | len) 0}}
-                        Arguments="{{$e.Arguments}}"
-                        {{end}}
-                        >
-                        {{if gt ($e.Icon | len) 0}}
-                        <Icon Id="Icon{{$i}}" SourceFile="{{$e.Icon}}" />
-                        {{end}}
-                  </Shortcut>
+            <Directory Id="ProgramMenuSubfolder" Name="$(var.Product)">
+               <Component Id="ApplicationShortcuts" Guid="4d117172-5c8f-4389-ba93-58c9f35e6a0f">
+                  <Shortcut Id="ApplicationShortcut0"
+                            Name="$(var.Product)"
+                            Description="$(var.Product)"
+                            Target="[INSTALLDIR]ssh-ca-client.exe"
+                            WorkingDirectory="INSTALLDIR" />
                   <RegistryValue Root="HKCU"
-                    Key="Software\{{$.Company}}\{{$.Product}}"
-                    Name="installed{{$i}}"
-                    Type="integer" Value="1" KeyPath="yes"/>
-                {{end}}
-                <RemoveFolder Id="ProgramMenuSubfolder" On="uninstall"/>
+                                 Key="Software\$(var.Company)\$(var.Product)"
+                                 Name="installed0"
+                                 Type="integer" Value="1" KeyPath="yes"/>
+                  <RemoveFolder Id="ProgramMenuSubfolder" On="uninstall"/>
                </Component>
             </Directory>
          </Directory>
-         {{end}}
 
       </Directory>
 
-      {{range $i, $e := .InstallHooks}}
-      <SetProperty Id="CustomInstallExec{{$i}}" Value="{{$e.CookedCommand}}" Before="CustomInstallExec{{$i}}" Sequence="execute"/>
-      <CustomAction Id="CustomInstallExec{{$i}}" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="no"/>
-      {{end}}
-      {{range $i, $e := .UninstallHooks}}
-      <SetProperty Id="CustomUninstallExec{{$i}}" Value="{{$e.CookedCommand}}" Before="CustomUninstallExec{{$i}}" Sequence="execute"/>
-      <CustomAction Id="CustomUninstallExec{{$i}}" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="no"/>
-      {{end}}
       <InstallExecuteSequence>
          <RemoveExistingProducts After="InstallValidate"/>
-         {{range $i, $e := .InstallHooks}}
-         <Custom Action="CustomInstallExec{{$i}}" After="{{if eq $i 0}}InstallFiles{{else}}CustomInstallExec{{dec $i}}{{end}}">NOT Installed AND NOT REMOVE</Custom>
-         {{end}}
-         {{range $i, $e := .UninstallHooks}}
-         <Custom Action="CustomUninstallExec{{$i}}" After="{{if eq $i 0}}InstallInitialize{{else}}CustomUninstallExec{{dec $i}}{{end}}">REMOVE ~= "ALL"</Custom>
-         {{end}}
       </InstallExecuteSequence>
 
       <Feature Id="DefaultFeature" Level="1">
-         {{if gt (.Env.Vars | len) 0}}
-         <ComponentRef Id="ENVS"/>
-         {{end}}
-         {{if gt (.Files.Items | len) 0}}
          <ComponentRef Id="ApplicationFiles"/>
-         {{end}}
-         {{if gt (.Shortcuts.Items | len) 0}}
          <ComponentRef Id="ApplicationShortcuts"/>
-         {{end}}
-         {{range $i, $e := .Directories}}
-         <ComponentGroupRef Id="AppFiles{{$i}}" />
-         {{end}}
-				 <ComponentRef Id="C.EventLog" />
-				 <ComponentRef Id="C.RunOnLogin" />
-      	 <ComponentRef Id="C.SSHAgent" />
+         <ComponentRef Id="C.PolicyADMX" />
+         <ComponentRef Id="C.PolicyADML" />
+         <ComponentRef Id="C.EventLog" />
+         <ComponentRef Id="C.RunOnLogin" />
+         <ComponentRef Id="C.SSHAgent" />
       </Feature>
 
-      <UI>
-         <!-- Define the installer UI -->
-         <UIRef Id="WixUI_HK" />
-      </UI>
+      <!-- Define the installer UI -->
+      <UIRef Id="WixUI_HK" />
 
       <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
-
-      <!-- this should help to propagate env var changes -->
-      <CustomActionRef Id="WixBroadcastEnvironmentChange" />
 
    </Product>
 

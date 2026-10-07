@@ -75,13 +75,19 @@ jobs:
 
   msi:
     name: Package as an MSI for Windows
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie@sha256:913f6706df59a68922d1dd08f78c2476560a8d367897200a6005b00e5f67c2d5
     permissions:
       contents: write
       id-token: write
       attestations: write
     needs: client
     steps:
+      - name: Install wixl
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates git wixl wixl-data
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -92,17 +98,11 @@ jobs:
         with:
           name: dist-artifact
           path: dist
-      - name: Add WiX Toolset to path
-        run: Write-Output $env:WIX | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      - name: Set up Go
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
-        with:
-          go-version: stable
-          cache: true
       - name: Build MSI
         run: |
-          go tool github.com/mh-cbon/go-msi make --arch amd64 --out "$(Join-Path $([System.Environment]::CurrentDirectory) "tmp")" --src ".\templates" --msi ".\dist\ssh-ca-client_$($env:GITHUB_REF_NAME)_amd64.msi" --version "$($env:GITHUB_REF_NAME)"
-          Write-Output "$((Get-FileHash -Algorithm SHA256 -Path ".\dist\ssh-ca-client_$($env:GITHUB_REF_NAME)_amd64.msi").Hash) ssh-ca-client_$($env:GITHUB_REF_NAME)_amd64.msi" | Out-File -FilePath ".\dist\ssh-ca-client.sha256sum"
+          version="$GITHUB_REF_NAME"
+          templates/build-msi.sh "$version" "dist/ssh-ca-client_${version}_amd64.msi"
+          cd dist && sha256sum "ssh-ca-client_${version}_amd64.msi" > ssh-ca-client.sha256sum
       - name: Attest MSI
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
