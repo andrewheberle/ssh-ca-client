@@ -94,10 +94,9 @@ E2E_CA_PACKAGE=/path/to/andrewheberle-serverless-ssh-ca-X.Y.Z.tgz go test -tags 
 Relative paths are resolved from `internal/e2e`, so an absolute path is
 simplest. The next run without `E2E_CA_PACKAGE` reinstalls the pinned version.
 
-The [End-to-end tests](.github/workflows/e2e.yml) workflow accepts `ca-ref`
-and `client-ref` inputs. Run it manually, or call it from the CA repository,
-to test a CA git ref against a client git ref (or `latest`, the latest GitHub
-release).
+The CA repository calls the [End-to-end tests](.github/workflows/e2e.yml)
+workflow with `ca-ref` and `client-ref` inputs to test its changes against a
+client git ref (or `latest`, the latest GitHub release) before publishing.
 
 ## Configuration
 

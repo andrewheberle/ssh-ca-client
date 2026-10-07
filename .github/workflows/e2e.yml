@@ -9,15 +9,6 @@ on:
       - 'main'
   pull_request:
   workflow_dispatch:
-    inputs:
-      ca-ref:
-        description: Git ref of andrewheberle/serverless-ssh-ca to build and test against instead of the pinned npm version
-        type: string
-        default: ''
-      client-ref:
-        description: Git ref of the client to test, or "latest" for the latest release (defaults to the selected branch)
-        type: string
-        default: ''
   # allows andrewheberle/serverless-ssh-ca to run these tests against
   # unreleased changes
   workflow_call:
