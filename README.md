@@ -59,6 +59,17 @@ go install github.com/andrewheberle/ssh-ca-client/cmd/ssh-ca-client-cli@latest
 go install github.com/andrewheberle/ssh-ca-client/cmd/ssh-ca-client@latest
 ```
 
+#### MSI
+
+The MSI is built on Linux using `wixl` from [msitools](https://gitlab.gnome.org/GNOME/msitools)
+0.106 or later (packaged as `wixl` and `wixl-data` on Debian 13 "trixie").
+Build the Windows binaries with GoReleaser first, then the MSI:
+
+```sh
+goreleaser release --clean --snapshot --skip sign
+templates/build-msi.sh "$(git describe --tags)" dist/ssh-ca-client.msi
+```
+
 #### Testing
 
 Unit tests have no external dependencies:

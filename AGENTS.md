@@ -17,7 +17,7 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 - `policy/` - Group Policy Object's for Windows to manage GUI on Windows; included in MSI build
 - `snap/` - Snap specific scripts and files
 - `systemd/` - Systemd units for host key renewals; included in APT package
-- `templates/` - templates used for MSI build
+- `templates/` - WiX sources and scripts for the MSI build; built on Linux with `wixl` from msitools (0.106 or later), not the WiX Toolset, so only the WiX v3 subset that `wixl` supports can be used
 
 ## Build, test, lint
 Run these before considering any change complete:
