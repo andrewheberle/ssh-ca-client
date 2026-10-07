@@ -79,6 +79,25 @@ The CA's npm dependencies are installed on the first run, which requires
 network access. The version of the CA that is tested against is set in
 [internal/e2e/testdata/ca/package.json](internal/e2e/testdata/ca/package.json).
 
+To test against an unreleased version of the CA, set `E2E_CA_PACKAGE` to any
+npm install spec, such as a tarball built from a checkout of
+[serverless-ssh-ca](https://github.com/andrewheberle/serverless-ssh-ca):
+
+```sh
+# in serverless-ssh-ca
+npm ci && npm run build -w packages/core && npm pack -w packages/core
+
+# in ssh-ca-client
+E2E_CA_PACKAGE=/path/to/andrewheberle-serverless-ssh-ca-X.Y.Z.tgz go test -tags e2e -race ./internal/e2e/...
+```
+
+Relative paths are resolved from `internal/e2e`, so an absolute path is
+simplest. The next run without `E2E_CA_PACKAGE` reinstalls the pinned version.
+
+The CA repository calls the [End-to-end tests](.github/workflows/e2e.yml)
+workflow with `ca-ref` and `client-ref` inputs to test its changes against a
+client git ref (or `latest`, the latest GitHub release) before publishing.
+
 ## Configuration
 
 The client requires the IdP and CA details set as follows:
