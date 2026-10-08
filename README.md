@@ -108,6 +108,21 @@ simplest. The next run without `E2E_CA_PACKAGE` reinstalls the pinned version.
 The CA repository calls the [End-to-end tests](.github/workflows/e2e.yml)
 workflow with `ca-ref` and `client-ref` inputs to test its changes against a
 client git ref (or `latest`, the latest GitHub release) before publishing.
+When `ca-ref` is set, the CA's OpenAPI schema is also checked with
+[oasdiff](https://github.com/oasdiff/oasdiff) for changes that would break the
+client under test.
+
+#### API Schema
+
+The client's API code in [internal/pkg/api](internal/pkg/api) is generated from
+`openapi.json`, which is a copy of the schema shipped in the pinned CA package.
+CI fails if they differ, so after changing the CA version update the schema and
+regenerate the code:
+
+```sh
+npm ci --prefix internal/e2e/testdata/ca
+npm run sync-schema --prefix internal/e2e/testdata/ca
+```
 
 ## Configuration
 
