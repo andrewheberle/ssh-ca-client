@@ -19,7 +19,7 @@ require (
 	github.com/hiddeco/sshsig v0.2.0
 	github.com/knadh/koanf/parsers/yaml v1.1.1
 	github.com/knadh/koanf/providers/file v1.2.1
-	github.com/knadh/koanf/v2 v2.3.7
+	github.com/knadh/koanf/v2 v2.3.8
 	github.com/ndbeals/winssh-pageant v0.0.0-20230609194536-9f88b630ebec
 	github.com/oapi-codegen/runtime v1.7.0
 	github.com/pda0/koanf-winreg/v2 v2.0.0
