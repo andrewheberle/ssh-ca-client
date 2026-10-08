@@ -80,7 +80,7 @@ go test -race ./...
 
 End-to-end tests run the client against the published
 [Serverless SSH CA](https://www.npmjs.com/package/@andrewheberle/serverless-ssh-ca)
-package and require Node.js 22.5 or later and npm:
+package and require Node.js 24 or later and npm:
 
 ```sh
 go test -tags e2e -race ./internal/e2e/...
