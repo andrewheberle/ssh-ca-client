@@ -23,10 +23,14 @@ on:
 
 jobs:
   e2e:
-    name: Run end-to-end tests (${{ matrix.os }})
+    name: Run end-to-end tests (${{ matrix.os }}, ${{ matrix.runtime }})
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest]
+        # the CA runs on Node.js and on Cloudflare Workers, which is tested
+        # under workerd
+        runtime: [node, workerd]
         include:
           - os: ubuntu-latest
             race: '-race'
@@ -39,6 +43,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CGO_ENABLED: ${{ matrix.cgo }}
+      E2E_CA_RUNTIME: ${{ matrix.runtime }}
     steps:
       - name: Resolve client ref
         id: client
@@ -110,9 +115,16 @@ jobs:
         shell: bash
         run: npm install --no-save --no-audit --no-fund "$CA_TARBALL"
 
+      # client releases from before workerd was supported ignore
+      # E2E_CA_RUNTIME, so would only repeat the Node.js tests
       - name: Run end-to-end tests
         shell: bash
-        run: go test -tags e2e ${{ matrix.race }} -v ./internal/e2e/...
+        run: |
+          if [ "$E2E_CA_RUNTIME" = "workerd" ] && [ ! -f internal/e2e/testdata/ca/workerd.mjs ]; then
+            echo "::notice::The client under test cannot run the CA under workerd, skipping"
+            exit 0
+          fi
+          go test -tags e2e ${{ matrix.race }} -v ./internal/e2e/...
 
       # compared with the schema committed in the client under test, so when
       # client-ref is "latest" this reports server changes that would break

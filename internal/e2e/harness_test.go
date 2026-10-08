@@ -13,6 +13,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io"
 	"maps"
 	"math"
 	"net/http"
@@ -48,6 +49,10 @@ const (
 
 	// stopTimeout is how long to wait for the CA to exit before killing it
 	stopTimeout = time.Second * 5
+
+	// logTimeout is how long to wait for a request to appear in the CA log,
+	// as the workerd harness writes it shortly after the response
+	logTimeout = time.Second * 2
 )
 
 // testIDP is an OIDC identity provider that serves a JWKS for the CA to
@@ -285,31 +290,13 @@ func newCA(t *testing.T, opts ...caOption) *testCA {
 	}
 	t.Cleanup(func() { _ = output.Close() })
 
-	cmd := exec.Command(nodePath, serverPath, configFile)
-	cmd.Stdout = output
-	cmd.Stderr = output
-	stdin, err := cmd.StdinPipe()
+	h, err := startHarness(output, serverPath, configFile)
 	if err != nil {
-		t.Fatalf("creating harness stdin: %v", err)
-	}
-	if err := cmd.Start(); err != nil {
 		t.Fatalf("starting harness: %v", err)
 	}
 
-	exited := make(chan error, 1)
-	go func() {
-		exited <- cmd.Wait()
-	}()
-
 	t.Cleanup(func() {
-		// closing stdin asks the harness to exit
-		_ = stdin.Close()
-		select {
-		case <-exited:
-		case <-time.After(stopTimeout):
-			_ = cmd.Process.Kill()
-			<-exited
-		}
+		h.stop()
 
 		checkLog(t, logFile)
 
@@ -319,7 +306,7 @@ func newCA(t *testing.T, opts ...caOption) *testCA {
 		}
 	})
 
-	port, err := waitForPort(portFile, exited)
+	port, err := h.waitForPort(portFile)
 	if err != nil {
 		t.Fatalf("waiting for CA to start: %v", err)
 	}
@@ -333,8 +320,52 @@ func newCA(t *testing.T, opts ...caOption) *testCA {
 	}
 }
 
+// harness is a running CA harness process
+type harness struct {
+	cmd   *exec.Cmd
+	stdin io.Closer
+
+	// exited is closed once the process has exited, after err is set
+	exited chan struct{}
+	err    error
+}
+
+// startHarness runs node with args, writing its output to output
+func startHarness(output io.Writer, args ...string) (*harness, error) {
+	cmd := exec.Command(nodePath, args...)
+	cmd.Stdout = output
+	cmd.Stderr = output
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return nil, fmt.Errorf("creating stdin: %w", err)
+	}
+	if err := cmd.Start(); err != nil {
+		return nil, err
+	}
+
+	h := &harness{cmd: cmd, stdin: stdin, exited: make(chan struct{})}
+	go func() {
+		h.err = cmd.Wait()
+		close(h.exited)
+	}()
+
+	return h, nil
+}
+
+// stop asks the harness to exit by closing its stdin, then kills it if it
+// has not exited within stopTimeout
+func (h *harness) stop() {
+	_ = h.stdin.Close()
+	select {
+	case <-h.exited:
+	case <-time.After(stopTimeout):
+		_ = h.cmd.Process.Kill()
+		<-h.exited
+	}
+}
+
 // waitForPort waits for the harness to write the port it is listening on
-func waitForPort(portFile string, exited <-chan error) (string, error) {
+func (h *harness) waitForPort(portFile string) (string, error) {
 	ticker := time.NewTicker(time.Millisecond * 50)
 	defer ticker.Stop()
 
@@ -342,8 +373,8 @@ func waitForPort(portFile string, exited <-chan error) (string, error) {
 
 	for {
 		select {
-		case err := <-exited:
-			return "", fmt.Errorf("harness exited: %v", err)
+		case <-h.exited:
+			return "", fmt.Errorf("harness exited: %v", h.err)
 		case <-timeout:
 			return "", errors.New("timed out")
 		case <-ticker.C:
@@ -406,9 +437,33 @@ func checkLog(t *testing.T, logFile string) {
 func (ca *testCA) assertRejected(t *testing.T, message string) {
 	t.Helper()
 
+	deadline := time.Now().Add(logTimeout)
+	for {
+		found, err := ca.rejected(message)
+		if err != nil {
+			t.Fatalf("reading CA log: %v", err)
+		}
+		if found {
+			return
+		}
+
+		if time.Now().After(deadline) {
+			break
+		}
+		time.Sleep(time.Millisecond * 50)
+	}
+
+	t.Errorf("CA did not reject a request with %q", message)
+}
+
+// rejected reports whether the CA log contains a rejected request with an
+// error containing message
+func (ca *testCA) rejected(message string) (bool, error) {
 	b, err := os.ReadFile(ca.logFile)
-	if err != nil {
-		t.Fatalf("reading CA log: %v", err)
+	if errors.Is(err, os.ErrNotExist) {
+		return false, nil
+	} else if err != nil {
+		return false, err
 	}
 
 	for line := range bytes.Lines(b) {
@@ -418,11 +473,11 @@ func (ca *testCA) assertRejected(t *testing.T, message string) {
 		}
 
 		if entry.Status >= http.StatusBadRequest && strings.Contains(entry.Body, message) {
-			return
+			return true, nil
 		}
 	}
 
-	t.Errorf("CA did not reject a request with %q", message)
+	return false, nil
 }
 
 func logContents(t *testing.T, name, path string) {

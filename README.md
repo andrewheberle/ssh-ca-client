@@ -90,6 +90,17 @@ The CA's npm dependencies are installed on the first run, which requires
 network access. The version of the CA that is tested against is set in
 [internal/e2e/testdata/ca/package.json](internal/e2e/testdata/ca/package.json).
 
+By default the CA runs on Node.js using the package's Node.js helpers. Set
+`E2E_CA_RUNTIME=workerd` to run it under workerd, the Cloudflare Workers
+runtime, with a local D1 database and Secrets Store via the Wrangler test
+harness instead:
+
+```sh
+E2E_CA_RUNTIME=workerd go test -tags e2e -race ./internal/e2e/...
+```
+
+CI runs the tests under both runtimes.
+
 To test against an unreleased version of the CA, set `E2E_CA_PACKAGE` to any
 npm install spec, such as a tarball built from a checkout of
 [serverless-ssh-ca](https://github.com/andrewheberle/serverless-ssh-ca):

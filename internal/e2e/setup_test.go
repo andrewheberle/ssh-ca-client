@@ -3,6 +3,7 @@
 package e2e
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -45,6 +46,76 @@ func TestCAPackageSpec(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("caPackageSpec(%q) = %q, want %q", tt.spec, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestHarnessScript(t *testing.T) {
+	tests := []struct {
+		name        string
+		runtime     string
+		wantRuntime string
+		wantScript  string
+		wantErr     bool
+	}{
+		{"unset", "", "node", "server.mjs", false},
+		{"node", "node", "node", "server.mjs", false},
+		{"workerd", "workerd", "workerd", "workerd.mjs", false},
+		{"unknown", "bun", "", "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			runtime, script, err := harnessScript(tt.runtime)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("harnessScript(%q) error = %v, wantErr %v", tt.runtime, err, tt.wantErr)
+			}
+			if runtime != tt.wantRuntime || script != tt.wantScript {
+				t.Errorf("harnessScript(%q) = %q, %q, want %q, %q", tt.runtime, runtime, script, tt.wantRuntime, tt.wantScript)
+			}
+		})
+	}
+}
+
+// TestHarness checks a harness can be stopped after waiting for it to start,
+// including when it exits without starting
+func TestHarness(t *testing.T) {
+	tests := []struct {
+		name     string
+		script   string
+		wantPort string
+		wantErr  bool
+	}{
+		{"started", `require("node:fs").writeFileSync(process.argv[1], "1234"); process.stdin.on("end", () => process.exit(0)); process.stdin.resume()`, "1234", false},
+		{"exited", `process.exit(3)`, "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			portFile := filepath.Join(t.TempDir(), "port")
+
+			h, err := startHarness(io.Discard, "-e", tt.script, portFile)
+			if err != nil {
+				t.Fatalf("startHarness() error = %v", err)
+			}
+
+			port, err := h.waitForPort(portFile)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("waitForPort() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if port != tt.wantPort {
+				t.Errorf("waitForPort() = %q, want %q", port, tt.wantPort)
+			}
+
+			stopped := make(chan struct{})
+			go func() {
+				h.stop()
+				close(stopped)
+			}()
+
+			select {
+			case <-stopped:
+			case <-time.After(stopTimeout + time.Second*5):
+				t.Fatal("stop() did not return")
 			}
 		})
 	}
