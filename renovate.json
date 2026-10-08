@@ -3,6 +3,16 @@
 	"extends": [
 		"config:recommended"
 	],
+	"packageRules": [
+		{
+			"matchPackageNames": [
+				"@andrewheberle/serverless-ssh-ca"
+			],
+			"prBodyNotes": [
+				"If the \"Check API schema\" job fails, run `npm run sync-schema --prefix internal/e2e/testdata/ca` on this branch and commit the changes."
+			]
+		}
+	],
 	"customManagers": [
 		{
 			"customType": "regex",

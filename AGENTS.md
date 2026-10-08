@@ -10,7 +10,7 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 - `docs/` - documentation of commands
 - `internal/pkg/` - application packages; not importable by other modules
 - `internal/e2e/` - end-to-end tests against the published server package; `testdata/ca/` runs the CA under Node.js
-- `internal/pkg/api/` - generated OpenAPI primitives to interact with the server implementation. Do not edit `api.gen.go` or `openapi.json`.
+- `internal/pkg/api/` - generated OpenAPI primitives to interact with the server implementation. Do not edit `api.gen.go` or `openapi.json`; `openapi.json` is copied from the CA package pinned in `internal/e2e/testdata/ca/package.json` and CI checks it matches, so update both with `npm run sync-schema --prefix internal/e2e/testdata/ca`.
 - `internal/pkg/cli/` - primary package used by the CLI
 - `internal/pkg/gui/` - primary package used by the GUI
 - `pkg/` - application packages; importable by others
@@ -24,6 +24,7 @@ Run these before considering any change complete:
 - Build: `go build ./...`
 - Test: `go test -race ./...`
 - End-to-end test (needs Node.js 22.5+ and npm): `go test -tags e2e -race ./internal/e2e/...`
+- Sync API schema after changing the pinned CA version (needs Node.js and npm): `npm ci --prefix internal/e2e/testdata/ca && npm run sync-schema --prefix internal/e2e/testdata/ca`
 - Vet: `go vet ./...`
 - Lint: `golangci-lint run`
 - Format: `gofmt -s -w .` (or `goimports`); never commit unformatted code

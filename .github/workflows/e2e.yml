@@ -113,3 +113,24 @@ jobs:
       - name: Run end-to-end tests
         shell: bash
         run: go test -tags e2e ${{ matrix.race }} -v ./internal/e2e/...
+
+      # compared with the schema committed in the client under test, so when
+      # client-ref is "latest" this reports server changes that would break
+      # clients already released. Run whatever the test result so both are
+      # reported.
+      - name: Export CA schema
+        if: ${{ !cancelled() && inputs.ca-ref && runner.os == 'Linux' }}
+        working-directory: _ca
+        run: npm run schema -w packages/core
+
+      # review is disabled so the schemas are not uploaded to oasdiff.com,
+      # and no token is passed as there is no PR comment to post
+      - name: Check CA schema for breaking changes
+        if: ${{ !cancelled() && inputs.ca-ref && runner.os == 'Linux' }}
+        uses: oasdiff/oasdiff-action/breaking@b9325c9e0a27ab65b0da3b766522cedec6be81dc # v0.1.18
+        with:
+          base: internal/pkg/api/openapi.json
+          revision: _ca/packages/core/openapi.json
+          fail-on: ERR
+          review: 'false'
+          github-token: ''

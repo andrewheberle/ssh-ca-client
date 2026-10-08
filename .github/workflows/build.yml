@@ -43,6 +43,28 @@ jobs:
           name: dist-artifact
           path: dist
           retention-days: 1
+  # the go generate check in the client job covers api.gen.go matching
+  # openapi.json, so this only needs to check openapi.json against the schema
+  # shipped in the pinned CA package
+  schema:
+    name: Check API schema
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: lts/*
+          package-manager-cache: false
+      - name: Install CA package
+        working-directory: internal/e2e/testdata/ca
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Compare schema with CA package
+        run: |
+          cmp internal/pkg/api/openapi.json internal/e2e/testdata/ca/node_modules/@andrewheberle/serverless-ssh-ca/openapi.json || (echo "::error::internal/pkg/api/openapi.json does not match the pinned CA package. Run 'npm run sync-schema --prefix internal/e2e/testdata/ca' and commit the changes." && exit 1)
   snapcraft:
     name: Publish Snap
     runs-on: ubuntu-latest
