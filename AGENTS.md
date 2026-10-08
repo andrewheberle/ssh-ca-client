@@ -23,7 +23,7 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 Run these before considering any change complete:
 - Build: `go build ./...`
 - Test: `go test -race ./...`
-- End-to-end test (needs Node.js 22.5+ and npm): `go test -tags e2e -race ./internal/e2e/...`
+- End-to-end test (needs Node.js 24+ and npm): `go test -tags e2e -race ./internal/e2e/...`
 - Sync API schema after changing the pinned CA version (needs Node.js and npm): `npm ci --prefix internal/e2e/testdata/ca && npm run sync-schema --prefix internal/e2e/testdata/ca`
 - Vet: `go vet ./...`
 - Lint: `golangci-lint run`

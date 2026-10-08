@@ -1,7 +1,7 @@
 // Package e2e contains end-to-end tests that run the client against the
 // published [Serverless SSH CA] package.
 //
-// The tests require Node.js 22.5 or later and npm, and use the "e2e" build
+// The tests require Node.js 24 or later and npm, and use the "e2e" build
 // tag so they are not run as part of the unit tests:
 //
 //	go test -tags e2e -race ./internal/e2e/...
