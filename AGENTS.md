@@ -47,7 +47,9 @@ Run these before considering any change complete:
 - New behaviour needs a test; bug fixes need a test that fails without the fix.
 
 ## Releases
-- Releases are built by GoReleaser from git tags (`vX.Y.Z`).
+- Releases are prepared by release-please (`release-please-config.json`, `.release-please-manifest.json`), which keeps a `chore(release): vX.Y.Z` PR open with the version bump and `CHANGELOG.md` entry, derived from conventional commit messages on `main`.
+- Merging the release PR creates the `vX.Y.Z` tag and GitHub release; the tag triggers GoReleaser, which adds the artifacts to that release.
+- Don't edit `CHANGELOG.md` or `.release-please-manifest.json` by hand; release-please maintains them.
 - Never delete, move, or force-push an existing tag. The Go module proxy caches versions immutably, so a retagged version won't be picked up. Fix forward with a new patch version.
 - Don't edit `.goreleaser.yaml` or CI config unless the task is specifically about them.
 - Do not create or push a tag unless specifically directed to as this triggers the release workflow.
