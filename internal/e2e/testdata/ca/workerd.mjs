@@ -86,12 +86,6 @@ const env = await server.getWorker().getEnv()
 const secrets = await env.PRIVATE_KEY["SecretsStoreSecret::admin_api"]()
 await secrets.create(config.private_key)
 
-// the CA applies its database migrations on first use, which fails for all but
-// one of several concurrent first requests, so apply them before any are made.
-// They are applied before the KRL is signed, so the response is ignored as
-// signing fails for CA keys the Workers runtime cannot use.
-await (await server.fetch("/api/v3/user/krl")).arrayBuffer()
-
 const timer = setInterval(flushLogs, 100)
 
 writeFileSync(config.port_file, url.port)
