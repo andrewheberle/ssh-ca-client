@@ -1,13 +1,14 @@
 {
 	"name": "ssh-ca-client-e2e-ca",
 	"private": true,
-	"description": "Runs the published Serverless SSH CA under Node.js for end-to-end tests of the client",
+	"description": "Runs the published Serverless SSH CA under Node.js or workerd for end-to-end tests of the client",
 	"type": "module",
 	"scripts": {
 		"sync-schema": "node -e \"require('node:fs').copyFileSync(require.resolve('@andrewheberle/serverless-ssh-ca/openapi.json'), '../../../pkg/api/openapi.json')\" && go generate ../../../pkg/api"
 	},
 	"dependencies": {
-		"@andrewheberle/serverless-ssh-ca": "0.20.0"
+		"@andrewheberle/serverless-ssh-ca": "0.20.1",
+		"wrangler": "4.148.0"
 	},
 	"engines": {
 		"node": ">=24.0.0"

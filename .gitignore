@@ -179,3 +179,6 @@ ssh-ca-client
 !cmd/ssh-ca-client
 ssh-ca-client-cli
 !cmd/ssh-ca-client-cli
+
+# wrangler working files from the e2e workerd harness
+.wrangler/

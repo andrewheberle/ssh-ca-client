@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	// harnessDir is the directory containing the Node.js CA harness
+	// harnessDir is the directory containing the CA harness
 	harnessDir = "testdata/ca"
 
 	// caPackage is the npm package name of the CA
@@ -27,7 +27,17 @@ const (
 	// replaced, so a later run without caPackageEnv reinstalls the pinned
 	// version
 	overrideMarker = ".e2e-ca-override"
+
+	// caRuntimeEnv is the environment variable that selects the runtime the
+	// CA is run under
+	caRuntimeEnv = "E2E_CA_RUNTIME"
 )
+
+// harnessScripts are the harness scripts that run the CA under each runtime
+var harnessScripts = map[string]string{
+	"node":    "server.mjs",
+	"workerd": "workerd.mjs",
+}
 
 var (
 	// nodePath is the path to the node executable
@@ -55,6 +65,11 @@ func setupHarness() error {
 	nodePath, err = exec.LookPath("node")
 	if err != nil {
 		return fmt.Errorf("node is required: %w", err)
+	}
+
+	runtime, script, err := harnessScript(os.Getenv(caRuntimeEnv))
+	if err != nil {
+		return err
 	}
 
 	dir, err := filepath.Abs(harnessDir)
@@ -102,14 +117,29 @@ func setupHarness() error {
 		return err
 	}
 	if spec != "" {
-		fmt.Fprintf(os.Stderr, "e2e: testing against %s %s from %s\n", caPackage, version, spec)
+		fmt.Fprintf(os.Stderr, "e2e: testing against %s %s from %s under %s\n", caPackage, version, spec, runtime)
 	} else {
-		fmt.Fprintf(os.Stderr, "e2e: testing against %s %s\n", caPackage, version)
+		fmt.Fprintf(os.Stderr, "e2e: testing against %s %s under %s\n", caPackage, version, runtime)
 	}
 
-	serverPath = filepath.Join(dir, "server.mjs")
+	serverPath = filepath.Join(dir, script)
 
 	return nil
+}
+
+// harnessScript returns the runtime named by caRuntimeEnv, which defaults to
+// Node.js, and the harness script that runs the CA under it.
+func harnessScript(runtime string) (string, string, error) {
+	if runtime == "" {
+		runtime = "node"
+	}
+
+	script, ok := harnessScripts[runtime]
+	if !ok {
+		return "", "", fmt.Errorf("%s must be \"node\" or \"workerd\", not %q", caRuntimeEnv, runtime)
+	}
+
+	return runtime, script, nil
 }
 
 // caPackageSpec returns the npm install spec to use in place of the pinned CA

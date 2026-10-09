@@ -11,6 +11,10 @@
 // dependencies are installed automatically when the tests start, which
 // requires network access.
 //
+// Setting E2E_CA_RUNTIME to "workerd" runs the CA under workerd, the
+// Cloudflare Workers runtime, using the Wrangler test harness with a local
+// D1 database and Secrets Store. The default is "node".
+//
 // Setting E2E_CA_PACKAGE to an npm install spec, such as the path to a
 // tarball from "npm pack", tests against that CA package instead of the
 // version pinned in testdata/ca/package-lock.json. The package must be
