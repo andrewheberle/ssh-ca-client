@@ -21,7 +21,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -51,7 +50,7 @@ const (
 	stopTimeout = time.Second * 5
 
 	// logTimeout is how long to wait for a request to appear in the CA log,
-	// as the workerd harness writes it shortly after the response
+	// as the test server writes it shortly after the response under workerd
 	logTimeout = time.Second * 2
 )
 
@@ -212,9 +211,8 @@ func withCAKeyType(keyType sshkey.KeyType, curve elliptic.Curve) caOption {
 // newCA starts a CA, with its own identity provider, that is stopped when the
 // test completes.
 //
-// Errors logged by the CA that indicate a fault in the harness rather than an
-// expected rejection of a request fail the test, as the CA does not report
-// all of these to clients.
+// Faults reported by the test server, rather than expected rejections of
+// requests, fail the test, as the CA does not report all of these to clients.
 func newCA(t *testing.T, opts ...caOption) *testCA {
 	t.Helper()
 
@@ -290,7 +288,7 @@ func newCA(t *testing.T, opts ...caOption) *testCA {
 	}
 	t.Cleanup(func() { _ = output.Close() })
 
-	h, err := startHarness(output, serverPath, configFile)
+	h, err := startHarness(output, serverPath, "--runtime", caRuntime, configFile)
 	if err != nil {
 		t.Fatalf("starting harness: %v", err)
 	}
@@ -386,7 +384,7 @@ func (h *harness) waitForPort(portFile string) (string, error) {
 	}
 }
 
-// logEntry is a line logged by the CA or harness
+// logEntry is a line logged by the CA or test server
 type logEntry struct {
 	Level   string `json:"level"`
 	Message string `json:"message"`
@@ -396,13 +394,10 @@ type logEntry struct {
 	Body   string `json:"body"`
 }
 
-// faultMessages are messages logged by the CA when returning an internal
-// server error
-var faultMessages = []string{"unhandled error", "unexpected error from router"}
-
-// checkLog fails the test for any errors logged by the CA that indicate a
-// fault in the harness, such as database errors, which are otherwise only
-// logged by the CA when issuing certificates.
+// checkLog fails the test for any faults reported by the test server, which
+// logs them as errors with a message starting with "harness". These include
+// errors logged by the CA that indicate a fault, such as database errors,
+// which are otherwise only logged by the CA when issuing certificates.
 func checkLog(t *testing.T, logFile string) {
 	t.Helper()
 
@@ -420,13 +415,7 @@ func checkLog(t *testing.T, logFile string) {
 			continue
 		}
 
-		if entry.Level != "error" {
-			continue
-		}
-
-		if strings.HasPrefix(entry.Message, "harness") ||
-			strings.Contains(entry.Message, "database") ||
-			slices.Contains(faultMessages, entry.Message) {
+		if strings.EqualFold(entry.Level, "error") && strings.HasPrefix(entry.Message, "harness") {
 			t.Errorf("CA logged a fault: %s", bytes.TrimSpace(line))
 		}
 	}

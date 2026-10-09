@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func TestCAPackageSpec(t *testing.T) {
+func TestPackageSpec(t *testing.T) {
 	dir := t.TempDir()
 	tarball := filepath.Join(dir, "ca.tgz")
 	if err := os.WriteFile(tarball, nil, 0o600); err != nil {
@@ -40,38 +40,37 @@ func TestCAPackageSpec(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := caPackageSpec(tt.spec)
+			got, err := packageSpec(caPackageEnv, tt.spec)
 			if err != nil {
-				t.Fatalf("caPackageSpec(%q) error = %v", tt.spec, err)
+				t.Fatalf("packageSpec(%q) error = %v", tt.spec, err)
 			}
 			if got != tt.want {
-				t.Errorf("caPackageSpec(%q) = %q, want %q", tt.spec, got, tt.want)
+				t.Errorf("packageSpec(%q) = %q, want %q", tt.spec, got, tt.want)
 			}
 		})
 	}
 }
 
-func TestHarnessScript(t *testing.T) {
+func TestHarnessRuntime(t *testing.T) {
 	tests := []struct {
-		name        string
-		runtime     string
-		wantRuntime string
-		wantScript  string
-		wantErr     bool
+		name    string
+		runtime string
+		want    string
+		wantErr bool
 	}{
-		{"unset", "", "node", "server.mjs", false},
-		{"node", "node", "node", "server.mjs", false},
-		{"workerd", "workerd", "workerd", "workerd.mjs", false},
-		{"unknown", "bun", "", "", true},
+		{"unset", "", "node", false},
+		{"node", "node", "node", false},
+		{"workerd", "workerd", "workerd", false},
+		{"unknown", "bun", "", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			runtime, script, err := harnessScript(tt.runtime)
+			got, err := harnessRuntime(tt.runtime)
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("harnessScript(%q) error = %v, wantErr %v", tt.runtime, err, tt.wantErr)
+				t.Fatalf("harnessRuntime(%q) error = %v, wantErr %v", tt.runtime, err, tt.wantErr)
 			}
-			if runtime != tt.wantRuntime || script != tt.wantScript {
-				t.Errorf("harnessScript(%q) = %q, %q, want %q, %q", tt.runtime, runtime, script, tt.wantRuntime, tt.wantScript)
+			if got != tt.want {
+				t.Errorf("harnessRuntime(%q) = %q, want %q", tt.runtime, got, tt.want)
 			}
 		})
 	}

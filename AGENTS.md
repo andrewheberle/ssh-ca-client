@@ -9,7 +9,7 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 - `deb/` - Debian package specific files
 - `docs/` - documentation of commands
 - `internal/pkg/` - application packages; not importable by other modules
-- `internal/e2e/` - end-to-end tests against the published server package; `testdata/ca/` runs the CA under Node.js (`server.mjs`) or workerd (`workerd.mjs`)
+- `internal/e2e/` - end-to-end tests against the published server package; `testdata/ca/` pins the CA and its test server (`@andrewheberle/serverless-ssh-ca-testing`), which runs the CA under Node.js or workerd. Changes to how the CA is run belong in the server repo's `packages/testing`
 - `internal/pkg/api/` - generated OpenAPI primitives to interact with the server implementation. Do not edit `api.gen.go` or `openapi.json`; `openapi.json` is copied from the CA package pinned in `internal/e2e/testdata/ca/package.json` and CI checks it matches, so update both with `npm run sync-schema --prefix internal/e2e/testdata/ca`.
 - `internal/pkg/cli/` - primary package used by the CLI
 - `internal/pkg/gui/` - primary package used by the GUI

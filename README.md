@@ -86,8 +86,11 @@ package and require Node.js 24 or later and npm:
 go test -tags e2e -race ./internal/e2e/...
 ```
 
-The CA's npm dependencies are installed on the first run, which requires
-network access. The version of the CA that is tested against is set in
+The CA is run by its test server,
+[@andrewheberle/serverless-ssh-ca-testing](https://www.npmjs.com/package/@andrewheberle/serverless-ssh-ca-testing),
+which is released with the CA. The npm dependencies are installed on the first
+run, which requires network access. The versions of the CA and test server
+that are used are set in
 [internal/e2e/testdata/ca/package.json](internal/e2e/testdata/ca/package.json).
 
 By default the CA runs on Node.js using the package's Node.js helpers. Set
@@ -103,18 +106,22 @@ CI runs the tests under both runtimes.
 
 To test against an unreleased version of the CA, set `E2E_CA_PACKAGE` to any
 npm install spec, such as a tarball built from a checkout of
-[serverless-ssh-ca](https://github.com/andrewheberle/serverless-ssh-ca):
+[serverless-ssh-ca](https://github.com/andrewheberle/serverless-ssh-ca), and
+`E2E_CA_TESTING_PACKAGE` to do the same for the test server. Either can be set
+on its own:
 
 ```sh
 # in serverless-ssh-ca
-npm ci && npm run build -w packages/core && npm pack -w packages/core
+npm ci && npm run build -w packages/core -w packages/testing && npm pack -w packages/core -w packages/testing
 
 # in ssh-ca-client
-E2E_CA_PACKAGE=/path/to/andrewheberle-serverless-ssh-ca-X.Y.Z.tgz go test -tags e2e -race ./internal/e2e/...
+E2E_CA_PACKAGE=/path/to/andrewheberle-serverless-ssh-ca-X.Y.Z.tgz \
+E2E_CA_TESTING_PACKAGE=/path/to/andrewheberle-serverless-ssh-ca-testing-X.Y.Z.tgz \
+go test -tags e2e -race ./internal/e2e/...
 ```
 
-Relative paths are resolved from `internal/e2e`, so an absolute path is
-simplest. The next run without `E2E_CA_PACKAGE` reinstalls the pinned version.
+Relative paths are resolved from `internal/e2e`, so absolute paths are
+simplest. The next run without either variable reinstalls the pinned versions.
 
 The CA repository calls the [End-to-end tests](.github/workflows/e2e.yml)
 workflow with `ca-ref` and `client-ref` inputs to test its changes against a
