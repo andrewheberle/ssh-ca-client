@@ -26,3 +26,25 @@ jobs:
           cache: false
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+
+  # Single required check for branch protection, so the ruleset doesn't need
+  # updating when jobs or matrix entries change. Runs even when a needed job
+  # fails, as a skipped required check counts as passing
+  lint-ok:
+    name: lint-ok
+    runs-on: ubuntu-latest
+    needs: [golangci]
+    if: ${{ always() }}
+    permissions: {}
+    steps:
+      - name: Check all lint jobs passed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Results: $RESULTS"
+          for result in $RESULTS; do
+            case "$result" in
+              success|skipped) ;;
+              *) exit 1 ;;
+            esac
+          done

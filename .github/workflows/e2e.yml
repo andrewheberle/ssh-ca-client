@@ -163,3 +163,25 @@ jobs:
           fail-on: ERR
           review: 'false'
           github-token: ''
+
+  # Single required check for branch protection, so the ruleset doesn't need
+  # updating when jobs or matrix entries change. Runs even when a needed job
+  # fails, as a skipped required check counts as passing
+  e2e-ok:
+    name: e2e-ok
+    runs-on: ubuntu-latest
+    needs: [e2e]
+    if: ${{ always() }}
+    permissions: {}
+    steps:
+      - name: Check all end-to-end tests passed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Results: $RESULTS"
+          for result in $RESULTS; do
+            case "$result" in
+              success|skipped) ;;
+              *) exit 1 ;;
+            esac
+          done
