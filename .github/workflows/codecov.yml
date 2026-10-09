@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    name: Run Go tests with coverage (${{ matrix.os }})
+    name: tests (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:

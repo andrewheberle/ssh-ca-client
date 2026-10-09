@@ -10,7 +10,7 @@ permissions: {}
 
 jobs:
   client:
-    name: Build Client
+    name: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -47,7 +47,7 @@ jobs:
   # openapi.json, so this only needs to check openapi.json against the schema
   # shipped in the pinned CA package
   schema:
-    name: Check API schema
+    name: schema
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -86,7 +86,7 @@ jobs:
       SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
   msi:
-    name: Package as an MSI for Windows
+    name: msi
     runs-on: ubuntu-latest
     container:
       image: debian:trixie@sha256:913f6706df59a68922d1dd08f78c2476560a8d367897200a6005b00e5f67c2d5
@@ -120,7 +120,7 @@ jobs:
           retention-days: 1
 
   msi-test:
-    name: Test MSI install on Windows
+    name: msi-test
     runs-on: windows-latest
     needs: msi
     steps:

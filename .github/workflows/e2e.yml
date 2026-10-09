@@ -23,7 +23,7 @@ on:
 
 jobs:
   e2e:
-    name: Run end-to-end tests (${{ matrix.os }}, ${{ matrix.runtime }})
+    name: e2e (${{ matrix.os }}, ${{ matrix.runtime }})
     strategy:
       fail-fast: false
       matrix:
