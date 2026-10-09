@@ -45,7 +45,7 @@ const (
 	audience = "ssh-ca-client"
 
 	// startTimeout is how long to wait for the CA to start listening
-	startTimeout = time.Second * 15
+	startTimeout = time.Second * 30
 
 	// stopTimeout is how long to wait for the CA to exit before killing it
 	stopTimeout = time.Second * 5
