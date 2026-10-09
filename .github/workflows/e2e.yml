@@ -93,7 +93,9 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
 
-      - name: Build CA package
+      # the test server package only exists in CA refs from after it was
+      # added, so it is only built when present
+      - name: Build CA packages
         if: ${{ inputs.ca-ref }}
         working-directory: _ca
         shell: bash
@@ -102,25 +104,40 @@ jobs:
           npm run build -w packages/core
           tarball="$(npm pack -w packages/core --pack-destination "$RUNNER_TEMP" | tail -n 1)"
           echo "CA_TARBALL=$RUNNER_TEMP/$tarball" >> "$GITHUB_ENV"
+          if [ -d packages/testing ]; then
+            npm run build -w packages/testing
+            tarball="$(npm pack -w packages/testing --pack-destination "$RUNNER_TEMP" | tail -n 1)"
+            echo "CA_TESTING_TARBALL=$RUNNER_TEMP/$tarball" >> "$GITHUB_ENV"
+          fi
 
       - name: Install CA dependencies
         working-directory: internal/e2e/testdata/ca
         run: npm ci --no-audit --no-fund
 
-      # done here rather than with E2E_CA_PACKAGE so that client releases
-      # from before it existed can also be tested
-      - name: Install CA package
+      # done here rather than with E2E_CA_PACKAGE and E2E_CA_TESTING_PACKAGE
+      # so that client releases from before they existed can also be tested.
+      # The test server is only replaced for clients that use it, rather than
+      # running the CA with their own harness scripts.
+      - name: Install CA packages
         if: ${{ inputs.ca-ref }}
         working-directory: internal/e2e/testdata/ca
         shell: bash
-        run: npm install --no-save --no-audit --no-fund "$CA_TARBALL"
+        run: |
+          tarballs=("$CA_TARBALL")
+          if [ -n "${CA_TESTING_TARBALL:-}" ] && grep -q '"@andrewheberle/serverless-ssh-ca-testing"' package.json; then
+            tarballs+=("$CA_TESTING_TARBALL")
+          fi
+          npm install --no-save --no-audit --no-fund "${tarballs[@]}"
 
       # client releases from before workerd was supported ignore
-      # E2E_CA_RUNTIME, so would only repeat the Node.js tests
+      # E2E_CA_RUNTIME, so would only repeat the Node.js tests. Clients
+      # support it with their own harness script (workerd.mjs) or the CA's
+      # test server package.
       - name: Run end-to-end tests
         shell: bash
         run: |
-          if [ "$E2E_CA_RUNTIME" = "workerd" ] && [ ! -f internal/e2e/testdata/ca/workerd.mjs ]; then
+          if [ "$E2E_CA_RUNTIME" = "workerd" ] && [ ! -f internal/e2e/testdata/ca/workerd.mjs ] &&
+            ! grep -q '"@andrewheberle/serverless-ssh-ca-testing"' internal/e2e/testdata/ca/package.json; then
             echo "::notice::The client under test cannot run the CA under workerd, skipping"
             exit 0
           fi
