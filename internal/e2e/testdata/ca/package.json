@@ -8,7 +8,7 @@
 	},
 	"dependencies": {
 		"@andrewheberle/serverless-ssh-ca": "0.20.1",
-		"wrangler": "4.148.0"
+		"wrangler": "4.149.0"
 	},
 	"engines": {
 		"node": ">=24.0.0"
