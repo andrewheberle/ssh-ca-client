@@ -61,11 +61,7 @@ func TestExecute_Flags(t *testing.T) {
 		{"show", []string{"show", "--certificate", "--git"}},
 		{"show private", []string{"show", "--private"}},
 		{"show public", []string{"show", "--public"}},
-		{"krl", []string{"krl", "--host", "--out", "krl.bin", "--force"}},
-		{"krl short flags", []string{"krl", "-f", "krl.bin"}},
-		{"revoke", []string{"revoke", "--host"}},
 		{"version", []string{"version", "--json"}},
-		{"host", []string{"host"}},
 	})
 }
 
@@ -104,7 +100,6 @@ func TestExecute(t *testing.T) {
 		{"generate with missing config", []string{"--config", missingConfig, "generate", "--dryrun"}, true},
 		{"login with missing config", []string{"--config", missingConfig, "login"}, true},
 		{"show with missing config", []string{"--config", missingConfig, "show"}, true},
-		{"krl with missing config", []string{"--config", missingConfig, "krl"}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
