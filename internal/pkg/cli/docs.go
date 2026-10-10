@@ -2,7 +2,7 @@
 
 package cli
 
-//go:generate go run ./gendocs ../../../docs
+//go:generate go run ./gendocs
 
 import (
 	"errors"
@@ -15,8 +15,14 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-// docsPrefix is the file name prefix of all generated documentation
-const docsPrefix = "ssh-ca-client-cli"
+const (
+	// DocsDir is the directory the documentation is generated in, relative to
+	// this package, which is the working directory for go generate and go test
+	DocsDir = "../../../docs"
+
+	// docsPrefix is the file name prefix of all generated documentation
+	docsPrefix = "ssh-ca-client-cli"
+)
 
 // docDefaults overrides flag defaults, by command name then flag name, that
 // depend on the system the documentation is generated on

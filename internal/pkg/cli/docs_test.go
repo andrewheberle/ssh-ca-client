@@ -10,8 +10,6 @@ import (
 )
 
 func TestGenerateDocsUpToDate(t *testing.T) {
-	const docsDir = "../../../docs"
-
 	dir := t.TempDir()
 	// a stale doc for a removed command should be removed
 	stale := filepath.Join(dir, docsPrefix+"-removed.md")
@@ -28,9 +26,9 @@ func TestGenerateDocsUpToDate(t *testing.T) {
 	}
 
 	generated := docFiles(t, dir)
-	committed := docFiles(t, docsDir)
+	committed := docFiles(t, DocsDir)
 	if !slices.Equal(generated, committed) {
-		t.Fatalf("docs in %s are out of date, run \"go generate ./...\": got %v, want %v", docsDir, committed, generated)
+		t.Fatalf("docs in %s are out of date, run \"go generate ./...\": got %v, want %v", DocsDir, committed, generated)
 	}
 
 	for _, name := range generated {
@@ -39,7 +37,7 @@ func TestGenerateDocsUpToDate(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			got, err := os.ReadFile(filepath.Join(docsDir, name))
+			got, err := os.ReadFile(filepath.Join(DocsDir, name))
 			if err != nil {
 				t.Fatal(err)
 			}
