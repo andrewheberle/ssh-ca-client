@@ -22,6 +22,7 @@ type Response api.KeyRevocationListResponse
 var (
 	ErrInvalidSignature  = errors.New("krl signature verification failed")
 	ErrNoPublicKey       = errors.New("no public key provided for signature verification")
+	ErrOlderKRL          = errors.New("krl is older than the existing krl")
 	ErrUnexpectedCA      = errors.New("encountered krl certificate section with unexpected CA")
 	ErrUnexpectedSection = errors.New("encountered unexpected section type in krl")
 )
@@ -113,6 +114,29 @@ func (r *Response) Verify(pub ssh.PublicKey) error {
 	}
 
 	return r.VerifyStrict(pub)
+}
+
+// CheckNotOlder returns an error wrapping [ErrOlderKRL] if the KRL is older
+// than existing, so a previously issued KRL cannot replace a newer one and
+// un-revoke certificates. KRLs are compared by version and then by the date
+// they were generated, as the CA does not increase the version for each KRL.
+func (r *Response) CheckNotOlder(existing []byte) error {
+	current, err := sshkrl.ParseKRL(existing)
+	if err != nil {
+		return fmt.Errorf("problem parsing existing krl: %w", err)
+	}
+
+	k, err := sshkrl.ParseKRL(r.Krl)
+	if err != nil {
+		return fmt.Errorf("problem parsing krl: %w", err)
+	}
+
+	if k.Version < current.Version || (k.Version == current.Version && k.GeneratedDate < current.GeneratedDate) {
+		return fmt.Errorf("%w: got version %d generated at %d, existing is version %d generated at %d",
+			ErrOlderKRL, k.Version, k.GeneratedDate, current.Version, current.GeneratedDate)
+	}
+
+	return nil
 }
 
 // parse parses the KRL and checks it only contains certificate sections

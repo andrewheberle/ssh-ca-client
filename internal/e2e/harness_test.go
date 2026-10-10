@@ -564,8 +564,8 @@ func (ca *testCA) revoke(t *testing.T, certificateType api.PostCertificateTypeRe
 	return res.StatusCode()
 }
 
-// krl fetches and verifies the KRL for certificateType
-func (ca *testCA) krl(t *testing.T, certificateType api.GetCertificateTypeKrlParamsCertificateType) *sshkrl.KRL {
+// krlResponse fetches and verifies the KRL for certificateType
+func (ca *testCA) krlResponse(t *testing.T, certificateType api.GetCertificateTypeKrlParamsCertificateType) *krl.Response {
 	t.Helper()
 
 	res, err := krl.Get(context.Background(), ca.URL, certificateType)
@@ -576,6 +576,15 @@ func (ca *testCA) krl(t *testing.T, certificateType api.GetCertificateTypeKrlPar
 	if err := res.VerifyStrict(ca.PublicKey); err != nil {
 		t.Fatalf("verifying %s KRL: %v", certificateType, err)
 	}
+
+	return res
+}
+
+// krl fetches, verifies and parses the KRL for certificateType
+func (ca *testCA) krl(t *testing.T, certificateType api.GetCertificateTypeKrlParamsCertificateType) *sshkrl.KRL {
+	t.Helper()
+
+	res := ca.krlResponse(t, certificateType)
 
 	parsed, err := sshkrl.ParseKRL(res.Krl)
 	if err != nil {

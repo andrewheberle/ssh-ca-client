@@ -104,7 +104,7 @@ func checkErr(t *testing.T, method string, got, want error) {
 			t.Errorf("%s() failed: %v", method, got)
 		}
 	case errParse:
-		for _, err := range []error{krl.ErrInvalidSignature, krl.ErrNoPublicKey, krl.ErrUnexpectedCA, krl.ErrUnexpectedSection} {
+		for _, err := range []error{krl.ErrInvalidSignature, krl.ErrNoPublicKey, krl.ErrOlderKRL, krl.ErrUnexpectedCA, krl.ErrUnexpectedSection} {
 			if errors.Is(got, err) {
 				t.Errorf("%s() error = %v, want parse error", method, got)
 				return
@@ -405,6 +405,53 @@ func TestVerify(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			res := &krl.Response{Krl: tt.krl, Signature: tt.signature}
 			checkErr(t, "Verify", res.Verify(tt.pub), tt.wantErr)
+		})
+	}
+}
+
+func TestCheckNotOlder(t *testing.T) {
+	ca := newSigner(t)
+
+	// generated returns a KRL with version and generated date, as the CA sets
+	// version 1 and the generated date for every KRL
+	generated := func(version, date uint64) []byte {
+		t.Helper()
+
+		k := &sshkrl.KRL{
+			Version:       version,
+			GeneratedDate: date,
+			Sections:      []sshkrl.KRLSection{certificateSection(ca.PublicKey())},
+		}
+		b, err := k.Marshal(rand.Reader)
+		if err != nil {
+			t.Fatalf("marshalling krl: %v", err)
+		}
+
+		return b
+	}
+
+	const date = 1_800_000_000
+
+	tests := []struct {
+		name     string
+		krl      []byte
+		existing []byte
+		wantErr  error
+	}{
+		{"same krl", generated(1, date), generated(1, date), nil},
+		{"generated later", generated(1, date+1), generated(1, date), nil},
+		{"generated earlier", generated(1, date-1), generated(1, date), krl.ErrOlderKRL},
+		{"higher version generated earlier", generated(2, date-1), generated(1, date), nil},
+		{"lower version generated later", generated(1, date+1), generated(2, date), krl.ErrOlderKRL},
+		{"existing malformed", generated(1, date), []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}, errParse},
+		{"existing empty", generated(1, date), []byte{}, errParse},
+		{"krl malformed", []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}, generated(1, date), errParse},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			res := &krl.Response{Krl: tt.krl}
+			checkErr(t, "CheckNotOlder", res.CheckNotOlder(tt.existing), tt.wantErr)
 		})
 	}
 }
