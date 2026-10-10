@@ -382,6 +382,52 @@ ssh-ca-client-cli host --principals remotehost --principals remotehost.example.c
 ssh-ca-client-cli host --renew
 ```
 
+### Key Revocation Lists
+
+The `krl` sub-command downloads a key revocation list (KRL) from the CA, verifies
+its signature using the `trusted_ca` public key and writes it to a file that
+`sshd` or `ssh` can use to reject revoked certificates. A downloaded KRL is not
+written if it is older than the existing file.
+
+To have `sshd` reject users that present a revoked certificate, first write the
+user KRL:
+
+```sh
+sudo ssh-ca-client-cli krl --out /etc/ssh/revocation_list
+```
+
+Then add the following to your `sshd_config` (or `/etc/ssh/sshd_config.d/*.conf`)
+and reload `sshd`:
+
+```
+RevokedKeys /etc/ssh/revocation_list
+```
+
+The KRL must be written before `RevokedKeys` is set, as `sshd` refuses all
+public key authentication if the file cannot be read.
+
+Example systemd unit files are located in the `systemd` directory and these are
+installed by the DEB package, so the user KRL can be refreshed hourly as follows
+if you have installed via the package:
+
+```sh
+sudo systemctl enable --now user-ssh-krl-refresh.timer
+```
+
+To have `ssh` reject hosts that present a revoked certificate, write the host
+KRL with `--host` and set `RevokedHostKeys` in your `~/.ssh/config`:
+
+```sh
+ssh-ca-client-cli krl --host --out ~/.ssh/revocation_list
+```
+
+```
+RevokedHostKeys ~/.ssh/revocation_list
+```
+
+See [docs/ssh-ca-client-cli-krl.md](docs/ssh-ca-client-cli-krl.md) for all
+options.
+
 ## As a GUI
 
 The GUI supports the following command line flags:

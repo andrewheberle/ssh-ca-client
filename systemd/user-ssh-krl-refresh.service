@@ -1,0 +1,8 @@
+[Unit]
+Description=Refresh SSH User Certificate Revocation List
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ssh-ca-client-cli krl --out /etc/ssh/revocation_list
