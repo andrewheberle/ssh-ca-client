@@ -20,6 +20,7 @@ const Namespace = "krl@com.github.serverless-ssh-ca.andrewheberle"
 type Response api.KeyRevocationListResponse
 
 var (
+	ErrInvalidSignature  = errors.New("krl signature verification failed")
 	ErrNoPublicKey       = errors.New("no public key provided for signature verification")
 	ErrUnexpectedCA      = errors.New("encountered krl certificate section with unexpected CA")
 	ErrUnexpectedSection = errors.New("encountered unexpected section type in krl")
@@ -63,20 +64,10 @@ func Get(ctx context.Context, server string, certificatetype api.GetCertificateT
 	}, nil
 }
 
+// VerifyStrict checks the signature on the KRL using pub, which must be the
+// public key of the CA, and that the KRL only contains certificate sections
+// for that CA. The signature is checked before the KRL is parsed.
 func (r *Response) VerifyStrict(pub ssh.PublicKey) error {
-	// parse the KRL
-	parsedKrl, err := sshkrl.ParseKRL(r.Krl)
-	if err != nil {
-		return fmt.Errorf("problem parsing krl: %w", err)
-	}
-
-	// check the only sections of the parsed KRL are for certificates
-	for _, section := range parsedKrl.Sections {
-		if _, ok := section.(*sshkrl.KRLCertificateSection); !ok {
-			return ErrUnexpectedSection
-		}
-	}
-
 	// error here if public key is not provided
 	if pub == nil {
 		return ErrNoPublicKey
@@ -85,11 +76,16 @@ func (r *Response) VerifyStrict(pub ssh.PublicKey) error {
 	// unarmor and verify signature
 	sig, err := sshsig.Unarmor([]byte(r.Signature))
 	if err != nil {
-		return fmt.Errorf("problem unarmoring signature: %w", err)
+		return fmt.Errorf("%w: problem unarmoring signature: %w", ErrInvalidSignature, err)
 	}
 
 	if err := sshsig.Verify(bytes.NewReader(r.Krl), sig, pub, sshsig.HashSHA512, Namespace); err != nil {
-		return fmt.Errorf("signature verification failed: %w", err)
+		return fmt.Errorf("%w: %w", ErrInvalidSignature, err)
+	}
+
+	parsedKrl, err := r.parse()
+	if err != nil {
+		return err
 	}
 
 	// check that all sections are for our CA
@@ -107,15 +103,30 @@ func (r *Response) VerifyStrict(pub ssh.PublicKey) error {
 	return nil
 }
 
+// Verify is the same as [Response.VerifyStrict] when pub is not nil. When pub
+// is nil the signature and CA are not checked, only that the KRL parses and
+// contains certificate sections.
 func (r *Response) Verify(pub ssh.PublicKey) error {
-	if err := r.VerifyStrict(pub); err != nil {
-		// if the error is that no public key was provided, we can ignore it
-		// in this non-strict verification method
-		if errors.Is(err, ErrNoPublicKey) {
-			return nil
-		}
+	if pub == nil {
+		_, err := r.parse()
 		return err
 	}
 
-	return nil
+	return r.VerifyStrict(pub)
+}
+
+// parse parses the KRL and checks it only contains certificate sections
+func (r *Response) parse() (*sshkrl.KRL, error) {
+	parsedKrl, err := sshkrl.ParseKRL(r.Krl)
+	if err != nil {
+		return nil, fmt.Errorf("problem parsing krl: %w", err)
+	}
+
+	for _, section := range parsedKrl.Sections {
+		if _, ok := section.(*sshkrl.KRLCertificateSection); !ok {
+			return nil, ErrUnexpectedSection
+		}
+	}
+
+	return parsedKrl, nil
 }
