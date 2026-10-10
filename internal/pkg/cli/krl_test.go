@@ -12,6 +12,8 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"slices"
+	"sync"
 	"testing"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
@@ -21,9 +23,23 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// krlCA serves KRLs signed by signer and returns a config file that trusts
-// trusted
-func krlCA(t *testing.T, signer ssh.Signer, trusted ssh.PublicKey, generated uint64) string {
+// testKRLCA serves a KRL and records the path of the last request
+type testKRLCA struct {
+	config string
+
+	mu   sync.Mutex
+	path string
+}
+
+func (ca *testKRLCA) requestedPath() string {
+	ca.mu.Lock()
+	defer ca.mu.Unlock()
+
+	return ca.path
+}
+
+// krlCA serves KRLs signed by signer with a config file that trusts trusted
+func krlCA(t *testing.T, signer ssh.Signer, trusted ssh.PublicKey, generated uint64) *testKRLCA {
 	t.Helper()
 
 	k := &sshkrl.KRL{
@@ -51,24 +67,29 @@ func krlCA(t *testing.T, signer ssh.Signer, trusted ssh.PublicKey, generated uin
 		t.Fatalf("marshalling response: %v", err)
 	}
 
+	ca := &testKRLCA{}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ca.mu.Lock()
+		ca.path = r.URL.Path
+		ca.mu.Unlock()
+
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write(body)
 	}))
 	t.Cleanup(srv.Close)
 
-	config := filepath.Join(t.TempDir(), "config.yml")
+	ca.config = filepath.Join(t.TempDir(), "config.yml")
 	content := fmt.Sprintf(`issuer: http://127.0.0.1:1/
 client_id: test-client
 scopes: ["openid"]
 redirect_url: http://127.0.0.1:1/auth/callback
 ca_url: %s/
 trusted_ca: %s`, srv.URL, ssh.MarshalAuthorizedKey(trusted))
-	if err := os.WriteFile(config, []byte(content), 0600); err != nil {
+	if err := os.WriteFile(ca.config, []byte(content), 0600); err != nil {
 		t.Fatalf("writing config: %v", err)
 	}
 
-	return config
+	return ca
 }
 
 func newKRLSigner(t *testing.T) ssh.Signer {
@@ -127,7 +148,7 @@ func TestExecute_KRL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := krlCA(t, tt.signer, ca.PublicKey(), generated)
+			server := krlCA(t, tt.signer, ca.PublicKey(), generated)
 			out := filepath.Join(t.TempDir(), "revocation_list")
 
 			if tt.existing != nil {
@@ -136,7 +157,7 @@ func TestExecute_KRL(t *testing.T) {
 				}
 			}
 
-			args := append([]string{"--config", config, "krl"}, tt.args...)
+			args := append([]string{"--config", server.config, "krl"}, tt.args...)
 			if !tt.noOut {
 				args = append(args, "--out", out)
 			}
@@ -144,6 +165,14 @@ func TestExecute_KRL(t *testing.T) {
 			err := execute(t, args...)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Execute(%q) error = %v, wantErr %v", args, err, tt.wantErr)
+			}
+
+			wantPath := "/api/v3/user/krl"
+			if slices.Contains(tt.args, "--host") {
+				wantPath = "/api/v3/host/krl"
+			}
+			if got := server.requestedPath(); got != wantPath {
+				t.Errorf("requested %q, want %q", got, wantPath)
 			}
 
 			got, readErr := os.ReadFile(out)

@@ -477,6 +477,15 @@ func TestHostCertificate_ResponseErrors(t *testing.T) {
 			wantRequests: 1,
 		},
 		{
+			name: "forbidden with error messages",
+			setup: func(ca *fakeCA, store *fakeStore) {
+				ca.status = http.StatusForbidden
+				ca.body = `{"success":false,"errors":[{"code":403,"message":"host not allowed"}]}`
+			},
+			wantMsg:      "bad status code: 403: host not allowed",
+			wantRequests: 1,
+		},
+		{
 			name:         "invalid json response",
 			setup:        func(ca *fakeCA, store *fakeStore) { ca.body = "not json" },
 			wantMsg:      "host certificate",

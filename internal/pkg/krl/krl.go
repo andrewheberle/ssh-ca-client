@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/httpclient"
@@ -15,15 +14,30 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// Namespace is the SSHSIG namespace the CA signs KRLs with
 const Namespace = "krl@com.github.serverless-ssh-ca.andrewheberle"
 
+// Response is a KRL and its SSHSIG signature as returned by the CA
 type Response api.KeyRevocationListResponse
 
 var (
-	ErrInvalidSignature  = errors.New("krl signature verification failed")
-	ErrNoPublicKey       = errors.New("no public key provided for signature verification")
-	ErrOlderKRL          = errors.New("krl is older than the existing krl")
-	ErrUnexpectedCA      = errors.New("encountered krl certificate section with unexpected CA")
+	// ErrInvalidSignature is returned when the signature on the KRL cannot be
+	// decoded or does not verify with the CA public key
+	ErrInvalidSignature = errors.New("krl signature verification failed")
+
+	// ErrNoPublicKey is returned when no CA public key is provided to verify
+	// the signature on the KRL with
+	ErrNoPublicKey = errors.New("no public key provided for signature verification")
+
+	// ErrOlderKRL is returned when the KRL is older than an existing KRL
+	ErrOlderKRL = errors.New("krl is older than the existing krl")
+
+	// ErrUnexpectedCA is returned when a certificate section of the KRL is not
+	// for the CA, including sections that apply to any CA
+	ErrUnexpectedCA = errors.New("encountered krl certificate section with unexpected CA")
+
+	// ErrUnexpectedSection is returned when the KRL contains a section that
+	// does not revoke certificates, such as one revoking explicit keys
 	ErrUnexpectedSection = errors.New("encountered unexpected section type in krl")
 )
 
@@ -44,15 +58,7 @@ func Get(ctx context.Context, server string, certificatetype api.GetCertificateT
 	}
 
 	if res.StatusCode() != http.StatusOK {
-		// include any error messages returned by the CA
-		if res.JSON500 != nil && len(res.JSON500.Errors) > 0 {
-			messages := make([]string, 0, len(res.JSON500.Errors))
-			for _, e := range res.JSON500.Errors {
-				messages = append(messages, e.Message)
-			}
-			return nil, fmt.Errorf("bad status code: %d: %s", res.StatusCode(), strings.Join(messages, "; "))
-		}
-		return nil, fmt.Errorf("bad status code: %d", res.StatusCode())
+		return nil, api.StatusError(res.StatusCode(), res.Body)
 	}
 
 	if res.JSON200 == nil {
@@ -84,7 +90,7 @@ func (r *Response) VerifyStrict(pub ssh.PublicKey) error {
 		return fmt.Errorf("%w: %w", ErrInvalidSignature, err)
 	}
 
-	parsedKrl, err := r.parse()
+	parsedKrl, err := r.Parse()
 	if err != nil {
 		return err
 	}
@@ -102,18 +108,6 @@ func (r *Response) VerifyStrict(pub ssh.PublicKey) error {
 	}
 
 	return nil
-}
-
-// Verify is the same as [Response.VerifyStrict] when pub is not nil. When pub
-// is nil the signature and CA are not checked, only that the KRL parses and
-// contains certificate sections.
-func (r *Response) Verify(pub ssh.PublicKey) error {
-	if pub == nil {
-		_, err := r.parse()
-		return err
-	}
-
-	return r.VerifyStrict(pub)
 }
 
 // CheckNotOlder returns an error wrapping [ErrOlderKRL] if the KRL is older
@@ -142,11 +136,6 @@ func (r *Response) CheckNotOlder(existing []byte) error {
 // Parse parses the KRL and checks it only contains certificate sections. It
 // does not check the signature, so use [Response.VerifyStrict] first.
 func (r *Response) Parse() (*sshkrl.KRL, error) {
-	return r.parse()
-}
-
-// parse parses the KRL and checks it only contains certificate sections
-func (r *Response) parse() (*sshkrl.KRL, error) {
 	parsedKrl, err := sshkrl.ParseKRL(r.Krl)
 	if err != nil {
 		return nil, fmt.Errorf("problem parsing krl: %w", err)

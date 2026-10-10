@@ -102,7 +102,7 @@ func (h *HostCertificate) RenewContext(ctx context.Context) error {
 
 	// ensure status code was 200 OK
 	if res.StatusCode() != http.StatusOK {
-		return fmt.Errorf("host certificate renewal: got bad status code: %d", res.StatusCode())
+		return fmt.Errorf("host certificate renewal: %w", api.StatusError(res.StatusCode(), res.Body))
 	}
 
 	// JSON200 is only set when the response was JSON
@@ -185,7 +185,7 @@ func (h *HostCertificate) RequestContext(ctx context.Context) error {
 
 	// ensure status code was 200 OK
 	if res.StatusCode() != http.StatusOK {
-		return fmt.Errorf("host certificate request: got bad status code: %d", res.StatusCode())
+		return fmt.Errorf("host certificate request: %w", api.StatusError(res.StatusCode(), res.Body))
 	}
 
 	// JSON200 is only set when the response was JSON

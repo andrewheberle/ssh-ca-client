@@ -77,7 +77,7 @@ type fakeCA struct {
 	// behaviour overrides
 	status      int    // non-zero to respond with this status
 	contentType string // overrides the response content type
-	body        string // overrides the response body
+	body        string // overrides the response body, including for status
 	hang        bool   // do not respond until the test finishes
 
 	release chan struct{} // closed when the test finishes
@@ -140,7 +140,11 @@ func (ca *fakeCA) handle(w http.ResponseWriter, r *http.Request) {
 
 	if ca.status != 0 {
 		w.WriteHeader(ca.status)
-		_, _ = w.Write([]byte(`{"success":false,"errors":[]}`))
+		body := `{"success":false,"errors":[]}`
+		if ca.body != "" {
+			body = ca.body
+		}
+		_, _ = w.Write([]byte(body))
 		return
 	}
 
@@ -380,6 +384,15 @@ func TestUserCertificate_Request_Errors(t *testing.T) {
 			name:         "server error",
 			setup:        func(ca *fakeCA, u *UserCertificate, store *fakeStore) { ca.status = http.StatusInternalServerError },
 			wantMsg:      "bad status code: 500",
+			wantRequests: 1,
+		},
+		{
+			name: "forbidden with error messages",
+			setup: func(ca *fakeCA, u *UserCertificate, store *fakeStore) {
+				ca.status = http.StatusForbidden
+				ca.body = `{"success":false,"errors":[{"code":403,"message":"identity not allowed"}]}`
+			},
+			wantMsg:      "bad status code: 403: identity not allowed",
 			wantRequests: 1,
 		},
 		{

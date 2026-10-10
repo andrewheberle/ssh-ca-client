@@ -368,47 +368,6 @@ func TestVerifyStrictKeyTypes(t *testing.T) {
 	}
 }
 
-func TestVerify(t *testing.T) {
-	ca := newSigner(t)
-	other := newSigner(t)
-
-	malformed := []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}
-	empty := marshal(t)
-	valid := marshal(t, certificateSection(ca.PublicKey()))
-	otherCA := marshal(t, certificateSection(other.PublicKey()))
-	explicitKey := marshal(t, &sshkrl.KRLExplicitKeySection{other.PublicKey()})
-
-	tests := []struct {
-		name      string
-		krl       []byte
-		signature string
-		pub       ssh.PublicKey
-		wantErr   error
-	}{
-		// without a public key only the sections are checked
-		{"no public key empty krl", empty, "", nil, nil},
-		{"no public key valid", valid, "", nil, nil},
-		{"no public key invalid signature", valid, "not a signature", nil, nil},
-		{"no public key other ca", otherCA, "", nil, nil},
-		{"no public key malformed krl", malformed, "", nil, errParse},
-		{"no public key explicit key section", explicitKey, "", nil, krl.ErrUnexpectedSection},
-
-		// with a public key it is the same as VerifyStrict
-		{"public key valid", valid, sign(t, valid, ca), ca.PublicKey(), nil},
-		{"public key no signature", valid, "", ca.PublicKey(), krl.ErrInvalidSignature},
-		{"public key wrong signer", valid, sign(t, valid, other), ca.PublicKey(), krl.ErrInvalidSignature},
-		{"public key other ca", otherCA, sign(t, otherCA, ca), ca.PublicKey(), krl.ErrUnexpectedCA},
-		{"public key explicit key section", explicitKey, sign(t, explicitKey, ca), ca.PublicKey(), krl.ErrUnexpectedSection},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			res := &krl.Response{Krl: tt.krl, Signature: tt.signature}
-			checkErr(t, "Verify", res.Verify(tt.pub), tt.wantErr)
-		})
-	}
-}
-
 func TestCheckNotOlder(t *testing.T) {
 	ca := newSigner(t)
 
