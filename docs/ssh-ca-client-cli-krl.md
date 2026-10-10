@@ -7,10 +7,10 @@ Download and parse a SSH KRL
 Download a key revocation list (KRL) in order to allow ssh or sshd to reject
 revoked host or user certificates respectively.
 
-The downloaded KRL is verified against a SSHSIG signature as long as the
-trusted_ca option is set in the global/system configuration. Using --force to
-write an unverified KRL could allow a third party to provide a malicious KRL
-payload in order to prevent legitimate connections.
+The downloaded KRL is verified against its SSHSIG signature using the trusted_ca
+public key from the configuration, and must only revoke certificates issued by
+that CA. A KRL that fails verification is not written. The --force flag is
+deprecated and has no effect.
 
 When --out is an existing KRL, the downloaded KRL is only written if it is not
 older than the existing one, comparing the KRL version and then the time it was
@@ -50,7 +50,6 @@ ssh-ca-client-cli krl --host --out /home/example/.ssh/revocation_list
 ### Options
 
 ```
-      --force        Force writing to output even if signature was not verified
   -h, --help         help for krl
       --host         Retrieve host KRL instead of user KRL
   -f, --out string   Output file for KRL

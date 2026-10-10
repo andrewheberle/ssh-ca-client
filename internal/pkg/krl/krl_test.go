@@ -455,3 +455,35 @@ func TestCheckNotOlder(t *testing.T) {
 		})
 	}
 }
+
+func TestParse(t *testing.T) {
+	ca := newSigner(t)
+	other := newSigner(t)
+
+	valid := marshal(t, certificateSection(ca.PublicKey()), certificateSection(other.PublicKey()))
+	explicitKey := marshal(t, &sshkrl.KRLExplicitKeySection{other.PublicKey()})
+
+	tests := []struct {
+		name         string
+		krl          []byte
+		wantSections int
+		wantErr      error
+	}{
+		{"empty krl", marshal(t), 0, nil},
+		// the CA of each section is only checked by VerifyStrict
+		{"certificate sections", valid, 2, nil},
+		{"malformed krl", []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}, 0, errParse},
+		{"explicit key section", explicitKey, 0, krl.ErrUnexpectedSection},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, gotErr := (&krl.Response{Krl: tt.krl}).Parse()
+			checkErr(t, "Parse", gotErr, tt.wantErr)
+
+			if gotErr == nil && len(got.Sections) != tt.wantSections {
+				t.Errorf("Parse() sections = %d, want %d", len(got.Sections), tt.wantSections)
+			}
+		})
+	}
+}
