@@ -42,6 +42,10 @@ func Get(server string, certificatetype api.GetCertificateTypeKrlParamsCertifica
 		return nil, fmt.Errorf("bad status code: %d", res.StatusCode())
 	}
 
+	if res.JSON200 == nil {
+		return nil, fmt.Errorf("unexpected response content type: %q", res.ContentType())
+	}
+
 	return &Response{
 		Krl:       res.JSON200.Krl,
 		Signature: res.JSON200.Signature,
@@ -82,8 +86,8 @@ func (r *Response) VerifyStrict(pub ssh.PublicKey) error {
 	for _, section := range parsedKrl.Sections {
 		switch s := section.(type) {
 		case *sshkrl.KRLCertificateSection:
-			krlCA := s.CA.Marshal()
-			if !bytes.Equal(krlCA, pubBytes) {
+			// a nil CA applies the section to certificates from any CA
+			if s.CA == nil || !bytes.Equal(s.CA.Marshal(), pubBytes) {
 				return ErrUnexpectedCA
 			}
 		}
