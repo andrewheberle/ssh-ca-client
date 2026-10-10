@@ -2,13 +2,19 @@ package krl_test
 
 import (
 	"bytes"
+	"crypto/ed25519"
+	"crypto/rand"
 	"encoding/json"
+	"errors"
+	"io"
 	"net/http"
 	"reflect"
 	"testing"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
+	sshkrl "github.com/forfuncsake/krl"
+	"github.com/hiddeco/sshsig"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -176,6 +182,103 @@ func TestGetAndVerify(t *testing.T) {
 				}
 			}
 
+		})
+	}
+}
+
+// staticClient returns a 200 response with the given content type and body
+type staticClient struct {
+	contentType string
+	body        []byte
+}
+
+func (c *staticClient) Do(req *http.Request) (*http.Response, error) {
+	return &http.Response{
+		StatusCode: http.StatusOK,
+		Header: http.Header{
+			"Content-Type": []string{c.contentType},
+		},
+		Body: io.NopCloser(bytes.NewReader(c.body)),
+	}, nil
+}
+
+func TestGetContentType(t *testing.T) {
+	tests := []struct {
+		name        string
+		contentType string
+		body        []byte
+		wantErr     bool
+	}{
+		{"json", "application/json", []byte(`{"krl":"","signature":""}`), false},
+		{"html", "text/html", []byte("<html></html>"), true},
+		{"plain text", "text/plain", []byte(`{"krl":"","signature":""}`), true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, gotErr := krl.Get("https://ssh.example.com/", "host", api.WithHTTPClient(&staticClient{contentType: tt.contentType, body: tt.body}))
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("Get() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("Get() succeeded unexpectedly")
+			}
+		})
+	}
+}
+
+func TestVerifyStrictCertificateSectionCA(t *testing.T) {
+	_, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatalf("generating ca key: %v", err)
+	}
+	signer, err := ssh.NewSignerFromKey(priv)
+	if err != nil {
+		t.Fatalf("creating ca signer: %v", err)
+	}
+
+	altpub, _, _, _, err := ssh.ParseAuthorizedKey([]byte(altcapublickey))
+	if err != nil {
+		t.Fatalf("parsing alt ca key: %v", err)
+	}
+
+	tests := []struct {
+		name    string
+		ca      ssh.PublicKey
+		wantErr error
+	}{
+		{"matching ca", signer.PublicKey(), nil},
+		{"other ca", altpub, krl.ErrUnexpectedCA},
+		{"any ca", nil, krl.ErrUnexpectedCA},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			k := &sshkrl.KRL{
+				Sections: []sshkrl.KRLSection{
+					&sshkrl.KRLCertificateSection{
+						CA:       tt.ca,
+						Sections: []sshkrl.KRLCertificateSubsection{&sshkrl.KRLCertificateSerialList{1}},
+					},
+				},
+			}
+			b, err := k.Marshal(rand.Reader)
+			if err != nil {
+				t.Fatalf("marshalling krl: %v", err)
+			}
+
+			sig, err := sshsig.Sign(bytes.NewReader(b), signer, sshsig.HashSHA512, krl.Namespace)
+			if err != nil {
+				t.Fatalf("signing krl: %v", err)
+			}
+
+			res := &krl.Response{Krl: b, Signature: string(sshsig.Armor(sig))}
+			if gotErr := res.VerifyStrict(signer.PublicKey()); !errors.Is(gotErr, tt.wantErr) {
+				t.Errorf("VerifyStrict() error = %v, want %v", gotErr, tt.wantErr)
+			}
 		})
 	}
 }
