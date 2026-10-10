@@ -139,6 +139,12 @@ func (r *Response) CheckNotOlder(existing []byte) error {
 	return nil
 }
 
+// Parse parses the KRL and checks it only contains certificate sections. It
+// does not check the signature, so use [Response.VerifyStrict] first.
+func (r *Response) Parse() (*sshkrl.KRL, error) {
+	return r.parse()
+}
+
 // parse parses the KRL and checks it only contains certificate sections
 func (r *Response) parse() (*sshkrl.KRL, error) {
 	parsedKrl, err := sshkrl.ParseKRL(r.Krl)

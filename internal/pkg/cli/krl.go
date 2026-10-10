@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"os"
+	"time"
 
 	"codeberg.org/sdassow/atomic"
 	"github.com/andrewheberle/simplecommand"
@@ -18,8 +19,10 @@ import (
 )
 
 type krlCommand struct {
-	host  bool
-	out   string
+	host bool
+	out  string
+
+	// force is deprecated and has no effect, as the KRL is always verified
 	force bool
 
 	config          *config.ClientConfig
@@ -38,6 +41,9 @@ func (c *krlCommand) Init(cd *simplecobra.Commandeer) error {
 	cmd.Flags().BoolVar(&c.host, "host", false, "Retrieve host KRL instead of user KRL")
 	cmd.Flags().StringVarP(&c.out, "out", "f", "", "Output file for KRL")
 	cmd.Flags().BoolVar(&c.force, "force", false, "Force writing to output even if signature was not verified")
+	if err := cmd.Flags().MarkDeprecated("force", "the krl is always verified as trusted_ca is required"); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -79,24 +85,23 @@ func (c *krlCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args [
 		return fmt.Errorf("could not retrieve krl: %w", err)
 	}
 
-	if pub := c.config.CertificateAuthorityPublicKey(); pub != nil {
-		if err := res.VerifyStrict(pub); err != nil {
-			c.logger.Error("verification of krl failed", "error", err)
-			return err
-		}
-	} else {
-		c.logger.Warn("trusted_ca not set so signature and CA of krl will not be verified")
-		if err := res.Verify(nil); err != nil {
-			c.logger.Error("verification of krl failed", "error", err)
-			return err
-		}
-
-		if !c.force && c.out != "" {
-			c.logger.Info("skipping writing krl to output location without force option set", "out", c.out)
-
-			return nil
-		}
+	// trusted_ca is required by the config, so the KRL is always verified
+	if err := res.VerifyStrict(c.config.CertificateAuthorityPublicKey()); err != nil {
+		c.logger.Error("verification of krl failed", "error", err)
+		return err
 	}
+
+	parsed, err := res.Parse()
+	if err != nil {
+		return fmt.Errorf("could not parse krl: %w", err)
+	}
+
+	c.logger.Info("verified krl",
+		"type", c.certificatetype,
+		"version", parsed.Version,
+		"generated", time.Unix(int64(parsed.GeneratedDate), 0).UTC(),
+		"sections", len(parsed.Sections),
+	)
 
 	if c.out != "" {
 		if err := c.checkExisting(res); err != nil {
@@ -104,7 +109,7 @@ func (c *krlCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args [
 		}
 
 		c.logger.Info("writing krl to output file", "out", c.out)
-		return atomic.WriteFile(c.out, bytes.NewReader([]byte(res.Krl)), atomic.FileMode(0440))
+		return atomic.WriteFile(c.out, bytes.NewReader(res.Krl), atomic.FileMode(0440))
 	}
 
 	return nil
