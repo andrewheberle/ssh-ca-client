@@ -388,3 +388,95 @@ func TestGetDefaultClient(t *testing.T) {
 		})
 	}
 }
+
+// errParse matches any error that is not a signature error, as parse errors
+// from the krl library are not exported
+var errParse = errors.New("parse error")
+
+func TestVerifyOrder(t *testing.T) {
+	newSigner := func() ssh.Signer {
+		_, priv, err := ed25519.GenerateKey(rand.Reader)
+		if err != nil {
+			t.Fatalf("generating key: %v", err)
+		}
+		signer, err := ssh.NewSignerFromKey(priv)
+		if err != nil {
+			t.Fatalf("creating signer: %v", err)
+		}
+		return signer
+	}
+	ca := newSigner()
+	other := newSigner()
+
+	marshal := func(sections ...sshkrl.KRLSection) []byte {
+		b, err := (&sshkrl.KRL{Sections: sections}).Marshal(rand.Reader)
+		if err != nil {
+			t.Fatalf("marshalling krl: %v", err)
+		}
+		return b
+	}
+	sign := func(b []byte, signer ssh.Signer) string {
+		sig, err := sshsig.Sign(bytes.NewReader(b), signer, sshsig.HashSHA512, krl.Namespace)
+		if err != nil {
+			t.Fatalf("signing krl: %v", err)
+		}
+		return string(sshsig.Armor(sig))
+	}
+
+	malformed := []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}
+	valid := marshal(&sshkrl.KRLCertificateSection{
+		CA:       ca.PublicKey(),
+		Sections: []sshkrl.KRLCertificateSubsection{&sshkrl.KRLCertificateSerialList{1}},
+	})
+	explicitKey := marshal(&sshkrl.KRLExplicitKeySection{other.PublicKey()})
+
+	tests := []struct {
+		name      string
+		krl       []byte
+		signature string
+		pub       ssh.PublicKey
+		strict    bool
+		wantErr   error
+	}{
+		{"strict valid", valid, sign(valid, ca), ca.PublicKey(), true, nil},
+		{"strict no key with malformed krl", malformed, "", nil, true, krl.ErrNoPublicKey},
+		{"strict malformed signature with malformed krl", malformed, "not a signature", ca.PublicKey(), true, krl.ErrInvalidSignature},
+		{"strict wrong signer with malformed krl", malformed, sign(malformed, other), ca.PublicKey(), true, krl.ErrInvalidSignature},
+		{"strict wrong signer with unexpected section", explicitKey, sign(explicitKey, other), ca.PublicKey(), true, krl.ErrInvalidSignature},
+		{"strict signature for other data", valid, sign(explicitKey, ca), ca.PublicKey(), true, krl.ErrInvalidSignature},
+		{"strict signed malformed krl", malformed, sign(malformed, ca), ca.PublicKey(), true, errParse},
+		{"strict signed unexpected section", explicitKey, sign(explicitKey, ca), ca.PublicKey(), true, krl.ErrUnexpectedSection},
+		{"no key valid", valid, "", nil, false, nil},
+		{"no key malformed krl", malformed, "", nil, false, errParse},
+		{"no key unexpected section", explicitKey, "", nil, false, krl.ErrUnexpectedSection},
+		{"key wrong signer", valid, sign(valid, other), ca.PublicKey(), false, krl.ErrInvalidSignature},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			res := &krl.Response{Krl: tt.krl, Signature: tt.signature}
+
+			var gotErr error
+			if tt.strict {
+				gotErr = res.VerifyStrict(tt.pub)
+			} else {
+				gotErr = res.Verify(tt.pub)
+			}
+
+			switch tt.wantErr {
+			case nil:
+				if gotErr != nil {
+					t.Errorf("verify failed: %v", gotErr)
+				}
+			case errParse:
+				if gotErr == nil || errors.Is(gotErr, krl.ErrInvalidSignature) || errors.Is(gotErr, krl.ErrNoPublicKey) {
+					t.Errorf("verify error = %v, want parse error", gotErr)
+				}
+			default:
+				if !errors.Is(gotErr, tt.wantErr) {
+					t.Errorf("verify error = %v, want %v", gotErr, tt.wantErr)
+				}
+			}
+		})
+	}
+}
