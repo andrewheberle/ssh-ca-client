@@ -21,7 +21,7 @@
             <string id="CertificateAuthorityURL">Certificate Authority URL</string>
             <string id="CertificateAuthorityURL_Explain">The URL of the SSH Certificate Authority (CA)</string>
             <string id="TrustedCertificateAuthority">Trusted Certificate Authority</string>
-            <string id="TrustedCertificateAuthority_Explain">The public key of the SSH Certificate Authority (CA). This is optional but recommended to validate CA response.</string>
+            <string id="TrustedCertificateAuthority_Explain">The public key of the SSH Certificate Authority (CA), in authorized_keys format. This is required, and is used to verify certificates and key revocation lists (KRLs) returned by the CA.</string>
         </stringTable>
         <presentationTable>
             <presentation id="ClientID">
@@ -49,7 +49,7 @@
             </presentation>
             <presentation id="TrustedCertificateAuthority">
                 <textBox refId="TrustedCertificateAuthority_Element">
-                    <label>Enter the Certificate Authority (CA) Public Key (optional):</label>
+                    <label>Enter the Certificate Authority (CA) Public Key:</label>
                 </textBox>
             </presentation>
         </presentationTable>
