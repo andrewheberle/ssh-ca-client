@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/httpclient"
@@ -24,21 +25,31 @@ var (
 	ErrUnexpectedSection = errors.New("encountered unexpected section type in krl")
 )
 
-func Get(server string, certificatetype api.GetCertificateTypeKrlParamsCertificateType, opts ...api.ClientOption) (*Response, error) {
-	if opts == nil {
-		opts = append(opts, api.WithHTTPClient(httpclient.New()))
-	}
+// Get retrieves the KRL for certificatetype from server. Requests use the
+// client from [httpclient.New] unless opts sets another with
+// [api.WithHTTPClient].
+func Get(ctx context.Context, server string, certificatetype api.GetCertificateTypeKrlParamsCertificateType, opts ...api.ClientOption) (*Response, error) {
+	// options are applied in order, so any client in opts replaces the default
+	opts = append([]api.ClientOption{api.WithHTTPClient(httpclient.New())}, opts...)
 	client, err := api.NewClientWithResponses(server, opts...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("creating api client: %w", err)
 	}
 
-	res, err := client.GetCertificateTypeKrlWithResponse(context.TODO(), certificatetype)
+	res, err := client.GetCertificateTypeKrlWithResponse(ctx, certificatetype)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("requesting krl: %w", err)
 	}
 
 	if res.StatusCode() != http.StatusOK {
+		// include any error messages returned by the CA
+		if res.JSON500 != nil && len(res.JSON500.Errors) > 0 {
+			messages := make([]string, 0, len(res.JSON500.Errors))
+			for _, e := range res.JSON500.Errors {
+				messages = append(messages, e.Message)
+			}
+			return nil, fmt.Errorf("bad status code: %d: %s", res.StatusCode(), strings.Join(messages, "; "))
+		}
 		return nil, fmt.Errorf("bad status code: %d", res.StatusCode())
 	}
 

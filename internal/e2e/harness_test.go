@@ -568,7 +568,7 @@ func (ca *testCA) revoke(t *testing.T, certificateType api.PostCertificateTypeRe
 func (ca *testCA) krl(t *testing.T, certificateType api.GetCertificateTypeKrlParamsCertificateType) *sshkrl.KRL {
 	t.Helper()
 
-	res, err := krl.Get(ca.URL, certificateType)
+	res, err := krl.Get(context.Background(), ca.URL, certificateType)
 	if err != nil {
 		t.Fatalf("getting %s KRL: %v", certificateType, err)
 	}
