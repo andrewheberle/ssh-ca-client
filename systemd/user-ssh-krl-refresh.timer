@@ -1,0 +1,11 @@
+[Unit]
+Description=Run SSH user certificate revocation list refresh
+
+[Timer]
+OnCalendar=hourly
+RandomizedDelaySec=15m
+FixedRandomDelay=true
+Persistent=true
+
+[Install]
+WantedBy=timers.target
