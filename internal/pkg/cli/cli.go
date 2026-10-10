@@ -9,12 +9,16 @@ import (
 	"github.com/andrewheberle/simplecommand"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
 	"github.com/bep/simplecobra"
+	"github.com/spf13/cobra"
 )
 
 type rootCommand struct {
 	configFile string
 	debug      bool
 	json       bool
+
+	// cmd is the underlying cobra command, which is set during Init
+	cmd *cobra.Command
 
 	*simplecommand.Command
 }
@@ -33,6 +37,7 @@ func (c *rootCommand) Init(cd *simplecobra.Commandeer) error {
 	}
 
 	cmd := cd.CobraCommand
+	c.cmd = cmd
 	cmd.PersistentFlags().StringVar(&c.configFile, "config", config.ConfigPath(), "Configuration location")
 	cmd.PersistentFlags().BoolVar(&c.debug, "debug", false, "Enable debug logging")
 	cmd.PersistentFlags().BoolVar(&c.json, "json", false, "Enable JSON logging")
@@ -48,11 +53,31 @@ func (c *rootCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 	return nil
 }
 
-func Execute(ctx context.Context, args []string) error {
-	rootCmd := &rootCommand{
-		Command: simplecommand.New("ssh-ca-client-cli", "A CLI based client for a serverless SSH CA"),
+// newRootCommand returns the root command with all sub-commands
+func newRootCommand() *rootCommand {
+	return &rootCommand{
+		Command: simplecommand.New(
+			"ssh-ca-client-cli",
+			"A CLI based client for a serverless SSH CA",
+			simplecommand.WithLong(rootLong),
+			simplecommand.WithSubCommands(commands()...),
+		),
 	}
-	rootCmd.SubCommands = commands()
+}
+
+// Command returns the fully initialised cobra command tree without executing
+// it, for uses such as generating documentation
+func Command() (*cobra.Command, error) {
+	rootCmd := newRootCommand()
+	if _, err := simplecobra.New(rootCmd); err != nil {
+		return nil, err
+	}
+
+	return rootCmd.cmd, nil
+}
+
+func Execute(ctx context.Context, args []string) error {
+	rootCmd := newRootCommand()
 
 	// Set up simplecobra
 	x, err := simplecobra.New(rootCmd)

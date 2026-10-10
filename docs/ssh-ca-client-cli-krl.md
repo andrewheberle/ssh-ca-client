@@ -1,84 +1,64 @@
-## Name
+## ssh-ca-client-cli krl
 
-ssh-ca-client-cli-krl - Download a key revocation list (KRL) for use by `ssh`
-or `sshd`.
+Download and parse a SSH KRL
 
-## Synopsis
+### Synopsis
 
-```sh
-ssh-ca-client-cli [global options] krl [--force]
-                                       [--host]
-                                       [--out]
-```
-
-## Description
-
-This sub-command can be used to download a list of revoked certificates in
-order to allow `ssh` or `sshd` to reject revoked host or user certificates
-respectively.
+Download a key revocation list (KRL) in order to allow ssh or sshd to reject
+revoked host or user certificates respectively.
 
 The downloaded KRL is verified against a SSHSIG signature as long as the
-`trusted_ca` option is set in the global/system configuration file.
+trusted_ca option is set in the global/system configuration. Using --force to
+write an unverified KRL could allow a third party to provide a malicious KRL
+payload in order to prevent legitimate connections.
 
-## Global Options
+To have sshd reject users that present a revoked certificate, write the user KRL
+to a file and add the following to /etc/ssh/sshd_config:
 
-See [Options](ssh-ca-client-cli.md#options)
+    RevokedKeys /etc/ssh/revocation_list
 
-## Options
+To have ssh reject connections to a server with a revoked host certificate,
+write the host KRL to a file and add the following to ~/.ssh/config:
 
-`--force`
-Force writing the KRL to the output location even if `trusted_ca` is not set.
+    RevokedHostKeys /home/example/.ssh/revocation_list
 
-This could allow a third party to provide a malicious KRL payload in order to
-pevent legitimate connections.
+This command is not available when installed as a snap.
 
-`--host`
-Download and parse the host KRL.
+```
+ssh-ca-client-cli krl [flags] [args]
+```
 
-Without this option the default is to download and parse the user KRL
+### Examples
 
-`--out`
-`-f`
-The output file for the verified KRL.
+```
+# Retrieve the host KRL and verify the signature
+ssh-ca-client-cli krl --host
 
-## Examples
+# Write the user KRL to a file for use by sshd
+ssh-ca-client-cli krl --out /etc/ssh/revocation_list
 
-* Retrieve host SSH key revocation list and verify the signature:
+# Write the host KRL to a file for use by ssh
+ssh-ca-client-cli krl --host --out /home/example/.ssh/revocation_list
+```
 
-  ```sh
-  ssh-ca-client-cli krl --host
-  ```
+### Options
 
-* Write a key revocation list to a file:
+```
+      --force        Force writing to output even if signature was not verified
+  -h, --help         help for krl
+      --host         Retrieve host KRL instead of user KRL
+  -f, --out string   Output file for KRL
+```
 
-  ```sh
-  ssh-ca-client-cli krl --out /etc/ssh/revocation_list
-  ```
+### Options inherited from parent commands
 
-  In the above example, having the following configuration in
-  `/etc/ssh/sshd_config` will cause `sshd` to reject users that present a
-  revoked certificate for authentication:
+```
+      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug           Enable debug logging
+      --json            Enable JSON logging
+```
 
-  ```
-  RevokedKeys /etc/ssh/revocation_list
-  ```
+### SEE ALSO
 
-* Write a key revocation list to a file for host keys:
+* [ssh-ca-client-cli](ssh-ca-client-cli.md)	 - A CLI based client for a serverless SSH CA
 
-  ```sh
-  ssh-ca-client-cli krl --host --out /home/example/.ssh/revocation_list
-      -
-  ```
-
-  In the above example, having the following configuration in `~/.ssh/config`
-  will cause `sshd` to reject connections to a server with a revoked
-  certificate:
-
-  ```
-  RevokedKeys /home/example/.ssh/revocation_list
-  ```
-
-
-## ssh-ca-client-cli
-
-Part of the [ssh-ca-client-cli](ssh-ca-client-cli.md)
