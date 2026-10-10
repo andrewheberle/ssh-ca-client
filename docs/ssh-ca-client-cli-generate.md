@@ -1,47 +1,44 @@
-## Name
+## ssh-ca-client-cli generate
 
-ssh-ca-client-cli-generate - Generate a user SSH private key
+Generate a SSH private key
 
-## Synopsis
-
-```sh
-ssh-ca-client-cli [global options] generate [--force]
-                                            [--dryrun]
-```
-
-## Description
+### Synopsis
 
 Generate a private key or overwrite an existing private key and store the
 resulting key in the users keyring. Overwriting a private key also removes any
 existing certificate, as it is not valid for the new key.
 
-## Global Options
+```
+ssh-ca-client-cli generate [flags] [args]
+```
 
-See [Options](ssh-ca-client-cli.md#options)
+### Examples
 
-## Options
+```
+# Generate a new private key overwriting any existing key
+ssh-ca-client-cli generate --force
 
-`--force`
-Force overwriting an existing private key.
+# Show any changes that would be made
+ssh-ca-client-cli generate --force --dryrun
+```
 
-`--dryrun`
-`-n`
-Show what would occur but make no changes.
+### Options
 
-## Examples
+```
+  -n, --dryrun   Show what would be done
+      --force    Force replacing an existing private key
+  -h, --help     help for generate
+```
 
-* Generate a new private key overwriting any existing key:
+### Options inherited from parent commands
 
-  ```sh
-  ssh-ca-client-cli generate --force
-  ```
+```
+      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug           Enable debug logging
+      --json            Enable JSON logging
+```
 
-* Show any changes that would be made:
+### SEE ALSO
 
-  ```sh
-  ssh-ca-client-cli generate --force --dryrun
-  ```
+* [ssh-ca-client-cli](ssh-ca-client-cli.md)	 - A CLI based client for a serverless SSH CA
 
-## ssh-ca-client-cli
-
-Part of the [ssh-ca-client-cli](ssh-ca-client-cli.md)

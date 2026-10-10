@@ -1,40 +1,40 @@
-## Name
+## ssh-ca-client-cli version
 
-ssh-ca-client-cli-version - Show the current version of the ssh-ca-client-cli
+Show the current version of the ssh-ca-client-cli
 
-## Synopsis
+### Synopsis
 
-```sh
-ssh-ca-client-cli [global options] version [--json]
+Display the version of the ssh-ca-client-cli.
+
+```
+ssh-ca-client-cli version [flags] [args]
 ```
 
-## Description
+### Examples
 
-This sub-command displays the version of the ssh-ca-client-cli
+```
+# Show version
+ssh-ca-client-cli version
 
-## Global Options
+# Show version as JSON
+ssh-ca-client-cli version --json
+```
 
-See [Options](ssh-ca-client-cli.md#options)
+### Options
 
-## Options
+```
+  -h, --help   help for version
+      --json   Output as JSON
+```
 
-`--json`
-Display version information as JSON.
+### Options inherited from parent commands
 
-## Examples
+```
+      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug           Enable debug logging
+```
 
-* Show version:
+### SEE ALSO
 
-  ```sh
-  ssh-ca-client-cli version
-  ```
+* [ssh-ca-client-cli](ssh-ca-client-cli.md)	 - A CLI based client for a serverless SSH CA
 
-* Show version as JSON:
-
-  ```sh
-  ssh-ca-client-cli version --json
-  ```
-
-## ssh-ca-client-cli
-
-Part of the [ssh-ca-client-cli](ssh-ca-client-cli.md)

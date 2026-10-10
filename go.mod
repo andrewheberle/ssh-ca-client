@@ -7,7 +7,7 @@ require (
 	fyne.io/systray v1.12.2
 	github.com/allan-simon/go-singleinstance v0.0.0-20210120080615-d0997106ab37
 	github.com/andrewheberle/opener v1.0.2
-	github.com/andrewheberle/simplecommand v0.5.1
+	github.com/andrewheberle/simplecommand v0.8.0
 	github.com/andrewheberle/sshagent v1.1.0
 	github.com/bep/simplecobra v0.8.0
 	github.com/coreos/go-oidc/v3 v3.21.0
@@ -23,6 +23,7 @@ require (
 	github.com/ndbeals/winssh-pageant v0.0.0-20230609194536-9f88b630ebec
 	github.com/oapi-codegen/runtime v1.7.0
 	github.com/pda0/koanf-winreg/v2 v2.0.0
+	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	github.com/zalando/go-keyring v0.2.8
 	golang.org/x/crypto v0.57.0
@@ -64,7 +65,6 @@ require (
 	github.com/sergeymakinen/go-ico v1.0.0-beta.0 // indirect
 	github.com/speakeasy-api/jsonpath v0.6.3 // indirect
 	github.com/speakeasy-api/openapi v1.24.0 // indirect
-	github.com/spf13/cobra v1.10.2 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/tc-hib/go-winres v0.3.3 // indirect
 	github.com/tc-hib/winres v0.2.1 // indirect

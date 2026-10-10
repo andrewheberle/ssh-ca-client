@@ -1,68 +1,57 @@
-## Name
+## ssh-ca-client-cli show
 
-ssh-ca-client-cli-show - Show any existing private key, public key or certificate.
+Show existing private/public key
 
-## Synopsis
+### Synopsis
 
-```sh
-ssh-ca-client-cli [global options] show [--certificate [--git]]
-                                        [--private]
-                                        [--public]
-```
+Display any existing private key, public key or certificate in OpenSSH format
+from the users keyring.
 
-## Description
+The --git option outputs the current certificate in a format suitable for use
+via gpg.ssh.defaultKeyCommand to provide a SSH public key for signing git
+commits, and implies --certificate:
 
-This sub-command can be used to display any exsiting private key, public key or
-certificate in Open SSH format from the users keyring.
+    [gpg "ssh"]
+      defaultKeyCommand = ssh-ca-client-cli show --git
 
-**Note:** The `--status` and `--json` options from previous versions have been
-removed.
-
-## Global Options
-
-See [Options](ssh-ca-client-cli.md#options)
-
-## Options
-
-`--certificate`
-Display the current certificate if one exists. When the `--git` flag is used
-with this option the current certificate will be output in a format suitable
-for use via `gpg.ssh.defaultKeyCommand` to provide a SSH public key for signing
-git commits:
-
-The `--git` flag may also be used by itself as it's use implies `--certificate`.
+The --status and --json options from previous versions have been removed.
 
 ```
-[gpg "ssh"]
-  defaultKeyCommand = ssh-ca-client-cli show --git
+ssh-ca-client-cli show [flags] [args]
 ```
 
-`--private`
-Display the users private key.
+### Examples
 
-`--public`
-Display the users public key.
+```
+# Display the current private key in OpenSSH format
+ssh-ca-client-cli show --private
 
-## Examples
+# Display the current certificate in OpenSSH format
+ssh-ca-client-cli show --certificate
 
-* Display the current private key in Open SSH format:
+# Display the current public key
+ssh-ca-client-cli show --public
+```
 
-  ```sh
-  ssh-ca-client-cli show --private
-  ```
+### Options
 
-* Display the current certificate in Open SSH format:
+```
+      --certificate   Display certificate if one exists
+      --git           Output certificate in a format suitable for git signing
+  -h, --help          help for show
+      --private       Display private key
+      --public        Display public key
+```
 
-  ```sh
-  ssh-ca-client-cli show --certificate
-  ```
+### Options inherited from parent commands
 
-* Display the current public key:
+```
+      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug           Enable debug logging
+      --json            Enable JSON logging
+```
 
-  ```sh
-  ssh-ca-client-cli show --public
-  ```
+### SEE ALSO
 
-## ssh-ca-client-cli
+* [ssh-ca-client-cli](ssh-ca-client-cli.md)	 - A CLI based client for a serverless SSH CA
 
-Part of the [ssh-ca-client-cli](ssh-ca-client-cli.md)

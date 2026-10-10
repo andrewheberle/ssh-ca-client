@@ -11,8 +11,8 @@ github.com/allan-simon/go-singleinstance v0.0.0-20210120080615-d0997106ab37 h1:2
 github.com/allan-simon/go-singleinstance v0.0.0-20210120080615-d0997106ab37/go.mod h1:6AXRstqK+32jeFmw89QGL2748+dj34Av4xc/I9oo9BY=
 github.com/andrewheberle/opener v1.0.2 h1:q/tiHleJ2LaZo5VB+faeIylQedEIbT/u7e6iRnIwAW0=
 github.com/andrewheberle/opener v1.0.2/go.mod h1:9BW68Czxp8UU5/wxA1NdRUW8NdJTnFS1XSQD+RqQ4gg=
-github.com/andrewheberle/simplecommand v0.5.1 h1:zgTPMj2hf5baFE09fW/qb4VNhZL8v7TuZo6YsK/nbvo=
-github.com/andrewheberle/simplecommand v0.5.1/go.mod h1:XQOLdO2a9/ZQMl5+MuBTeBzct2vsR3nIrJD3fRJlNmI=
+github.com/andrewheberle/simplecommand v0.8.0 h1:9zX9qmydlTx7KyVXmQat8gam31OrdX5ImPicH1Ujh4A=
+github.com/andrewheberle/simplecommand v0.8.0/go.mod h1:mwOLcpoyFoR4UshHv6NevDMMkQJzKMlpcx8WWBkWlxE=
 github.com/andrewheberle/sshagent v1.1.0 h1:UUKJ7LSGdnRZgso4NRwX+93eN0HJ4gl+WQAd+FqdRmc=
 github.com/andrewheberle/sshagent v1.1.0/go.mod h1:5XBxii3k4fbw1wt2i2P/WqVwb48WMKoOWEwx8WU4DNc=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0 h1:axGnT1gRIfimI7gJifB699GoE/oq+F2MU7Dml6nw9rQ=
@@ -110,8 +110,6 @@ github.com/knadh/koanf/parsers/yaml v1.1.1 h1:u70vV5IyaM0HvONh8HoqBC97oTgO33KcpZ
 github.com/knadh/koanf/parsers/yaml v1.1.1/go.mod h1:HHmcHXUrp9cOPcuC+2wrr44GTUB0EC+PyfN3HZD9tFg=
 github.com/knadh/koanf/providers/file v1.2.1 h1:bEWbtQwYrA+W2DtdBrQWyXqJaJSG3KrP3AESOJYp9wM=
 github.com/knadh/koanf/providers/file v1.2.1/go.mod h1:bp1PM5f83Q+TOUu10J/0ApLBd9uIzg+n9UgthfY+nRA=
-github.com/knadh/koanf/v2 v2.3.7 h1:amceufOeoQcq6VFKjm7/ggJ3t0Dkqaxy5fza4j3YgTA=
-github.com/knadh/koanf/v2 v2.3.7/go.mod h1:gRb40VRAbd4iJMYYD5IxZ6hfuopFcXBpc9bbQpZwo28=
 github.com/knadh/koanf/v2 v2.3.8 h1:NftEOf0Y456FqpLJj31RYYZQnfBQ+DDhsNQPqJ6nuk4=
 github.com/knadh/koanf/v2 v2.3.8/go.mod h1:gRb40VRAbd4iJMYYD5IxZ6hfuopFcXBpc9bbQpZwo28=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
