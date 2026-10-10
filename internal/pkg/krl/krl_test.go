@@ -2,16 +2,20 @@ package krl_test
 
 import (
 	"bytes"
+	"context"
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/httpclient"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
 	sshkrl "github.com/forfuncsake/krl"
 	"github.com/hiddeco/sshsig"
@@ -145,7 +149,7 @@ func TestGetAndVerify(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := krl.Get("https://ssh.example.com/", "host", api.WithHTTPClient(&mockClient{krl: tt.krldata, sig: tt.signature}))
+			got, gotErr := krl.Get(t.Context(), "https://ssh.example.com/", "host", api.WithHTTPClient(&mockClient{krl: tt.krldata, sig: tt.signature}))
 			if gotErr != nil {
 				if !tt.wantErr {
 					t.Errorf("Read() failed: %v", gotErr)
@@ -216,7 +220,7 @@ func TestGetContentType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, gotErr := krl.Get("https://ssh.example.com/", "host", api.WithHTTPClient(&staticClient{contentType: tt.contentType, body: tt.body}))
+			_, gotErr := krl.Get(t.Context(), "https://ssh.example.com/", "host", api.WithHTTPClient(&staticClient{contentType: tt.contentType, body: tt.body}))
 			if gotErr != nil {
 				if !tt.wantErr {
 					t.Errorf("Get() failed: %v", gotErr)
@@ -278,6 +282,108 @@ func TestVerifyStrictCertificateSectionCA(t *testing.T) {
 			res := &krl.Response{Krl: b, Signature: string(sshsig.Armor(sig))}
 			if gotErr := res.VerifyStrict(signer.PublicKey()); !errors.Is(gotErr, tt.wantErr) {
 				t.Errorf("VerifyStrict() error = %v, want %v", gotErr, tt.wantErr)
+			}
+		})
+	}
+}
+
+// responseClient returns the response from fn, or the error from the request
+// context once it is done
+type responseClient struct {
+	fn func(req *http.Request) (*http.Response, error)
+}
+
+func (c *responseClient) Do(req *http.Request) (*http.Response, error) {
+	if err := req.Context().Err(); err != nil {
+		return nil, err
+	}
+
+	return c.fn(req)
+}
+
+func response(status int, contentType, body string) func(req *http.Request) (*http.Response, error) {
+	return func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: status,
+			Header: http.Header{
+				"Content-Type": []string{contentType},
+			},
+			Body: io.NopCloser(strings.NewReader(body)),
+		}, nil
+	}
+}
+
+func TestGetErrors(t *testing.T) {
+	errTransport := errors.New("connection refused")
+
+	cancelled, cancel := context.WithCancel(t.Context())
+	cancel()
+
+	tests := []struct {
+		name        string
+		ctx         context.Context
+		fn          func(req *http.Request) (*http.Response, error)
+		wantErr     error
+		wantMessage string
+	}{
+		{"not found", t.Context(), response(http.StatusNotFound, "text/plain", "not found"), nil, "bad status code: 404"},
+		{"server error with messages", t.Context(), response(http.StatusInternalServerError, "application/json", `{"success":false,"errors":[{"code":1,"message":"krl unavailable"},{"code":2,"message":"try again"}]}`), nil, "bad status code: 500: krl unavailable; try again"},
+		{"server error without messages", t.Context(), response(http.StatusInternalServerError, "application/json", `{"success":false,"errors":[]}`), nil, "bad status code: 500"},
+		{"server error not json", t.Context(), response(http.StatusInternalServerError, "text/plain", "internal error"), nil, "bad status code: 500"},
+		{"transport error", t.Context(), func(req *http.Request) (*http.Response, error) { return nil, errTransport }, errTransport, ""},
+		{"cancelled context", cancelled, response(http.StatusOK, "application/json", `{"krl":"","signature":""}`), context.Canceled, ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, gotErr := krl.Get(tt.ctx, "https://ssh.example.com/", "host", api.WithHTTPClient(&responseClient{fn: tt.fn}))
+			if gotErr == nil {
+				t.Fatal("Get() succeeded unexpectedly")
+			}
+			if tt.wantErr != nil && !errors.Is(gotErr, tt.wantErr) {
+				t.Errorf("Get() error = %v, want %v", gotErr, tt.wantErr)
+			}
+			if tt.wantMessage != "" && !strings.HasSuffix(gotErr.Error(), tt.wantMessage) {
+				t.Errorf("Get() error = %q, want suffix %q", gotErr, tt.wantMessage)
+			}
+		})
+	}
+}
+
+func TestGetDefaultClient(t *testing.T) {
+	var gotUserAgent, gotHeader string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotUserAgent = r.Header.Get("User-Agent")
+		gotHeader = r.Header.Get("X-Test")
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"krl":"","signature":""}`))
+	}))
+	defer srv.Close()
+
+	tests := []struct {
+		name string
+		opts []api.ClientOption
+	}{
+		{"no options", nil},
+		{"request editor", []api.ClientOption{api.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
+			req.Header.Set("X-Test", "set")
+			return nil
+		})}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotUserAgent, gotHeader = "", ""
+
+			if _, err := krl.Get(t.Context(), srv.URL, "host", tt.opts...); err != nil {
+				t.Fatalf("Get() failed: %v", err)
+			}
+
+			if want := httpclient.GenerateUserAgent(httpclient.UserAgent); gotUserAgent != want {
+				t.Errorf("User-Agent = %q, want %q", gotUserAgent, want)
+			}
+			if tt.opts != nil && gotHeader != "set" {
+				t.Errorf("X-Test = %q, want %q", gotHeader, "set")
 			}
 		})
 	}

@@ -71,7 +71,7 @@ func (c *krlCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 
 func (c *krlCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args []string) error {
 	// get KRL payload from CA
-	res, err := krl.Get(c.config.CertificateAuthorityURL, c.certificatetype)
+	res, err := krl.Get(ctx, c.config.CertificateAuthorityURL, c.certificatetype)
 	if err != nil {
 		return fmt.Errorf("could not retrieve krl: %w", err)
 	}
