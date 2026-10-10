@@ -13,6 +13,8 @@ github.com/andrewheberle/opener v1.0.2 h1:q/tiHleJ2LaZo5VB+faeIylQedEIbT/u7e6iRn
 github.com/andrewheberle/opener v1.0.2/go.mod h1:9BW68Czxp8UU5/wxA1NdRUW8NdJTnFS1XSQD+RqQ4gg=
 github.com/andrewheberle/simplecommand v0.5.1 h1:zgTPMj2hf5baFE09fW/qb4VNhZL8v7TuZo6YsK/nbvo=
 github.com/andrewheberle/simplecommand v0.5.1/go.mod h1:XQOLdO2a9/ZQMl5+MuBTeBzct2vsR3nIrJD3fRJlNmI=
+github.com/andrewheberle/simplecommand v0.8.0 h1:9zX9qmydlTx7KyVXmQat8gam31OrdX5ImPicH1Ujh4A=
+github.com/andrewheberle/simplecommand v0.8.0/go.mod h1:mwOLcpoyFoR4UshHv6NevDMMkQJzKMlpcx8WWBkWlxE=
 github.com/andrewheberle/sshagent v1.1.0 h1:UUKJ7LSGdnRZgso4NRwX+93eN0HJ4gl+WQAd+FqdRmc=
 github.com/andrewheberle/sshagent v1.1.0/go.mod h1:5XBxii3k4fbw1wt2i2P/WqVwb48WMKoOWEwx8WU4DNc=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0 h1:axGnT1gRIfimI7gJifB699GoE/oq+F2MU7Dml6nw9rQ=
