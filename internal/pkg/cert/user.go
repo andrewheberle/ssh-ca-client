@@ -99,7 +99,7 @@ func (u *UserCertificate) RequestContext(ctx context.Context) error {
 
 	// ensure status code was 200 OK
 	if res.StatusCode() != http.StatusOK {
-		return fmt.Errorf("user certificate request: got bad status code: %d", res.StatusCode())
+		return fmt.Errorf("user certificate request: %w", api.StatusError(res.StatusCode(), res.Body))
 	}
 
 	// JSON200 is only set when the response was JSON

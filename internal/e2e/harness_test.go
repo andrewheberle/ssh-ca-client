@@ -586,7 +586,7 @@ func (ca *testCA) krl(t *testing.T, certificateType api.GetCertificateTypeKrlPar
 
 	res := ca.krlResponse(t, certificateType)
 
-	parsed, err := sshkrl.ParseKRL(res.Krl)
+	parsed, err := res.Parse()
 	if err != nil {
 		t.Fatalf("parsing %s KRL: %v", certificateType, err)
 	}
