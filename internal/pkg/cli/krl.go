@@ -3,8 +3,11 @@ package cli
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
+	"io/fs"
 	"log/slog"
+	"os"
 
 	"codeberg.org/sdassow/atomic"
 	"github.com/andrewheberle/simplecommand"
@@ -96,8 +99,35 @@ func (c *krlCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args [
 	}
 
 	if c.out != "" {
+		if err := c.checkExisting(res); err != nil {
+			return err
+		}
+
 		c.logger.Info("writing krl to output file", "out", c.out)
 		return atomic.WriteFile(c.out, bytes.NewReader([]byte(res.Krl)), atomic.FileMode(0440))
+	}
+
+	return nil
+}
+
+// checkExisting returns an error if the KRL in the output file is newer than
+// res. A missing or unparseable output file is replaced.
+func (c *krlCommand) checkExisting(res *krl.Response) error {
+	existing, err := os.ReadFile(c.out)
+	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil
+		}
+		return fmt.Errorf("could not read existing krl: %w", err)
+	}
+
+	if err := res.CheckNotOlder(existing); err != nil {
+		if errors.Is(err, krl.ErrOlderKRL) {
+			c.logger.Error("not replacing existing krl with an older krl", "out", c.out, "error", err)
+			return err
+		}
+
+		c.logger.Warn("existing krl could not be parsed so it will be replaced", "out", c.out, "error", err)
 	}
 
 	return nil
