@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<policyDefinitions revision="1.0" schemaVersion="1.0">
+<policyDefinitions revision="1.1" schemaVersion="1.0">
     <policyNamespaces>
         <target prefix="sshcaclient" namespace="SSHCAClient_v0.23.0" />
     </policyNamespaces>
-    <resources minRequiredRevision="1.0" />
+    <resources minRequiredRevision="1.1" />
     <supportedOn>
         <definitions>
             <definition name="SUPPORTED_All" displayName="$(string.SupportedOn_All)" />
