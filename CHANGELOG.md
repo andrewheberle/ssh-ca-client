@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.23.1](https://github.com/andrewheberle/ssh-ca-client/compare/v0.23.0...v0.23.1) (2026-10-11)
+
+
+### Bug Fixes
+
+* **deps:** update module golang.org/x/sys to v0.49.0 ([#79](https://github.com/andrewheberle/ssh-ca-client/issues/79)) ([eb33b1a](https://github.com/andrewheberle/ssh-ca-client/commit/eb33b1ae0ff414383c10d893e6333b0acc1c115b))
+
 ## [0.23.0](https://github.com/andrewheberle/ssh-ca-client/compare/v0.22.1...v0.23.0) (2026-10-10)
 
 
