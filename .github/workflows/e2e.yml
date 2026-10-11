@@ -152,7 +152,12 @@ jobs:
         run: npm run schema -w packages/core
 
       # review is disabled so the schemas are not uploaded to oasdiff.com,
-      # and no token is passed as there is no PR comment to post
+      # and no token is passed as there is no PR comment to post.
+      # A CA change can accept specific breaking changes, such as ones that
+      # are compatible on the wire or that clients are being updated for, by
+      # listing them in packages/core/.oasdiff-err-ignore, so the
+      # acknowledgement is reviewed with the change. The file is optional and
+      # the input is empty when it is absent.
       - name: Check CA schema for breaking changes
         if: ${{ !cancelled() && inputs.ca-ref && runner.os == 'Linux' }}
         uses: oasdiff/oasdiff-action/breaking@b9325c9e0a27ab65b0da3b766522cedec6be81dc # v0.1.18
@@ -160,6 +165,7 @@ jobs:
           base: internal/pkg/api/openapi.json
           revision: _ca/packages/core/openapi.json
           fail-on: ERR
+          err-ignore: ${{ hashFiles('_ca/packages/core/.oasdiff-err-ignore') != '' && '_ca/packages/core/.oasdiff-err-ignore' || '' }}
           review: 'false'
           github-token: ''
 
