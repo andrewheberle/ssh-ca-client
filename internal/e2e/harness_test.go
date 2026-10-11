@@ -539,7 +539,7 @@ func (ca *testCA) client(t *testing.T) *api.ClientWithResponses {
 // revoke revokes the certificate with serial using the API, with proof of
 // possession of the private key in store, as the client does not implement
 // revocation. The status code of the response is returned.
-func (ca *testCA) revoke(t *testing.T, certificateType api.PostCertificateTypeRevokeParamsCertificateType, serial uint64, store cert.Storage) int {
+func (ca *testCA) revoke(t *testing.T, certificateType krl.CertificateType, serial uint64, store cert.Storage) int {
 	t.Helper()
 
 	signer, err := store.Signer()
@@ -552,20 +552,33 @@ func (ca *testCA) revoke(t *testing.T, certificateType api.PostCertificateTypeRe
 		t.Fatalf("generating proof: %v", err)
 	}
 
-	res, err := ca.client(t).PostCertificateTypeRevokeWithResponse(context.Background(), certificateType, api.CertificateRevocation{
+	body := api.CertificateRevocation{
 		Serial:    strconv.FormatUint(serial, 10),
 		PublicKey: ssh.MarshalAuthorizedKey(signer.PublicKey()),
 		Proof:     p.String(),
-	})
-	if err != nil {
-		t.Fatalf("revoking certificate: %v", err)
 	}
 
-	return res.StatusCode()
+	switch certificateType {
+	case krl.User:
+		res, err := ca.client(t).PostUserRevokeWithResponse(context.Background(), body)
+		if err != nil {
+			t.Fatalf("revoking certificate: %v", err)
+		}
+		return res.StatusCode()
+	case krl.Host:
+		res, err := ca.client(t).PostHostRevokeWithResponse(context.Background(), body)
+		if err != nil {
+			t.Fatalf("revoking certificate: %v", err)
+		}
+		return res.StatusCode()
+	default:
+		t.Fatalf("unsupported certificate type: %q", certificateType)
+		return 0
+	}
 }
 
 // krlResponse fetches and verifies the KRL for certificateType
-func (ca *testCA) krlResponse(t *testing.T, certificateType api.GetCertificateTypeKrlParamsCertificateType) *krl.Response {
+func (ca *testCA) krlResponse(t *testing.T, certificateType krl.CertificateType) *krl.Response {
 	t.Helper()
 
 	res, err := krl.Get(context.Background(), ca.URL, certificateType)
@@ -581,7 +594,7 @@ func (ca *testCA) krlResponse(t *testing.T, certificateType api.GetCertificateTy
 }
 
 // krl fetches, verifies and parses the KRL for certificateType
-func (ca *testCA) krl(t *testing.T, certificateType api.GetCertificateTypeKrlParamsCertificateType) *sshkrl.KRL {
+func (ca *testCA) krl(t *testing.T, certificateType krl.CertificateType) *sshkrl.KRL {
 	t.Helper()
 
 	res := ca.krlResponse(t, certificateType)

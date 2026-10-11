@@ -20,6 +20,17 @@ const Namespace = "krl@com.github.serverless-ssh-ca.andrewheberle"
 // Response is a KRL and its SSHSIG signature as returned by the CA
 type Response api.KeyRevocationListResponse
 
+// CertificateType is the type of certificate a KRL revokes
+type CertificateType string
+
+const (
+	// User is the KRL for user certificates
+	User CertificateType = "user"
+
+	// Host is the KRL for host certificates
+	Host CertificateType = "host"
+)
+
 var (
 	// ErrInvalidSignature is returned when the signature on the KRL cannot be
 	// decoded or does not verify with the CA public key
@@ -44,7 +55,7 @@ var (
 // Get retrieves the KRL for certificatetype from server. Requests use the
 // client from [httpclient.New] unless opts sets another with
 // [api.WithHTTPClient].
-func Get(ctx context.Context, server string, certificatetype api.GetCertificateTypeKrlParamsCertificateType, opts ...api.ClientOption) (*Response, error) {
+func Get(ctx context.Context, server string, certificatetype CertificateType, opts ...api.ClientOption) (*Response, error) {
 	// options are applied in order, so any client in opts replaces the default
 	opts = append([]api.ClientOption{api.WithHTTPClient(httpclient.New())}, opts...)
 	client, err := api.NewClientWithResponses(server, opts...)
@@ -52,22 +63,40 @@ func Get(ctx context.Context, server string, certificatetype api.GetCertificateT
 		return nil, fmt.Errorf("creating api client: %w", err)
 	}
 
-	res, err := client.GetCertificateTypeKrlWithResponse(ctx, certificatetype)
-	if err != nil {
-		return nil, fmt.Errorf("requesting krl: %w", err)
+	var (
+		statusCode  int
+		body        []byte
+		contentType string
+		list        *api.KeyRevocationListResponse
+	)
+	switch certificatetype {
+	case User:
+		res, err := client.GetUserKrlWithResponse(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("requesting krl: %w", err)
+		}
+		statusCode, body, contentType, list = res.StatusCode(), res.Body, res.ContentType(), res.JSON200
+	case Host:
+		res, err := client.GetHostKrlWithResponse(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("requesting krl: %w", err)
+		}
+		statusCode, body, contentType, list = res.StatusCode(), res.Body, res.ContentType(), res.JSON200
+	default:
+		return nil, fmt.Errorf("unsupported certificate type: %q", certificatetype)
 	}
 
-	if res.StatusCode() != http.StatusOK {
-		return nil, api.StatusError(res.StatusCode(), res.Body)
+	if statusCode != http.StatusOK {
+		return nil, api.StatusError(statusCode, body)
 	}
 
-	if res.JSON200 == nil {
-		return nil, fmt.Errorf("unexpected response content type: %q", res.ContentType())
+	if list == nil {
+		return nil, fmt.Errorf("unexpected response content type: %q", contentType)
 	}
 
 	return &Response{
-		Krl:       res.JSON200.Krl,
-		Signature: res.JSON200.Signature,
+		Krl:       list.Krl,
+		Signature: list.Signature,
 	}, nil
 }
 

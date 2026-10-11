@@ -158,11 +158,11 @@ func TestGet(t *testing.T) {
 
 	tests := []struct {
 		name            string
-		certificateType api.GetCertificateTypeKrlParamsCertificateType
+		certificateType krl.CertificateType
 		wantPath        string
 	}{
-		{"host", api.GetCertificateTypeKrlParamsCertificateTypeHost, "/api/v3/host/krl"},
-		{"user", api.GetCertificateTypeKrlParamsCertificateTypeUser, "/api/v3/user/krl"},
+		{"host", krl.Host, "/api/v3/host/krl"},
+		{"user", krl.User, "/api/v3/user/krl"},
 	}
 
 	for _, tt := range tests {
@@ -213,7 +213,7 @@ func TestGetErrors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, gotErr := krl.Get(tt.ctx, "https://ssh.example.com/", "host", api.WithHTTPClient(&responseClient{fn: tt.fn}))
+			_, gotErr := krl.Get(tt.ctx, "https://ssh.example.com/", krl.Host, api.WithHTTPClient(&responseClient{fn: tt.fn}))
 			if gotErr == nil {
 				t.Fatal("Get() succeeded unexpectedly")
 			}
@@ -222,6 +222,29 @@ func TestGetErrors(t *testing.T) {
 			}
 			if tt.wantMessage != "" && !strings.HasSuffix(gotErr.Error(), tt.wantMessage) {
 				t.Errorf("Get() error = %q, want suffix %q", gotErr, tt.wantMessage)
+			}
+		})
+	}
+}
+
+func TestGetUnsupportedType(t *testing.T) {
+	client := &responseClient{fn: func(req *http.Request) (*http.Response, error) {
+		t.Errorf("Get() made a request to %q", req.URL)
+		return response(http.StatusOK, "application/json", `{"krl":"","signature":""}`)(req)
+	}}
+
+	tests := []struct {
+		name            string
+		certificateType krl.CertificateType
+	}{
+		{"empty", ""},
+		{"unknown", "other"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if _, err := krl.Get(t.Context(), "https://ssh.example.com/", tt.certificateType, api.WithHTTPClient(client)); err == nil {
+				t.Fatal("Get() succeeded unexpectedly")
 			}
 		})
 	}
@@ -252,7 +275,7 @@ func TestGetDefaultClient(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gotUserAgent, gotHeader = "", ""
 
-			if _, err := krl.Get(t.Context(), srv.URL, "host", tt.opts...); err != nil {
+			if _, err := krl.Get(t.Context(), srv.URL, krl.Host, tt.opts...); err != nil {
 				t.Fatalf("Get() failed: %v", err)
 			}
 

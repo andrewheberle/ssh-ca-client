@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
 )
@@ -16,14 +15,13 @@ import (
 // certificateType is a type of certificate as used by the KRL and revocation
 // endpoints
 type certificateType struct {
-	name   string
-	krl    api.GetCertificateTypeKrlParamsCertificateType
-	revoke api.PostCertificateTypeRevokeParamsCertificateType
+	name string
+	kind krl.CertificateType
 }
 
 var (
-	userType = certificateType{"user", api.GetCertificateTypeKrlParamsCertificateTypeUser, api.PostCertificateTypeRevokeParamsCertificateTypeUser}
-	hostType = certificateType{"host", api.GetCertificateTypeKrlParamsCertificateTypeHost, api.PostCertificateTypeRevokeParamsCertificateTypeHost}
+	userType = certificateType{"user", krl.User}
+	hostType = certificateType{"host", krl.Host}
 )
 
 // request returns a store with a certificate of type ct issued by ca
@@ -58,7 +56,7 @@ func TestKRL(t *testing.T) {
 
 			c := certificate(t, ca.request(t, ct))
 
-			if ca.krl(t, ct.krl).IsRevoked(c) {
+			if ca.krl(t, ct.kind).IsRevoked(c) {
 				t.Error("certificate is revoked by the KRL but was never revoked")
 			}
 		})
@@ -76,12 +74,12 @@ func TestKRL_NotOlder(t *testing.T) {
 		t.Run(ct.name, func(t *testing.T) {
 			t.Parallel()
 
-			first := ca.krlResponse(t, ct.krl)
+			first := ca.krlResponse(t, ct.kind)
 
 			// the generated date has a resolution of one second
 			time.Sleep(time.Until(time.Now().Truncate(time.Second).Add(time.Second + time.Millisecond*50)))
 
-			second := ca.krlResponse(t, ct.krl)
+			second := ca.krlResponse(t, ct.kind)
 
 			if err := second.CheckNotOlder(first.Krl); err != nil {
 				t.Errorf("CheckNotOlder() of later KRL error = %v, want nil", err)
@@ -114,19 +112,19 @@ func TestRevocation(t *testing.T) {
 			store := ca.request(t, tt.ct)
 			c := certificate(t, store)
 
-			if code := ca.revoke(t, tt.ct.revoke, c.Serial, store); code != http.StatusOK {
+			if code := ca.revoke(t, tt.ct.kind, c.Serial, store); code != http.StatusOK {
 				t.Fatalf("revocation status code = %d, want %d", code, http.StatusOK)
 			}
 
-			if !ca.krl(t, tt.ct.krl).IsRevoked(c) {
+			if !ca.krl(t, tt.ct.kind).IsRevoked(c) {
 				t.Errorf("certificate is not revoked by the %s KRL", tt.ct.name)
 			}
 
-			if ca.krl(t, tt.other.krl).IsRevoked(c) {
+			if ca.krl(t, tt.other.kind).IsRevoked(c) {
 				t.Errorf("certificate is revoked by the %s KRL", tt.other.name)
 			}
 
-			if code := ca.revoke(t, tt.ct.revoke, c.Serial, store); code != http.StatusConflict {
+			if code := ca.revoke(t, tt.ct.kind, c.Serial, store); code != http.StatusConflict {
 				t.Errorf("repeated revocation status code = %d, want %d", code, http.StatusConflict)
 			}
 		})
@@ -177,7 +175,7 @@ func TestRevocation_Rejected(t *testing.T) {
 
 			ct, serial, store := tt.revoke(t)
 
-			if code := ca.revoke(t, ct.revoke, serial, store); code != tt.wantCode {
+			if code := ca.revoke(t, ct.kind, serial, store); code != tt.wantCode {
 				t.Errorf("revocation status code = %d, want %d", code, tt.wantCode)
 			}
 		})

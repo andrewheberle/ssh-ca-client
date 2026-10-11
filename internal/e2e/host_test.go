@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -301,7 +301,7 @@ func TestHostCertificate_Renew_Rejected(t *testing.T) {
 			store: func(t *testing.T, ca *testCA) cert.Storage {
 				store := issued(t, ca)
 
-				if code := ca.revoke(t, api.PostCertificateTypeRevokeParamsCertificateTypeHost, certificate(t, store).Serial, store); code != http.StatusOK {
+				if code := ca.revoke(t, krl.Host, certificate(t, store).Serial, store); code != http.StatusOK {
 					t.Fatalf("revocation status code = %d, want %d", code, http.StatusOK)
 				}
 
