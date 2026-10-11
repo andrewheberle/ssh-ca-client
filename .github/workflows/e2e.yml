@@ -158,6 +158,13 @@ jobs:
       # listing them in packages/core/.oasdiff-err-ignore, so the
       # acknowledgement is reviewed with the change. The file is optional and
       # the input is empty when it is absent.
+      # Each entry is a line of the reported change, such as "GET /api/v3/x
+      # api path removed without deprecation". oasdiff has no comment syntax,
+      # but ignores lines without a matching method, path and message, so
+      # entries are preceded by "#" lines naming the CA PR, why the change is
+      # accepted, and the latest client release when it was added, so they
+      # can be removed once a later client release has the new schema. A "#"
+      # in front of an entry does not disable it, so delete the line instead.
       - name: Check CA schema for breaking changes
         if: ${{ !cancelled() && inputs.ca-ref && runner.os == 'Linux' }}
         uses: oasdiff/oasdiff-action/breaking@b9325c9e0a27ab65b0da3b766522cedec6be81dc # v0.1.18
