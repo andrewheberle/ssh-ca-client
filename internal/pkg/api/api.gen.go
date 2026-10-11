@@ -107,6 +107,21 @@ func (e PostHostCertificate500JSONResponseBodySuccess) Valid() bool {
 	}
 }
 
+// Defines values for GetHostKrl500JSONResponseBodySuccess.
+const (
+	GetHostKrl500JSONResponseBodySuccessFalse GetHostKrl500JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the GetHostKrl500JSONResponseBodySuccess enum.
+func (e GetHostKrl500JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case GetHostKrl500JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for PostHostRenew400JSONResponseBodySuccess.
 const (
 	PostHostRenew400JSONResponseBodySuccessFalse PostHostRenew400JSONResponseBodySuccess = false
@@ -176,6 +191,96 @@ const (
 func (e PostHostRenew500JSONResponseBodySuccess) Valid() bool {
 	switch e {
 	case PostHostRenew500JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PostHostRevoke400JSONResponseBodySuccess.
+const (
+	PostHostRevoke400JSONResponseBodySuccessFalse PostHostRevoke400JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the PostHostRevoke400JSONResponseBodySuccess enum.
+func (e PostHostRevoke400JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case PostHostRevoke400JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PostHostRevoke401JSONResponseBodySuccess.
+const (
+	PostHostRevoke401JSONResponseBodySuccessFalse PostHostRevoke401JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the PostHostRevoke401JSONResponseBodySuccess enum.
+func (e PostHostRevoke401JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case PostHostRevoke401JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PostHostRevoke403JSONResponseBodySuccess.
+const (
+	PostHostRevoke403JSONResponseBodySuccessFalse PostHostRevoke403JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the PostHostRevoke403JSONResponseBodySuccess enum.
+func (e PostHostRevoke403JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case PostHostRevoke403JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PostHostRevoke409JSONResponseBodySuccess.
+const (
+	PostHostRevoke409JSONResponseBodySuccessFalse PostHostRevoke409JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the PostHostRevoke409JSONResponseBodySuccess enum.
+func (e PostHostRevoke409JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case PostHostRevoke409JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PostHostRevoke422JSONResponseBodySuccess.
+const (
+	PostHostRevoke422JSONResponseBodySuccessFalse PostHostRevoke422JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the PostHostRevoke422JSONResponseBodySuccess enum.
+func (e PostHostRevoke422JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case PostHostRevoke422JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PostHostRevoke500JSONResponseBodySuccess.
+const (
+	PostHostRevoke500JSONResponseBodySuccessFalse PostHostRevoke500JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the PostHostRevoke500JSONResponseBodySuccess enum.
+func (e PostHostRevoke500JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case PostHostRevoke500JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
@@ -257,141 +362,105 @@ func (e PostUserCertificate500JSONResponseBodySuccess) Valid() bool {
 	}
 }
 
-// Defines values for GetCertificateTypeKrlParamsCertificateType.
+// Defines values for GetUserKrl500JSONResponseBodySuccess.
 const (
-	GetCertificateTypeKrlParamsCertificateTypeHost GetCertificateTypeKrlParamsCertificateType = "host"
-	GetCertificateTypeKrlParamsCertificateTypeUser GetCertificateTypeKrlParamsCertificateType = "user"
+	GetUserKrl500JSONResponseBodySuccessFalse GetUserKrl500JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the GetCertificateTypeKrlParamsCertificateType enum.
-func (e GetCertificateTypeKrlParamsCertificateType) Valid() bool {
+// Valid indicates whether the value is a known member of the GetUserKrl500JSONResponseBodySuccess enum.
+func (e GetUserKrl500JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case GetCertificateTypeKrlParamsCertificateTypeHost:
-		return true
-	case GetCertificateTypeKrlParamsCertificateTypeUser:
+	case GetUserKrl500JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for GetCertificateTypeKrl500JSONResponseBodySuccess.
+// Defines values for PostUserRevoke400JSONResponseBodySuccess.
 const (
-	GetCertificateTypeKrl500JSONResponseBodySuccessFalse GetCertificateTypeKrl500JSONResponseBodySuccess = false
+	PostUserRevoke400JSONResponseBodySuccessFalse PostUserRevoke400JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the GetCertificateTypeKrl500JSONResponseBodySuccess enum.
-func (e GetCertificateTypeKrl500JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostUserRevoke400JSONResponseBodySuccess enum.
+func (e PostUserRevoke400JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case GetCertificateTypeKrl500JSONResponseBodySuccessFalse:
+	case PostUserRevoke400JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostCertificateTypeRevokeParamsCertificateType.
+// Defines values for PostUserRevoke401JSONResponseBodySuccess.
 const (
-	PostCertificateTypeRevokeParamsCertificateTypeHost PostCertificateTypeRevokeParamsCertificateType = "host"
-	PostCertificateTypeRevokeParamsCertificateTypeUser PostCertificateTypeRevokeParamsCertificateType = "user"
+	PostUserRevoke401JSONResponseBodySuccessFalse PostUserRevoke401JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostCertificateTypeRevokeParamsCertificateType enum.
-func (e PostCertificateTypeRevokeParamsCertificateType) Valid() bool {
+// Valid indicates whether the value is a known member of the PostUserRevoke401JSONResponseBodySuccess enum.
+func (e PostUserRevoke401JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostCertificateTypeRevokeParamsCertificateTypeHost:
-		return true
-	case PostCertificateTypeRevokeParamsCertificateTypeUser:
+	case PostUserRevoke401JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostCertificateTypeRevoke400JSONResponseBodySuccess.
+// Defines values for PostUserRevoke403JSONResponseBodySuccess.
 const (
-	PostCertificateTypeRevoke400JSONResponseBodySuccessFalse PostCertificateTypeRevoke400JSONResponseBodySuccess = false
+	PostUserRevoke403JSONResponseBodySuccessFalse PostUserRevoke403JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke400JSONResponseBodySuccess enum.
-func (e PostCertificateTypeRevoke400JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostUserRevoke403JSONResponseBodySuccess enum.
+func (e PostUserRevoke403JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostCertificateTypeRevoke400JSONResponseBodySuccessFalse:
+	case PostUserRevoke403JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostCertificateTypeRevoke401JSONResponseBodySuccess.
+// Defines values for PostUserRevoke409JSONResponseBodySuccess.
 const (
-	PostCertificateTypeRevoke401JSONResponseBodySuccessFalse PostCertificateTypeRevoke401JSONResponseBodySuccess = false
+	PostUserRevoke409JSONResponseBodySuccessFalse PostUserRevoke409JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke401JSONResponseBodySuccess enum.
-func (e PostCertificateTypeRevoke401JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostUserRevoke409JSONResponseBodySuccess enum.
+func (e PostUserRevoke409JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostCertificateTypeRevoke401JSONResponseBodySuccessFalse:
+	case PostUserRevoke409JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostCertificateTypeRevoke403JSONResponseBodySuccess.
+// Defines values for PostUserRevoke422JSONResponseBodySuccess.
 const (
-	PostCertificateTypeRevoke403JSONResponseBodySuccessFalse PostCertificateTypeRevoke403JSONResponseBodySuccess = false
+	PostUserRevoke422JSONResponseBodySuccessFalse PostUserRevoke422JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke403JSONResponseBodySuccess enum.
-func (e PostCertificateTypeRevoke403JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostUserRevoke422JSONResponseBodySuccess enum.
+func (e PostUserRevoke422JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostCertificateTypeRevoke403JSONResponseBodySuccessFalse:
+	case PostUserRevoke422JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for PostCertificateTypeRevoke409JSONResponseBodySuccess.
+// Defines values for PostUserRevoke500JSONResponseBodySuccess.
 const (
-	PostCertificateTypeRevoke409JSONResponseBodySuccessFalse PostCertificateTypeRevoke409JSONResponseBodySuccess = false
+	PostUserRevoke500JSONResponseBodySuccessFalse PostUserRevoke500JSONResponseBodySuccess = false
 )
 
-// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke409JSONResponseBodySuccess enum.
-func (e PostCertificateTypeRevoke409JSONResponseBodySuccess) Valid() bool {
+// Valid indicates whether the value is a known member of the PostUserRevoke500JSONResponseBodySuccess enum.
+func (e PostUserRevoke500JSONResponseBodySuccess) Valid() bool {
 	switch e {
-	case PostCertificateTypeRevoke409JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostCertificateTypeRevoke422JSONResponseBodySuccess.
-const (
-	PostCertificateTypeRevoke422JSONResponseBodySuccessFalse PostCertificateTypeRevoke422JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke422JSONResponseBodySuccess enum.
-func (e PostCertificateTypeRevoke422JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostCertificateTypeRevoke422JSONResponseBodySuccessFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostCertificateTypeRevoke500JSONResponseBodySuccess.
-const (
-	PostCertificateTypeRevoke500JSONResponseBodySuccessFalse PostCertificateTypeRevoke500JSONResponseBodySuccess = false
-)
-
-// Valid indicates whether the value is a known member of the PostCertificateTypeRevoke500JSONResponseBodySuccess enum.
-func (e PostCertificateTypeRevoke500JSONResponseBodySuccess) Valid() bool {
-	switch e {
-	case PostCertificateTypeRevoke500JSONResponseBodySuccessFalse:
+	case PostUserRevoke500JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
@@ -503,6 +572,9 @@ type PostHostCertificate422JSONResponseBodySuccess bool
 // PostHostCertificate500JSONResponseBodySuccess defines parameters for PostHostCertificate.
 type PostHostCertificate500JSONResponseBodySuccess bool
 
+// GetHostKrl500JSONResponseBodySuccess defines parameters for GetHostKrl.
+type GetHostKrl500JSONResponseBodySuccess bool
+
 // PostHostRenew400JSONResponseBodySuccess defines parameters for PostHostRenew.
 type PostHostRenew400JSONResponseBodySuccess bool
 
@@ -517,6 +589,24 @@ type PostHostRenew422JSONResponseBodySuccess bool
 
 // PostHostRenew500JSONResponseBodySuccess defines parameters for PostHostRenew.
 type PostHostRenew500JSONResponseBodySuccess bool
+
+// PostHostRevoke400JSONResponseBodySuccess defines parameters for PostHostRevoke.
+type PostHostRevoke400JSONResponseBodySuccess bool
+
+// PostHostRevoke401JSONResponseBodySuccess defines parameters for PostHostRevoke.
+type PostHostRevoke401JSONResponseBodySuccess bool
+
+// PostHostRevoke403JSONResponseBodySuccess defines parameters for PostHostRevoke.
+type PostHostRevoke403JSONResponseBodySuccess bool
+
+// PostHostRevoke409JSONResponseBodySuccess defines parameters for PostHostRevoke.
+type PostHostRevoke409JSONResponseBodySuccess bool
+
+// PostHostRevoke422JSONResponseBodySuccess defines parameters for PostHostRevoke.
+type PostHostRevoke422JSONResponseBodySuccess bool
+
+// PostHostRevoke500JSONResponseBodySuccess defines parameters for PostHostRevoke.
+type PostHostRevoke500JSONResponseBodySuccess bool
 
 // PostUserCertificateParams defines parameters for PostUserCertificate.
 type PostUserCertificateParams struct {
@@ -539,32 +629,26 @@ type PostUserCertificate422JSONResponseBodySuccess bool
 // PostUserCertificate500JSONResponseBodySuccess defines parameters for PostUserCertificate.
 type PostUserCertificate500JSONResponseBodySuccess bool
 
-// GetCertificateTypeKrlParamsCertificateType defines parameters for GetCertificateTypeKrl.
-type GetCertificateTypeKrlParamsCertificateType string
+// GetUserKrl500JSONResponseBodySuccess defines parameters for GetUserKrl.
+type GetUserKrl500JSONResponseBodySuccess bool
 
-// GetCertificateTypeKrl500JSONResponseBodySuccess defines parameters for GetCertificateTypeKrl.
-type GetCertificateTypeKrl500JSONResponseBodySuccess bool
+// PostUserRevoke400JSONResponseBodySuccess defines parameters for PostUserRevoke.
+type PostUserRevoke400JSONResponseBodySuccess bool
 
-// PostCertificateTypeRevokeParamsCertificateType defines parameters for PostCertificateTypeRevoke.
-type PostCertificateTypeRevokeParamsCertificateType string
+// PostUserRevoke401JSONResponseBodySuccess defines parameters for PostUserRevoke.
+type PostUserRevoke401JSONResponseBodySuccess bool
 
-// PostCertificateTypeRevoke400JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
-type PostCertificateTypeRevoke400JSONResponseBodySuccess bool
+// PostUserRevoke403JSONResponseBodySuccess defines parameters for PostUserRevoke.
+type PostUserRevoke403JSONResponseBodySuccess bool
 
-// PostCertificateTypeRevoke401JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
-type PostCertificateTypeRevoke401JSONResponseBodySuccess bool
+// PostUserRevoke409JSONResponseBodySuccess defines parameters for PostUserRevoke.
+type PostUserRevoke409JSONResponseBodySuccess bool
 
-// PostCertificateTypeRevoke403JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
-type PostCertificateTypeRevoke403JSONResponseBodySuccess bool
+// PostUserRevoke422JSONResponseBodySuccess defines parameters for PostUserRevoke.
+type PostUserRevoke422JSONResponseBodySuccess bool
 
-// PostCertificateTypeRevoke409JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
-type PostCertificateTypeRevoke409JSONResponseBodySuccess bool
-
-// PostCertificateTypeRevoke422JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
-type PostCertificateTypeRevoke422JSONResponseBodySuccess bool
-
-// PostCertificateTypeRevoke500JSONResponseBodySuccess defines parameters for PostCertificateTypeRevoke.
-type PostCertificateTypeRevoke500JSONResponseBodySuccess bool
+// PostUserRevoke500JSONResponseBodySuccess defines parameters for PostUserRevoke.
+type PostUserRevoke500JSONResponseBodySuccess bool
 
 // PostHostCertificateJSONRequestBody defines body for PostHostCertificate for application/json ContentType.
 type PostHostCertificateJSONRequestBody = HostCertificateRequest
@@ -572,11 +656,14 @@ type PostHostCertificateJSONRequestBody = HostCertificateRequest
 // PostHostRenewJSONRequestBody defines body for PostHostRenew for application/json ContentType.
 type PostHostRenewJSONRequestBody = HostCertificateRenew
 
+// PostHostRevokeJSONRequestBody defines body for PostHostRevoke for application/json ContentType.
+type PostHostRevokeJSONRequestBody = CertificateRevocation
+
 // PostUserCertificateJSONRequestBody defines body for PostUserCertificate for application/json ContentType.
 type PostUserCertificateJSONRequestBody = UserCertificateRequest
 
-// PostCertificateTypeRevokeJSONRequestBody defines body for PostCertificateTypeRevoke for application/json ContentType.
-type PostCertificateTypeRevokeJSONRequestBody = CertificateRevocation
+// PostUserRevokeJSONRequestBody defines body for PostUserRevoke for application/json ContentType.
+type PostUserRevokeJSONRequestBody = CertificateRevocation
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -663,6 +750,11 @@ type ClientInterface interface {
 	// Takes a body of the `application/json` content type.
 	PostHostCertificate(ctx context.Context, params *PostHostCertificateParams, body PostHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetHostKrl Get the Key Revocation List for host certificates
+	//
+	// Corresponds with GET /api/v3/host/krl (the `GetHostKrl` operationId).
+	GetHostKrl(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// PostHostRenewWithBody performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
 	// with any type of body and a specified content type.
 	PostHostRenewWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -670,6 +762,20 @@ type ClientInterface interface {
 	// PostHostRenew performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request.
 	// Takes a body of the `application/json` content type.
 	PostHostRenew(ctx context.Context, body PostHostRenewJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostHostRevokeWithBody Revoke a host certificate
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
+	PostHostRevokeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostHostRevoke Revoke a host certificate
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
+	PostHostRevoke(ctx context.Context, body PostHostRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostUserCertificateWithBody performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request,
 	// with any type of body and a specified content type.
@@ -679,16 +785,24 @@ type ClientInterface interface {
 	// Takes a body of the `application/json` content type.
 	PostUserCertificate(ctx context.Context, params *PostUserCertificateParams, body PostUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetCertificateTypeKrl performs a GET /api/v3/{certificateType}/krl (the `GetCertificateTypeKrl` operationId) request.
-	GetCertificateTypeKrl(ctx context.Context, certificateType GetCertificateTypeKrlParamsCertificateType, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetUserKrl Get the Key Revocation List for user certificates
+	//
+	// Corresponds with GET /api/v3/user/krl (the `GetUserKrl` operationId).
+	GetUserKrl(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostCertificateTypeRevokeWithBody performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request,
-	// with any type of body and a specified content type.
-	PostCertificateTypeRevokeWithBody(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostUserRevokeWithBody Revoke a user certificate
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
+	PostUserRevokeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostCertificateTypeRevoke performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request.
+	// PostUserRevoke Revoke a user certificate
+	//
 	// Takes a body of the `application/json` content type.
-	PostCertificateTypeRevoke(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, body PostCertificateTypeRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	//
+	// Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
+	PostUserRevoke(ctx context.Context, body PostUserRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 // GetCa performs a GET /api/v3/ca (the `GetCa` operationId) request.
@@ -732,6 +846,21 @@ func (c *Client) PostHostCertificate(ctx context.Context, params *PostHostCertif
 	return c.Client.Do(req)
 }
 
+// GetHostKrl Get the Key Revocation List for host certificates
+//
+// Corresponds with GET /api/v3/host/krl (the `GetHostKrl` operationId).
+func (c *Client) GetHostKrl(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetHostKrlRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 // PostHostRenewWithBody performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
 // with any type of body and a specified content type.
 func (c *Client) PostHostRenewWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -750,6 +879,40 @@ func (c *Client) PostHostRenewWithBody(ctx context.Context, contentType string, 
 // Takes a body of the `application/json` content type.
 func (c *Client) PostHostRenew(ctx context.Context, body PostHostRenewJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostHostRenewRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// PostHostRevokeWithBody Revoke a host certificate
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
+func (c *Client) PostHostRevokeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostHostRevokeRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// PostHostRevoke Revoke a host certificate
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
+func (c *Client) PostHostRevoke(ctx context.Context, body PostHostRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostHostRevokeRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -788,9 +951,11 @@ func (c *Client) PostUserCertificate(ctx context.Context, params *PostUserCertif
 	return c.Client.Do(req)
 }
 
-// GetCertificateTypeKrl performs a GET /api/v3/{certificateType}/krl (the `GetCertificateTypeKrl` operationId) request.
-func (c *Client) GetCertificateTypeKrl(ctx context.Context, certificateType GetCertificateTypeKrlParamsCertificateType, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetCertificateTypeKrlRequest(c.Server, certificateType)
+// GetUserKrl Get the Key Revocation List for user certificates
+//
+// Corresponds with GET /api/v3/user/krl (the `GetUserKrl` operationId).
+func (c *Client) GetUserKrl(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetUserKrlRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -801,10 +966,13 @@ func (c *Client) GetCertificateTypeKrl(ctx context.Context, certificateType GetC
 	return c.Client.Do(req)
 }
 
-// PostCertificateTypeRevokeWithBody performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request,
-// with any type of body and a specified content type.
-func (c *Client) PostCertificateTypeRevokeWithBody(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostCertificateTypeRevokeRequestWithBody(c.Server, certificateType, contentType, body)
+// PostUserRevokeWithBody Revoke a user certificate
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
+func (c *Client) PostUserRevokeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostUserRevokeRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -815,10 +983,13 @@ func (c *Client) PostCertificateTypeRevokeWithBody(ctx context.Context, certific
 	return c.Client.Do(req)
 }
 
-// PostCertificateTypeRevoke performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request.
+// PostUserRevoke Revoke a user certificate
+//
 // Takes a body of the `application/json` content type.
-func (c *Client) PostCertificateTypeRevoke(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, body PostCertificateTypeRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostCertificateTypeRevokeRequest(c.Server, certificateType, body)
+//
+// Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
+func (c *Client) PostUserRevoke(ctx context.Context, body PostUserRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostUserRevokeRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -909,6 +1080,33 @@ func NewPostHostCertificateRequestWithBody(server string, params *PostHostCertif
 	return req, nil
 }
 
+// NewGetHostKrlRequest constructs an http.Request for the GetHostKrl method
+func NewGetHostKrlRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v3/host/krl")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewPostHostRenewRequest calls the generic PostHostRenew builder with application/json body
 func NewPostHostRenewRequest(server string, body PostHostRenewJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -930,6 +1128,46 @@ func NewPostHostRenewRequestWithBody(server string, contentType string, body io.
 	}
 
 	operationPath := fmt.Sprintf("/api/v3/host/renew")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostHostRevokeRequest calls the generic PostHostRevoke builder with application/json body
+func NewPostHostRevokeRequest(server string, body PostHostRevokeJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostHostRevokeRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostHostRevokeRequestWithBody constructs an http.Request for the PostHostRevoke method, with any body, and a specified content type
+func NewPostHostRevokeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v3/host/revoke")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1002,23 +1240,16 @@ func NewPostUserCertificateRequestWithBody(server string, params *PostUserCertif
 	return req, nil
 }
 
-// NewGetCertificateTypeKrlRequest constructs an http.Request for the GetCertificateTypeKrl method
-func NewGetCertificateTypeKrlRequest(server string, certificateType GetCertificateTypeKrlParamsCertificateType) (*http.Request, error) {
+// NewGetUserKrlRequest constructs an http.Request for the GetUserKrl method
+func NewGetUserKrlRequest(server string) (*http.Request, error) {
 	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "certificateType", certificateType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v3/%s/krl", pathParam0)
+	operationPath := fmt.Sprintf("/api/v3/user/krl")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1036,34 +1267,27 @@ func NewGetCertificateTypeKrlRequest(server string, certificateType GetCertifica
 	return req, nil
 }
 
-// NewPostCertificateTypeRevokeRequest calls the generic PostCertificateTypeRevoke builder with application/json body
-func NewPostCertificateTypeRevokeRequest(server string, certificateType PostCertificateTypeRevokeParamsCertificateType, body PostCertificateTypeRevokeJSONRequestBody) (*http.Request, error) {
+// NewPostUserRevokeRequest calls the generic PostUserRevoke builder with application/json body
+func NewPostUserRevokeRequest(server string, body PostUserRevokeJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostCertificateTypeRevokeRequestWithBody(server, certificateType, "application/json", bodyReader)
+	return NewPostUserRevokeRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewPostCertificateTypeRevokeRequestWithBody constructs an http.Request for the PostCertificateTypeRevoke method, with any body, and a specified content type
-func NewPostCertificateTypeRevokeRequestWithBody(server string, certificateType PostCertificateTypeRevokeParamsCertificateType, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostUserRevokeRequestWithBody constructs an http.Request for the PostUserRevoke method, with any body, and a specified content type
+func NewPostUserRevokeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "certificateType", certificateType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v3/%s/revoke", pathParam0)
+	operationPath := fmt.Sprintf("/api/v3/user/revoke")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1142,6 +1366,13 @@ type ClientWithResponsesInterface interface {
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	PostHostCertificateWithResponse(ctx context.Context, params *PostHostCertificateParams, body PostHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateResponse, error)
 
+	// GetHostKrlWithResponse Get the Key Revocation List for host certificates
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v3/host/krl (the `GetHostKrl` operationId).
+	GetHostKrlWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetHostKrlResponse, error)
+
 	// PostHostRenewWithBodyWithResponse performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
 	// with any type of body and a specified content type.
 	//
@@ -1151,6 +1382,20 @@ type ClientWithResponsesInterface interface {
 	// PostHostRenewWithResponse performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	PostHostRenewWithResponse(ctx context.Context, body PostHostRenewJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostRenewResponse, error)
+
+	// PostHostRevokeWithBodyWithResponse Revoke a host certificate
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
+	PostHostRevokeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostRevokeResponse, error)
+
+	// PostHostRevokeWithResponse Revoke a host certificate
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
+	PostHostRevokeWithResponse(ctx context.Context, body PostHostRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostRevokeResponse, error)
 
 	// PostUserCertificateWithBodyWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request,
 	// with any type of body and a specified content type.
@@ -1162,20 +1407,26 @@ type ClientWithResponsesInterface interface {
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	PostUserCertificateWithResponse(ctx context.Context, params *PostUserCertificateParams, body PostUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUserCertificateResponse, error)
 
-	// GetCertificateTypeKrlWithResponse performs a GET /api/v3/{certificateType}/krl (the `GetCertificateTypeKrl` operationId) request.
+	// GetUserKrlWithResponse Get the Key Revocation List for user certificates
 	//
 	// Returns a wrapper object for the known response body format(s).
-	GetCertificateTypeKrlWithResponse(ctx context.Context, certificateType GetCertificateTypeKrlParamsCertificateType, reqEditors ...RequestEditorFn) (*GetCertificateTypeKrlResponse, error)
-
-	// PostCertificateTypeRevokeWithBodyWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request,
-	// with any type of body and a specified content type.
 	//
-	// Returns a wrapper object for the known response body format(s).
-	PostCertificateTypeRevokeWithBodyWithResponse(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCertificateTypeRevokeResponse, error)
+	// Corresponds with GET /api/v3/user/krl (the `GetUserKrl` operationId).
+	GetUserKrlWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetUserKrlResponse, error)
 
-	// PostCertificateTypeRevokeWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request.
+	// PostUserRevokeWithBodyWithResponse Revoke a user certificate
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
+	PostUserRevokeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostUserRevokeResponse, error)
+
+	// PostUserRevokeWithResponse Revoke a user certificate
+	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-	PostCertificateTypeRevokeWithResponse(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, body PostCertificateTypeRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCertificateTypeRevokeResponse, error)
+	//
+	// Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
+	PostUserRevokeWithResponse(ctx context.Context, body PostUserRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUserRevokeResponse, error)
 }
 
 type GetCaResponse struct {
@@ -1371,6 +1622,66 @@ func (r PostHostCertificateResponse) ContentType() string {
 	return ""
 }
 
+type GetHostKrlResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *KeyRevocationListResponse
+	// JSON500 the response for an HTTP 500 `application/json` response
+	JSON500 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success GetHostKrl500JSONResponseBodySuccess `json:"success"`
+	}
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r GetHostKrlResponse) GetJSON200() *KeyRevocationListResponse {
+	return r.JSON200
+}
+
+// GetJSON500 returns the response for an HTTP 500 `application/json` response
+func (r GetHostKrlResponse) GetJSON500() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success GetHostKrl500JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON500
+}
+
+// GetBody returns the raw response body bytes
+func (r GetHostKrlResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r GetHostKrlResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetHostKrlResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetHostKrlResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 type PostHostRenewResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -1505,6 +1816,165 @@ func (r PostHostRenewResponse) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r PostHostRenewResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type PostHostRevokeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *RevocationResponse
+	// JSON400 the response for an HTTP 400 `application/json` response
+	JSON400 *struct {
+		Errors []struct {
+			Code    float32  `json:"code"`
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors"`
+		Success PostHostRevoke400JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success PostHostRevoke401JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success PostHostRevoke403JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON409 the response for an HTTP 409 `application/json` response
+	JSON409 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success PostHostRevoke409JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *struct {
+		Errors []struct {
+			Code    float32  `json:"code"`
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors"`
+		Success PostHostRevoke422JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON500 the response for an HTTP 500 `application/json` response
+	JSON500 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success PostHostRevoke500JSONResponseBodySuccess `json:"success"`
+	}
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r PostHostRevokeResponse) GetJSON200() *RevocationResponse {
+	return r.JSON200
+}
+
+// GetJSON400 returns the response for an HTTP 400 `application/json` response
+func (r PostHostRevokeResponse) GetJSON400() *struct {
+	Errors []struct {
+		Code    float32  `json:"code"`
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Success PostHostRevoke400JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON400
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r PostHostRevokeResponse) GetJSON401() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success PostHostRevoke401JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r PostHostRevokeResponse) GetJSON403() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success PostHostRevoke403JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON403
+}
+
+// GetJSON409 returns the response for an HTTP 409 `application/json` response
+func (r PostHostRevokeResponse) GetJSON409() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success PostHostRevoke409JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON409
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r PostHostRevokeResponse) GetJSON422() *struct {
+	Errors []struct {
+		Code    float32  `json:"code"`
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Success PostHostRevoke422JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON422
+}
+
+// GetJSON500 returns the response for an HTTP 500 `application/json` response
+func (r PostHostRevokeResponse) GetJSON500() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success PostHostRevoke500JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON500
+}
+
+// GetBody returns the raw response body bytes
+func (r PostHostRevokeResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r PostHostRevokeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostHostRevokeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PostHostRevokeResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -1651,7 +2121,7 @@ func (r PostUserCertificateResponse) ContentType() string {
 	return ""
 }
 
-type GetCertificateTypeKrlResponse struct {
+type GetUserKrlResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
@@ -1662,33 +2132,33 @@ type GetCertificateTypeKrlResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success GetCertificateTypeKrl500JSONResponseBodySuccess `json:"success"`
+		Success GetUserKrl500JSONResponseBodySuccess `json:"success"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r GetCertificateTypeKrlResponse) GetJSON200() *KeyRevocationListResponse {
+func (r GetUserKrlResponse) GetJSON200() *KeyRevocationListResponse {
 	return r.JSON200
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r GetCertificateTypeKrlResponse) GetJSON500() *struct {
+func (r GetUserKrlResponse) GetJSON500() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success GetCertificateTypeKrl500JSONResponseBodySuccess `json:"success"`
+	Success GetUserKrl500JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON500
 }
 
 // GetBody returns the raw response body bytes
-func (r GetCertificateTypeKrlResponse) GetBody() []byte {
+func (r GetUserKrlResponse) GetBody() []byte {
 	return r.Body
 }
 
 // Status returns HTTPResponse.Status
-func (r GetCertificateTypeKrlResponse) Status() string {
+func (r GetUserKrlResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1696,7 +2166,7 @@ func (r GetCertificateTypeKrlResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetCertificateTypeKrlResponse) StatusCode() int {
+func (r GetUserKrlResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1704,14 +2174,14 @@ func (r GetCertificateTypeKrlResponse) StatusCode() int {
 }
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r GetCertificateTypeKrlResponse) ContentType() string {
+func (r GetUserKrlResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
 	return ""
 }
 
-type PostCertificateTypeRevokeResponse struct {
+type PostUserRevokeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
@@ -1723,7 +2193,7 @@ type PostCertificateTypeRevokeResponse struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		} `json:"errors"`
-		Success PostCertificateTypeRevoke400JSONResponseBodySuccess `json:"success"`
+		Success PostUserRevoke400JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON401 the response for an HTTP 401 `application/json` response
 	JSON401 *struct {
@@ -1731,7 +2201,7 @@ type PostCertificateTypeRevokeResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostCertificateTypeRevoke401JSONResponseBodySuccess `json:"success"`
+		Success PostUserRevoke401JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON403 the response for an HTTP 403 `application/json` response
 	JSON403 *struct {
@@ -1739,7 +2209,7 @@ type PostCertificateTypeRevokeResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostCertificateTypeRevoke403JSONResponseBodySuccess `json:"success"`
+		Success PostUserRevoke403JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON409 the response for an HTTP 409 `application/json` response
 	JSON409 *struct {
@@ -1747,7 +2217,7 @@ type PostCertificateTypeRevokeResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostCertificateTypeRevoke409JSONResponseBodySuccess `json:"success"`
+		Success PostUserRevoke409JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *struct {
@@ -1756,7 +2226,7 @@ type PostCertificateTypeRevokeResponse struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		} `json:"errors"`
-		Success PostCertificateTypeRevoke422JSONResponseBodySuccess `json:"success"`
+		Success PostUserRevoke422JSONResponseBodySuccess `json:"success"`
 	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
@@ -1764,90 +2234,90 @@ type PostCertificateTypeRevokeResponse struct {
 			Code    float32 `json:"code"`
 			Message string  `json:"message"`
 		} `json:"errors"`
-		Success PostCertificateTypeRevoke500JSONResponseBodySuccess `json:"success"`
+		Success PostUserRevoke500JSONResponseBodySuccess `json:"success"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r PostCertificateTypeRevokeResponse) GetJSON200() *RevocationResponse {
+func (r PostUserRevokeResponse) GetJSON200() *RevocationResponse {
 	return r.JSON200
 }
 
 // GetJSON400 returns the response for an HTTP 400 `application/json` response
-func (r PostCertificateTypeRevokeResponse) GetJSON400() *struct {
+func (r PostUserRevokeResponse) GetJSON400() *struct {
 	Errors []struct {
 		Code    float32  `json:"code"`
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Success PostCertificateTypeRevoke400JSONResponseBodySuccess `json:"success"`
+	Success PostUserRevoke400JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON400
 }
 
 // GetJSON401 returns the response for an HTTP 401 `application/json` response
-func (r PostCertificateTypeRevokeResponse) GetJSON401() *struct {
+func (r PostUserRevokeResponse) GetJSON401() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostCertificateTypeRevoke401JSONResponseBodySuccess `json:"success"`
+	Success PostUserRevoke401JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON401
 }
 
 // GetJSON403 returns the response for an HTTP 403 `application/json` response
-func (r PostCertificateTypeRevokeResponse) GetJSON403() *struct {
+func (r PostUserRevokeResponse) GetJSON403() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostCertificateTypeRevoke403JSONResponseBodySuccess `json:"success"`
+	Success PostUserRevoke403JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON403
 }
 
 // GetJSON409 returns the response for an HTTP 409 `application/json` response
-func (r PostCertificateTypeRevokeResponse) GetJSON409() *struct {
+func (r PostUserRevokeResponse) GetJSON409() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostCertificateTypeRevoke409JSONResponseBodySuccess `json:"success"`
+	Success PostUserRevoke409JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON409
 }
 
 // GetJSON422 returns the response for an HTTP 422 `application/json` response
-func (r PostCertificateTypeRevokeResponse) GetJSON422() *struct {
+func (r PostUserRevokeResponse) GetJSON422() *struct {
 	Errors []struct {
 		Code    float32  `json:"code"`
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Success PostCertificateTypeRevoke422JSONResponseBodySuccess `json:"success"`
+	Success PostUserRevoke422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r PostCertificateTypeRevokeResponse) GetJSON500() *struct {
+func (r PostUserRevokeResponse) GetJSON500() *struct {
 	Errors []struct {
 		Code    float32 `json:"code"`
 		Message string  `json:"message"`
 	} `json:"errors"`
-	Success PostCertificateTypeRevoke500JSONResponseBodySuccess `json:"success"`
+	Success PostUserRevoke500JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON500
 }
 
 // GetBody returns the raw response body bytes
-func (r PostCertificateTypeRevokeResponse) GetBody() []byte {
+func (r PostUserRevokeResponse) GetBody() []byte {
 	return r.Body
 }
 
 // Status returns HTTPResponse.Status
-func (r PostCertificateTypeRevokeResponse) Status() string {
+func (r PostUserRevokeResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1855,7 +2325,7 @@ func (r PostCertificateTypeRevokeResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostCertificateTypeRevokeResponse) StatusCode() int {
+func (r PostUserRevokeResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1863,7 +2333,7 @@ func (r PostCertificateTypeRevokeResponse) StatusCode() int {
 }
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r PostCertificateTypeRevokeResponse) ContentType() string {
+func (r PostUserRevokeResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -1903,6 +2373,19 @@ func (c *ClientWithResponses) PostHostCertificateWithResponse(ctx context.Contex
 	return ParsePostHostCertificateResponse(rsp)
 }
 
+// GetHostKrlWithResponse Get the Key Revocation List for host certificates
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v3/host/krl (the `GetHostKrl` operationId).
+func (c *ClientWithResponses) GetHostKrlWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetHostKrlResponse, error) {
+	rsp, err := c.GetHostKrl(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetHostKrlResponse(rsp)
+}
+
 // PostHostRenewWithBodyWithResponse performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
 // with any type of body and a specified content type.
 //
@@ -1923,6 +2406,32 @@ func (c *ClientWithResponses) PostHostRenewWithResponse(ctx context.Context, bod
 		return nil, err
 	}
 	return ParsePostHostRenewResponse(rsp)
+}
+
+// PostHostRevokeWithBodyWithResponse Revoke a host certificate
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
+func (c *ClientWithResponses) PostHostRevokeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostRevokeResponse, error) {
+	rsp, err := c.PostHostRevokeWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostHostRevokeResponse(rsp)
+}
+
+// PostHostRevokeWithResponse Revoke a host certificate
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
+func (c *ClientWithResponses) PostHostRevokeWithResponse(ctx context.Context, body PostHostRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostRevokeResponse, error) {
+	rsp, err := c.PostHostRevoke(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostHostRevokeResponse(rsp)
 }
 
 // PostUserCertificateWithBodyWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request,
@@ -1947,37 +2456,43 @@ func (c *ClientWithResponses) PostUserCertificateWithResponse(ctx context.Contex
 	return ParsePostUserCertificateResponse(rsp)
 }
 
-// GetCertificateTypeKrlWithResponse performs a GET /api/v3/{certificateType}/krl (the `GetCertificateTypeKrl` operationId) request.
+// GetUserKrlWithResponse Get the Key Revocation List for user certificates
 //
 // Returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) GetCertificateTypeKrlWithResponse(ctx context.Context, certificateType GetCertificateTypeKrlParamsCertificateType, reqEditors ...RequestEditorFn) (*GetCertificateTypeKrlResponse, error) {
-	rsp, err := c.GetCertificateTypeKrl(ctx, certificateType, reqEditors...)
+//
+// Corresponds with GET /api/v3/user/krl (the `GetUserKrl` operationId).
+func (c *ClientWithResponses) GetUserKrlWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetUserKrlResponse, error) {
+	rsp, err := c.GetUserKrl(ctx, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetCertificateTypeKrlResponse(rsp)
+	return ParseGetUserKrlResponse(rsp)
 }
 
-// PostCertificateTypeRevokeWithBodyWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request,
-// with any type of body and a specified content type.
+// PostUserRevokeWithBodyWithResponse Revoke a user certificate
 //
-// Returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) PostCertificateTypeRevokeWithBodyWithResponse(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCertificateTypeRevokeResponse, error) {
-	rsp, err := c.PostCertificateTypeRevokeWithBody(ctx, certificateType, contentType, body, reqEditors...)
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
+func (c *ClientWithResponses) PostUserRevokeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostUserRevokeResponse, error) {
+	rsp, err := c.PostUserRevokeWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostCertificateTypeRevokeResponse(rsp)
+	return ParsePostUserRevokeResponse(rsp)
 }
 
-// PostCertificateTypeRevokeWithResponse performs a POST /api/v3/{certificateType}/revoke (the `PostCertificateTypeRevoke` operationId) request.
+// PostUserRevokeWithResponse Revoke a user certificate
+//
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-func (c *ClientWithResponses) PostCertificateTypeRevokeWithResponse(ctx context.Context, certificateType PostCertificateTypeRevokeParamsCertificateType, body PostCertificateTypeRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCertificateTypeRevokeResponse, error) {
-	rsp, err := c.PostCertificateTypeRevoke(ctx, certificateType, body, reqEditors...)
+//
+// Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
+func (c *ClientWithResponses) PostUserRevokeWithResponse(ctx context.Context, body PostUserRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUserRevokeResponse, error) {
+	rsp, err := c.PostUserRevoke(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostCertificateTypeRevokeResponse(rsp)
+	return ParsePostUserRevokeResponse(rsp)
 }
 
 // ParseGetCaResponse parses an HTTP response from a GetCaWithResponse call
@@ -2105,6 +2620,45 @@ func ParsePostHostCertificateResponse(rsp *http.Response) (*PostHostCertificateR
 	return response, nil
 }
 
+// ParseGetHostKrlResponse parses an HTTP response from a GetHostKrlWithResponse call
+func ParseGetHostKrlResponse(rsp *http.Response) (*GetHostKrlResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetHostKrlResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest KeyRevocationListResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success GetHostKrl500JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParsePostHostRenewResponse parses an HTTP response from a PostHostRenewWithResponse call
 func ParsePostHostRenewResponse(rsp *http.Response) (*PostHostRenewResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -2187,6 +2741,112 @@ func ParsePostHostRenewResponse(rsp *http.Response) (*PostHostRenewResponse, err
 				Message string  `json:"message"`
 			} `json:"errors"`
 			Success PostHostRenew500JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostHostRevokeResponse parses an HTTP response from a PostHostRevokeWithResponse call
+func ParsePostHostRevokeResponse(rsp *http.Response) (*PostHostRevokeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostHostRevokeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RevocationResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Errors []struct {
+				Code    float32  `json:"code"`
+				Message string   `json:"message"`
+				Path    []string `json:"path"`
+			} `json:"errors"`
+			Success PostHostRevoke400JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success PostHostRevoke401JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success PostHostRevoke403JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success PostHostRevoke409JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Errors []struct {
+				Code    float32  `json:"code"`
+				Message string   `json:"message"`
+				Path    []string `json:"path"`
+			} `json:"errors"`
+			Success PostHostRevoke422JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success PostHostRevoke500JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -2291,15 +2951,15 @@ func ParsePostUserCertificateResponse(rsp *http.Response) (*PostUserCertificateR
 	return response, nil
 }
 
-// ParseGetCertificateTypeKrlResponse parses an HTTP response from a GetCertificateTypeKrlWithResponse call
-func ParseGetCertificateTypeKrlResponse(rsp *http.Response) (*GetCertificateTypeKrlResponse, error) {
+// ParseGetUserKrlResponse parses an HTTP response from a GetUserKrlWithResponse call
+func ParseGetUserKrlResponse(rsp *http.Response) (*GetUserKrlResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetCertificateTypeKrlResponse{
+	response := &GetUserKrlResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2318,7 +2978,7 @@ func ParseGetCertificateTypeKrlResponse(rsp *http.Response) (*GetCertificateType
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success GetCertificateTypeKrl500JSONResponseBodySuccess `json:"success"`
+			Success GetUserKrl500JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -2330,15 +2990,15 @@ func ParseGetCertificateTypeKrlResponse(rsp *http.Response) (*GetCertificateType
 	return response, nil
 }
 
-// ParsePostCertificateTypeRevokeResponse parses an HTTP response from a PostCertificateTypeRevokeWithResponse call
-func ParsePostCertificateTypeRevokeResponse(rsp *http.Response) (*PostCertificateTypeRevokeResponse, error) {
+// ParsePostUserRevokeResponse parses an HTTP response from a PostUserRevokeWithResponse call
+func ParsePostUserRevokeResponse(rsp *http.Response) (*PostUserRevokeResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostCertificateTypeRevokeResponse{
+	response := &PostUserRevokeResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2358,7 +3018,7 @@ func ParsePostCertificateTypeRevokeResponse(rsp *http.Response) (*PostCertificat
 				Message string   `json:"message"`
 				Path    []string `json:"path"`
 			} `json:"errors"`
-			Success PostCertificateTypeRevoke400JSONResponseBodySuccess `json:"success"`
+			Success PostUserRevoke400JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -2371,7 +3031,7 @@ func ParsePostCertificateTypeRevokeResponse(rsp *http.Response) (*PostCertificat
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostCertificateTypeRevoke401JSONResponseBodySuccess `json:"success"`
+			Success PostUserRevoke401JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -2384,7 +3044,7 @@ func ParsePostCertificateTypeRevokeResponse(rsp *http.Response) (*PostCertificat
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostCertificateTypeRevoke403JSONResponseBodySuccess `json:"success"`
+			Success PostUserRevoke403JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -2397,7 +3057,7 @@ func ParsePostCertificateTypeRevokeResponse(rsp *http.Response) (*PostCertificat
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostCertificateTypeRevoke409JSONResponseBodySuccess `json:"success"`
+			Success PostUserRevoke409JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -2411,7 +3071,7 @@ func ParsePostCertificateTypeRevokeResponse(rsp *http.Response) (*PostCertificat
 				Message string   `json:"message"`
 				Path    []string `json:"path"`
 			} `json:"errors"`
-			Success PostCertificateTypeRevoke422JSONResponseBodySuccess `json:"success"`
+			Success PostUserRevoke422JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -2424,7 +3084,7 @@ func ParsePostCertificateTypeRevokeResponse(rsp *http.Response) (*PostCertificat
 				Code    float32 `json:"code"`
 				Message string  `json:"message"`
 			} `json:"errors"`
-			Success PostCertificateTypeRevoke500JSONResponseBodySuccess `json:"success"`
+			Success PostUserRevoke500JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err

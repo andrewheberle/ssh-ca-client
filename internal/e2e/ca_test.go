@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
 	"golang.org/x/crypto/ssh"
 )
@@ -92,8 +92,8 @@ func TestCA_KeyTypes(t *testing.T) {
 				t.Errorf("certificate not valid: %v", err)
 			}
 
-			ca.krl(t, api.GetCertificateTypeKrlParamsCertificateTypeUser)
-			ca.krl(t, api.GetCertificateTypeKrlParamsCertificateTypeHost)
+			ca.krl(t, krl.User)
+			ca.krl(t, krl.Host)
 		})
 	}
 }
@@ -130,8 +130,8 @@ func TestCA_Ed25519KeySeeds(t *testing.T) {
 				t.Fatalf("requesting user certificate: %v", err)
 			}
 
-			ca.krl(t, api.GetCertificateTypeKrlParamsCertificateTypeUser)
-			ca.krl(t, api.GetCertificateTypeKrlParamsCertificateTypeHost)
+			ca.krl(t, krl.User)
+			ca.krl(t, krl.Host)
 		})
 	}
 }

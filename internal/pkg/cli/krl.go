@@ -12,7 +12,6 @@ import (
 
 	"codeberg.org/sdassow/atomic"
 	"github.com/andrewheberle/simplecommand"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
 	"github.com/bep/simplecobra"
@@ -27,7 +26,7 @@ type krlCommand struct {
 
 	config          *config.ClientConfig
 	logger          *slog.Logger
-	certificatetype api.GetCertificateTypeKrlParamsCertificateType
+	certificatetype krl.CertificateType
 
 	*simplecommand.Command
 }
@@ -70,9 +69,9 @@ func (c *krlCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 	c.config = config
 
 	if c.host {
-		c.certificatetype = api.GetCertificateTypeKrlParamsCertificateTypeHost
+		c.certificatetype = krl.Host
 	} else {
-		c.certificatetype = api.GetCertificateTypeKrlParamsCertificateTypeUser
+		c.certificatetype = krl.User
 	}
 
 	return nil
