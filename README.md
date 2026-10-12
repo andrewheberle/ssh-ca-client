@@ -387,7 +387,8 @@ ssh-ca-client-cli host --renew
 The `krl` sub-command downloads a key revocation list (KRL) from the CA, verifies
 its signature using the `trusted_ca` public key and writes it to a file that
 `sshd` or `ssh` can use to reject revoked certificates. A downloaded KRL is not
-written if it is older than the existing file.
+written if it is older than the existing file, and the file is left as it is
+when the KRL has not changed.
 
 To have `sshd` reject users that present a revoked certificate, first write the
 user KRL:

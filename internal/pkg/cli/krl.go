@@ -103,36 +103,56 @@ func (c *krlCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args [
 	)
 
 	if c.out != "" {
-		if err := c.checkExisting(res); err != nil {
+		unchanged, err := c.checkExisting(res)
+		if err != nil {
 			return err
 		}
 
+		if unchanged {
+			c.logger.Info("existing krl is unchanged so it was not rewritten", "out", c.out)
+			return nil
+		}
+
 		c.logger.Info("writing krl to output file", "out", c.out)
-		return atomic.WriteFile(c.out, bytes.NewReader(res.Krl), atomic.FileMode(0440))
+		return atomic.WriteFile(c.out, bytes.NewReader(res.Krl), atomic.FileMode(krlFileMode))
 	}
 
 	return nil
 }
 
+// krlFileMode is the mode of the KRL output file
+const krlFileMode fs.FileMode = 0440
+
 // checkExisting returns an error if the KRL in the output file is newer than
-// res. A missing or unparseable output file is replaced.
-func (c *krlCommand) checkExisting(res *krl.Response) error {
+// res, and whether the output file already holds res with the expected mode,
+// so does not need to be written. A missing or unparseable output file is
+// replaced.
+func (c *krlCommand) checkExisting(res *krl.Response) (bool, error) {
 	existing, err := os.ReadFile(c.out)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
-			return nil
+			return false, nil
 		}
-		return fmt.Errorf("could not read existing krl: %w", err)
+		return false, fmt.Errorf("could not read existing krl: %w", err)
+	}
+
+	if bytes.Equal(existing, res.Krl) {
+		info, err := os.Stat(c.out)
+		if err != nil {
+			return false, fmt.Errorf("could not check existing krl: %w", err)
+		}
+
+		return info.Mode().Perm() == krlFileMode, nil
 	}
 
 	if err := res.CheckNotOlder(existing); err != nil {
 		if errors.Is(err, krl.ErrOlderKRL) {
 			c.logger.Error("not replacing existing krl with an older krl", "out", c.out, "error", err)
-			return err
+			return false, err
 		}
 
 		c.logger.Warn("existing krl could not be parsed so it will be replaced", "out", c.out, "error", err)
 	}
 
-	return nil
+	return false, nil
 }
