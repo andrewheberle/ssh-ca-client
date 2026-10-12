@@ -356,7 +356,7 @@ func TestHostCertificate_Renew_Rejected(t *testing.T) {
 					certificate: certificate(t, issued(t, ca)),
 				}
 			},
-			wantReason: "proof of possession fingerprints did not match",
+			wantReason: "proof of possession fingerprint did not match public key",
 		},
 	}
 

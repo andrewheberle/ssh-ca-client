@@ -547,26 +547,25 @@ func (ca *testCA) revoke(t *testing.T, certificateType krl.CertificateType, seri
 		t.Fatalf("getting signer: %v", err)
 	}
 
-	p, err := proof.Generate(signer)
-	if err != nil {
-		t.Fatalf("generating proof: %v", err)
-	}
-
-	body := api.CertificateRevocation{
-		Serial:    strconv.FormatUint(serial, 10),
-		PublicKey: ssh.MarshalAuthorizedKey(signer.PublicKey()),
-		Proof:     p.String(),
-	}
+	id := strconv.FormatUint(serial, 10)
 
 	switch certificateType {
 	case krl.User:
-		res, err := ca.client(t).PostUserRevokeWithResponse(context.Background(), body)
+		p, err := proof.GenerateForRequest(signer, http.MethodDelete, "/api/v4/user/certificates/"+id)
+		if err != nil {
+			t.Fatalf("generating proof: %v", err)
+		}
+		res, err := ca.client(t).RevokeUserCertificateWithResponse(context.Background(), id, &api.RevokeUserCertificateParams{ProofOfPossession: p.String()})
 		if err != nil {
 			t.Fatalf("revoking certificate: %v", err)
 		}
 		return res.StatusCode()
 	case krl.Host:
-		res, err := ca.client(t).PostHostRevokeWithResponse(context.Background(), body)
+		p, err := proof.GenerateForRequest(signer, http.MethodDelete, "/api/v4/host/certificates/"+id)
+		if err != nil {
+			t.Fatalf("generating proof: %v", err)
+		}
+		res, err := ca.client(t).RevokeHostCertificateWithResponse(context.Background(), id, &api.RevokeHostCertificateParams{ProofOfPossession: p.String()})
 		if err != nil {
 			t.Fatalf("revoking certificate: %v", err)
 		}

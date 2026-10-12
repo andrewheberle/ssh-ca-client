@@ -71,13 +71,13 @@ func Get(ctx context.Context, server string, certificatetype CertificateType, op
 	)
 	switch certificatetype {
 	case User:
-		res, err := client.GetUserKrlWithResponse(ctx)
+		res, err := client.GetUserRevocationListWithResponse(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("requesting krl: %w", err)
 		}
 		statusCode, body, contentType, list = res.StatusCode(), res.Body, res.ContentType(), res.JSON200
 	case Host:
-		res, err := client.GetHostKrlWithResponse(ctx)
+		res, err := client.GetHostRevocationListWithResponse(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("requesting krl: %w", err)
 		}

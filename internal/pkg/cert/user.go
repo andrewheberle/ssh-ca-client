@@ -71,25 +71,25 @@ func (u *UserCertificate) RequestContext(ctx context.Context) error {
 	}
 	publicKey := ssh.MarshalAuthorizedKey(signer.PublicKey())
 
-	proof, err := proof.Generate(signer)
+	proof, err := proof.GenerateForRequest(signer, http.MethodPost, apiBasePath+"/user/certificates")
 	if err != nil {
 		return fmt.Errorf("user certificate request: could not generate proof: %w", err)
 	}
 
 	lifetime := int(u.Lifetime.Seconds())
 
-	payload := api.UserCertificateRequest{
+	payload := api.UserCertificateIssueRequest{
 		PublicKey: publicKey,
 		Lifetime:  &lifetime,
 		Identity:  tokens.Identity,
-		Proof:     proof.String(),
 	}
 
 	// do request
-	res, err := u.client.PostUserCertificateWithResponse(
+	res, err := u.client.IssueUserCertificateWithResponse(
 		ctx,
-		&api.PostUserCertificateParams{
-			Authorization: "Bearer " + tokens.Access,
+		&api.IssueUserCertificateParams{
+			Authorization:     "Bearer " + tokens.Access,
+			ProofOfPossession: proof.String(),
 		},
 		payload,
 	)

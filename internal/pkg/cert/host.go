@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -71,29 +72,37 @@ func (h *HostCertificate) RenewContext(ctx context.Context) error {
 		return fmt.Errorf("host certificate renewal: could not get certificate: %w", err)
 	}
 
+	// the renewal is for the serial of the existing certificate
+	existing, err := h.store.Certificate()
+	if err != nil {
+		return fmt.Errorf("host certificate renewal: could not get certificate: %w", err)
+	}
+	serial := strconv.FormatUint(existing.Serial, 10)
+
 	signer, err := h.store.Signer()
 	if err != nil {
 		return fmt.Errorf("host certificate renewal: could not get signer: %w", err)
 	}
-	publicKey := ssh.MarshalAuthorizedKey(signer.PublicKey())
 
-	proof, err := proof.Generate(signer)
+	proof, err := proof.GenerateForRequest(signer, http.MethodPost, apiBasePath+"/host/certificates/"+serial+"/renew")
 	if err != nil {
 		return fmt.Errorf("host certificate renewal: could not generate proof: %w", err)
 	}
 
 	lifetime := int(h.Lifetime.Seconds())
 
-	payload := api.HostCertificateRenew{
+	payload := api.HostCertificateRenewalRequest{
 		Certificate: certBytes,
 		Lifetime:    &lifetime,
-		PublicKey:   publicKey,
-		Proof:       proof.String(),
 	}
 
 	// do renewal
-	res, err := h.client.PostHostRenewWithResponse(
+	res, err := h.client.RenewHostCertificateWithResponse(
 		ctx,
+		serial,
+		&api.RenewHostCertificateParams{
+			ProofOfPossession: proof.String(),
+		},
 		payload,
 	)
 	if err != nil {
@@ -156,26 +165,26 @@ func (h *HostCertificate) RequestContext(ctx context.Context) error {
 	}
 	publicKey := ssh.MarshalAuthorizedKey(signer.PublicKey())
 
-	proof, err := proof.Generate(signer)
+	proof, err := proof.GenerateForRequest(signer, http.MethodPost, apiBasePath+"/host/certificates")
 	if err != nil {
 		return fmt.Errorf("host certificate request: could not generate proof: %w", err)
 	}
 
 	lifetime := int(h.Lifetime.Seconds())
 
-	payload := api.HostCertificateRequest{
+	payload := api.HostCertificateIssueRequest{
 		Principals: h.Principals,
 		PublicKey:  publicKey,
 		Lifetime:   &lifetime,
 		Identity:   tokens.Identity,
-		Proof:      proof.String(),
 	}
 
 	// do request
-	res, err := h.client.PostHostCertificateWithResponse(
+	res, err := h.client.IssueHostCertificateWithResponse(
 		ctx,
-		&api.PostHostCertificateParams{
-			Authorization: "Bearer " + tokens.Access,
+		&api.IssueHostCertificateParams{
+			Authorization:     "Bearer " + tokens.Access,
+			ProofOfPossession: proof.String(),
 		},
 		payload,
 	)

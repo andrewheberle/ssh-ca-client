@@ -167,9 +167,9 @@ func TestExecute_KRL(t *testing.T) {
 				t.Fatalf("Execute(%q) error = %v, wantErr %v", args, err, tt.wantErr)
 			}
 
-			wantPath := "/api/v3/user/krl"
+			wantPath := "/api/v4/user/krl"
 			if slices.Contains(tt.args, "--host") {
-				wantPath = "/api/v3/host/krl"
+				wantPath = "/api/v4/host/krl"
 			}
 			if got := server.requestedPath(); got != wantPath {
 				t.Errorf("requested %q, want %q", got, wantPath)
