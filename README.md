@@ -10,7 +10,7 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 There are two versions of the client, one CLI based and the other GUI based both of which
 are tested on Windows and Linux.
 
-[<img src="https://snapcraft.io/en/dark/install.svg)" alt="Get it from the Snap Store" width="200"/>](https://snapcraft.io/ssh-ca-client)
+[<img src="https://snapcraft.io/en/dark/install.svg" alt="Get it from the Snap Store" width="200"/>](https://snapcraft.io/ssh-ca-client)
 
 On Linux the client is available from the Snapcraft store, however at this time
 there are additional steps required to allow the snap version access to the SSH
