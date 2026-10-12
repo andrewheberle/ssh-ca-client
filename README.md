@@ -425,6 +425,22 @@ ssh-ca-client-cli krl --host --out ~/.ssh/revocation_list
 RevokedHostKeys ~/.ssh/revocation_list
 ```
 
+The DEB package also installs a systemd user unit, so the host KRL can be
+refreshed hourly for your user as follows:
+
+```sh
+systemctl --user enable --now host-ssh-krl-refresh.timer
+```
+
+The timer is not enabled by default, so each user that wants it enables it
+for themselves. It only runs while the user is logged in, and a refresh missed
+while they were logged out runs when they next log in. To keep the KRL
+refreshed while the user is logged out, enable lingering for them:
+
+```sh
+sudo loginctl enable-linger <user>
+```
+
 See [docs/ssh-ca-client-cli-krl.md](docs/ssh-ca-client-cli-krl.md) for all
 options.
 
