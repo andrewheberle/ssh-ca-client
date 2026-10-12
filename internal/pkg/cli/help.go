@@ -98,7 +98,8 @@ When --out is an existing KRL, the downloaded KRL is only written if it is not
 older than the existing one, comparing the KRL version and then the time it was
 generated. This prevents an older KRL being used to un-revoke certificates. If
 the existing KRL is newer, for example because it was generated while the CA
-clock was wrong, remove the file to replace it.
+clock was wrong, remove the file to replace it. If the existing KRL is the same
+as the downloaded one, the file is left as it is rather than rewritten.
 
 To have sshd reject users that present a revoked certificate, write the user KRL
 to a file and add the following to /etc/ssh/sshd_config:

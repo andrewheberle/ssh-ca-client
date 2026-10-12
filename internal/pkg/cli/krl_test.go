@@ -26,6 +26,7 @@ import (
 // testKRLCA serves a KRL and records the path of the last request
 type testKRLCA struct {
 	config string
+	krl    []byte
 
 	mu   sync.Mutex
 	path string
@@ -67,7 +68,7 @@ func krlCA(t *testing.T, signer ssh.Signer, trusted ssh.PublicKey, generated uin
 		t.Fatalf("marshalling response: %v", err)
 	}
 
-	ca := &testKRLCA{}
+	ca := &testKRLCA{krl: b}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ca.mu.Lock()
 		ca.path = r.URL.Path
@@ -203,6 +204,60 @@ func TestExecute_KRL(t *testing.T) {
 				if !os.IsNotExist(readErr) {
 					t.Errorf("output exists, want no output (read error = %v)", readErr)
 				}
+			}
+		})
+	}
+}
+
+func TestExecute_KRLUnchanged(t *testing.T) {
+	ca := newKRLSigner(t)
+
+	tests := []struct {
+		name        string
+		mode        os.FileMode
+		wantRewrite bool
+	}{
+		{"same krl is not rewritten", 0440, false},
+		{"same krl with another mode is rewritten", 0600, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := krlCA(t, ca, ca.PublicKey(), 1_800_000_000)
+			out := filepath.Join(t.TempDir(), "revocation_list")
+
+			if err := os.WriteFile(out, server.krl, 0600); err != nil {
+				t.Fatalf("writing existing krl: %v", err)
+			}
+			if err := os.Chmod(out, tt.mode); err != nil {
+				t.Fatalf("setting existing krl mode: %v", err)
+			}
+			before, err := os.Stat(out)
+			if err != nil {
+				t.Fatalf("checking existing krl: %v", err)
+			}
+
+			if err := execute(t, "--config", server.config, "krl", "--out", out); err != nil {
+				t.Fatalf("Execute() error = %v", err)
+			}
+
+			after, err := os.Stat(out)
+			if err != nil {
+				t.Fatalf("checking output: %v", err)
+			}
+			// the output is written by renaming a new file over it
+			if rewritten := !os.SameFile(before, after); rewritten != tt.wantRewrite {
+				t.Errorf("rewritten = %v, want %v", rewritten, tt.wantRewrite)
+			}
+			if mode := after.Mode().Perm(); mode != 0440 {
+				t.Errorf("output mode = %o, want %o", mode, 0440)
+			}
+			got, err := os.ReadFile(out)
+			if err != nil {
+				t.Fatalf("reading output: %v", err)
+			}
+			if !bytes.Equal(got, server.krl) {
+				t.Error("output is not the downloaded krl")
 			}
 		})
 	}
