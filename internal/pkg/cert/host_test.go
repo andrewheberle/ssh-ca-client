@@ -21,6 +21,10 @@ import (
 
 var testPrincipals = []string{"host.example.com", "host"}
 
+// testSerial is the serial of existing host certificates, which is above
+// math.MaxInt64 to catch it being handled as a signed integer
+const testSerial uint64 = 12345678901234567890
+
 // newTestHostCertificate returns a HostCertificate for server using store,
 // with test principals and an auth handler that returns test tokens
 func newTestHostCertificate(t *testing.T, server string, store Storage) *HostCertificate {
@@ -50,6 +54,7 @@ func existingHostCert(t *testing.T, ca ssh.Signer, key crypto.Signer) *ssh.Certi
 	c := &ssh.Certificate{
 		Key:             pub,
 		CertType:        ssh.HostCert,
+		Serial:          testSerial,
 		KeyId:           "host",
 		ValidPrincipals: testPrincipals,
 		ValidAfter:      uint64(now.Add(-time.Hour).Unix()),
@@ -328,17 +333,14 @@ func TestHostCertificate_Renew(t *testing.T) {
 				t.Fatalf("Renew() error = %v", err)
 			}
 
-			if ca.path != hostRenewPath {
-				t.Errorf("request path = %q, want %q", ca.path, hostRenewPath)
+			if ca.path != hostRenewPath(testSerial) {
+				t.Errorf("request path = %q, want %q", ca.path, hostRenewPath(testSerial))
 			}
 			if ca.auth != "" {
 				t.Errorf("Authorization = %q, want none", ca.auth)
 			}
 			if string(ca.payload.Certificate) != string(existing) {
 				t.Errorf("certificate = %q, want existing certificate %q", ca.payload.Certificate, existing)
-			}
-			if string(ca.payload.PublicKey) != string(ssh.MarshalAuthorizedKey(store.signer.PublicKey())) {
-				t.Errorf("public key = %q, want %q", ca.payload.PublicKey, ssh.MarshalAuthorizedKey(store.signer.PublicKey()))
 			}
 			if ca.payload.Lifetime == nil || *ca.payload.Lifetime != tt.wantLifetime {
 				t.Errorf("lifetime = %v, want %d", ca.payload.Lifetime, tt.wantLifetime)

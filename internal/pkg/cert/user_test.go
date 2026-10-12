@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -50,10 +51,15 @@ func (a *fakeAuth) GetTokensContext(ctx context.Context) (*auth.Tokens, error) {
 
 // CA API endpoints served by fakeCA
 const (
-	userCertificatePath = "/api/v3/user/certificate"
-	hostCertificatePath = "/api/v3/host/certificate"
-	hostRenewPath       = "/api/v3/host/renew"
+	userCertificatePath = "/api/v4/user/certificates"
+	hostCertificatePath = "/api/v4/host/certificates"
 )
+
+// hostRenewPath returns the CA API endpoint to renew the host certificate
+// with serial
+func hostRenewPath(serial uint64) string {
+	return fmt.Sprintf("%s/%d/renew", hostCertificatePath, serial)
+}
 
 // caRequest holds the fields of any of the user certificate, host
 // certificate and host renewal request payloads
@@ -62,7 +68,6 @@ type caRequest struct {
 	Identity    string   `json:"identity"`
 	Lifetime    *int     `json:"lifetime"`
 	Principals  []string `json:"principals"`
-	Proof       string   `json:"proof"`
 	PublicKey   []byte   `json:"public_key"`
 }
 
@@ -108,9 +113,8 @@ func (ca *fakeCA) handle(w http.ResponseWriter, r *http.Request) {
 	ca.mu.Lock()
 	defer ca.mu.Unlock()
 
-	switch r.URL.Path {
-	case userCertificatePath, hostCertificatePath, hostRenewPath:
-	default:
+	renew := strings.HasPrefix(r.URL.Path, hostCertificatePath+"/") && strings.HasSuffix(r.URL.Path, "/renew")
+	if r.URL.Path != userCertificatePath && r.URL.Path != hostCertificatePath && !renew {
 		http.NotFound(w, r)
 		return
 	}
@@ -153,16 +157,35 @@ func (ca *fakeCA) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pub, _, _, _, err := ssh.ParseAuthorizedKey(ca.payload.PublicKey)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	// a renewal is for the key of the existing certificate, which must have
+	// the serial in the path
+	var existing *ssh.Certificate
+	var pub ssh.PublicKey
+	if renew {
+		c, err := sshcert.ParseCert(ca.payload.Certificate)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if r.URL.Path != hostRenewPath(c.Serial) {
+			http.Error(w, "certificate serial did not match the serial in the path", http.StatusBadRequest)
+			return
+		}
+		existing, pub = c, c.Key
+	} else {
+		k, _, _, _, err := ssh.ParseAuthorizedKey(ca.payload.PublicKey)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		pub = k
 	}
 
-	// record whether the proof of possession verifies for the public key
-	p, err := proof.Parse(ca.payload.Proof)
+	// record whether the proof of possession verifies for the public key and
+	// this request
+	p, err := proof.Parse(r.Header.Get("Proof-Of-Possession"))
 	if err == nil {
-		err = p.Verify(pub, time.Minute)
+		err = p.VerifyRequest(pub, r.Method, r.URL.Path, time.Minute)
 	}
 	ca.proofErr = err
 
@@ -180,18 +203,16 @@ func (ca *fakeCA) handle(w http.ResponseWriter, r *http.Request) {
 		ValidAfter:      uint64(now.Add(-time.Minute).Unix()),
 		ValidBefore:     uint64(now.Add(lifetime).Unix()),
 	}
-	switch ca.path {
-	case hostCertificatePath:
+	switch {
+	case ca.path == hostCertificatePath:
 		c.CertType = ssh.HostCert
 		c.KeyId = "host"
 		c.ValidPrincipals = ca.payload.Principals
-	case hostRenewPath:
+	case renew:
 		// a renewal keeps the principals of the existing certificate
 		c.CertType = ssh.HostCert
 		c.KeyId = "host"
-		if existing, err := sshcert.ParseCert(ca.payload.Certificate); err == nil {
-			c.ValidPrincipals = existing.ValidPrincipals
-		}
+		c.ValidPrincipals = existing.ValidPrincipals
 	}
 	if err := c.SignCert(rand.Reader, ca.ca); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

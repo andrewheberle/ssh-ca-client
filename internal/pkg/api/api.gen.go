@@ -467,6 +467,396 @@ func (e PostUserRevoke500JSONResponseBodySuccess) Valid() bool {
 	}
 }
 
+// Defines values for GetCaPublicKey500JSONResponseBodySuccess.
+const (
+	GetCaPublicKey500JSONResponseBodySuccessFalse GetCaPublicKey500JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the GetCaPublicKey500JSONResponseBodySuccess enum.
+func (e GetCaPublicKey500JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case GetCaPublicKey500JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IssueHostCertificate400JSONResponseBodySuccess.
+const (
+	IssueHostCertificate400JSONResponseBodySuccessFalse IssueHostCertificate400JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueHostCertificate400JSONResponseBodySuccess enum.
+func (e IssueHostCertificate400JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueHostCertificate400JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IssueHostCertificate401JSONResponseBodySuccess.
+const (
+	IssueHostCertificate401JSONResponseBodySuccessFalse IssueHostCertificate401JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueHostCertificate401JSONResponseBodySuccess enum.
+func (e IssueHostCertificate401JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueHostCertificate401JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IssueHostCertificate403JSONResponseBodySuccess.
+const (
+	IssueHostCertificate403JSONResponseBodySuccessFalse IssueHostCertificate403JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueHostCertificate403JSONResponseBodySuccess enum.
+func (e IssueHostCertificate403JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueHostCertificate403JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IssueHostCertificate422JSONResponseBodySuccess.
+const (
+	IssueHostCertificate422JSONResponseBodySuccessFalse IssueHostCertificate422JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueHostCertificate422JSONResponseBodySuccess enum.
+func (e IssueHostCertificate422JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueHostCertificate422JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IssueHostCertificate500JSONResponseBodySuccess.
+const (
+	IssueHostCertificate500JSONResponseBodySuccessFalse IssueHostCertificate500JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueHostCertificate500JSONResponseBodySuccess enum.
+func (e IssueHostCertificate500JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueHostCertificate500JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RevokeHostCertificate400JSONResponseBodySuccess.
+const (
+	RevokeHostCertificate400JSONResponseBodySuccessFalse RevokeHostCertificate400JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RevokeHostCertificate400JSONResponseBodySuccess enum.
+func (e RevokeHostCertificate400JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RevokeHostCertificate400JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RevokeHostCertificate404JSONResponseBodySuccess.
+const (
+	RevokeHostCertificate404JSONResponseBodySuccessFalse RevokeHostCertificate404JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RevokeHostCertificate404JSONResponseBodySuccess enum.
+func (e RevokeHostCertificate404JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RevokeHostCertificate404JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RevokeHostCertificate409JSONResponseBodySuccess.
+const (
+	RevokeHostCertificate409JSONResponseBodySuccessFalse RevokeHostCertificate409JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RevokeHostCertificate409JSONResponseBodySuccess enum.
+func (e RevokeHostCertificate409JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RevokeHostCertificate409JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RevokeHostCertificate500JSONResponseBodySuccess.
+const (
+	RevokeHostCertificate500JSONResponseBodySuccessFalse RevokeHostCertificate500JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RevokeHostCertificate500JSONResponseBodySuccess enum.
+func (e RevokeHostCertificate500JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RevokeHostCertificate500JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RenewHostCertificate400JSONResponseBodySuccess.
+const (
+	RenewHostCertificate400JSONResponseBodySuccessFalse RenewHostCertificate400JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RenewHostCertificate400JSONResponseBodySuccess enum.
+func (e RenewHostCertificate400JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RenewHostCertificate400JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RenewHostCertificate401JSONResponseBodySuccess.
+const (
+	RenewHostCertificate401JSONResponseBodySuccessFalse RenewHostCertificate401JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RenewHostCertificate401JSONResponseBodySuccess enum.
+func (e RenewHostCertificate401JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RenewHostCertificate401JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RenewHostCertificate403JSONResponseBodySuccess.
+const (
+	RenewHostCertificate403JSONResponseBodySuccessFalse RenewHostCertificate403JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RenewHostCertificate403JSONResponseBodySuccess enum.
+func (e RenewHostCertificate403JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RenewHostCertificate403JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RenewHostCertificate422JSONResponseBodySuccess.
+const (
+	RenewHostCertificate422JSONResponseBodySuccessFalse RenewHostCertificate422JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RenewHostCertificate422JSONResponseBodySuccess enum.
+func (e RenewHostCertificate422JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RenewHostCertificate422JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RenewHostCertificate500JSONResponseBodySuccess.
+const (
+	RenewHostCertificate500JSONResponseBodySuccessFalse RenewHostCertificate500JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RenewHostCertificate500JSONResponseBodySuccess enum.
+func (e RenewHostCertificate500JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RenewHostCertificate500JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for GetHostRevocationList500JSONResponseBodySuccess.
+const (
+	GetHostRevocationList500JSONResponseBodySuccessFalse GetHostRevocationList500JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the GetHostRevocationList500JSONResponseBodySuccess enum.
+func (e GetHostRevocationList500JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case GetHostRevocationList500JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IssueUserCertificate400JSONResponseBodySuccess.
+const (
+	IssueUserCertificate400JSONResponseBodySuccessFalse IssueUserCertificate400JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueUserCertificate400JSONResponseBodySuccess enum.
+func (e IssueUserCertificate400JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueUserCertificate400JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IssueUserCertificate401JSONResponseBodySuccess.
+const (
+	IssueUserCertificate401JSONResponseBodySuccessFalse IssueUserCertificate401JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueUserCertificate401JSONResponseBodySuccess enum.
+func (e IssueUserCertificate401JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueUserCertificate401JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IssueUserCertificate403JSONResponseBodySuccess.
+const (
+	IssueUserCertificate403JSONResponseBodySuccessFalse IssueUserCertificate403JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueUserCertificate403JSONResponseBodySuccess enum.
+func (e IssueUserCertificate403JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueUserCertificate403JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IssueUserCertificate422JSONResponseBodySuccess.
+const (
+	IssueUserCertificate422JSONResponseBodySuccessFalse IssueUserCertificate422JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueUserCertificate422JSONResponseBodySuccess enum.
+func (e IssueUserCertificate422JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueUserCertificate422JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IssueUserCertificate500JSONResponseBodySuccess.
+const (
+	IssueUserCertificate500JSONResponseBodySuccessFalse IssueUserCertificate500JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueUserCertificate500JSONResponseBodySuccess enum.
+func (e IssueUserCertificate500JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueUserCertificate500JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RevokeUserCertificate400JSONResponseBodySuccess.
+const (
+	RevokeUserCertificate400JSONResponseBodySuccessFalse RevokeUserCertificate400JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RevokeUserCertificate400JSONResponseBodySuccess enum.
+func (e RevokeUserCertificate400JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RevokeUserCertificate400JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RevokeUserCertificate404JSONResponseBodySuccess.
+const (
+	RevokeUserCertificate404JSONResponseBodySuccessFalse RevokeUserCertificate404JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RevokeUserCertificate404JSONResponseBodySuccess enum.
+func (e RevokeUserCertificate404JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RevokeUserCertificate404JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RevokeUserCertificate409JSONResponseBodySuccess.
+const (
+	RevokeUserCertificate409JSONResponseBodySuccessFalse RevokeUserCertificate409JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RevokeUserCertificate409JSONResponseBodySuccess enum.
+func (e RevokeUserCertificate409JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RevokeUserCertificate409JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RevokeUserCertificate500JSONResponseBodySuccess.
+const (
+	RevokeUserCertificate500JSONResponseBodySuccessFalse RevokeUserCertificate500JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RevokeUserCertificate500JSONResponseBodySuccess enum.
+func (e RevokeUserCertificate500JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RevokeUserCertificate500JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for GetUserRevocationList500JSONResponseBodySuccess.
+const (
+	GetUserRevocationList500JSONResponseBodySuccessFalse GetUserRevocationList500JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the GetUserRevocationList500JSONResponseBodySuccess enum.
+func (e GetUserRevocationList500JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case GetUserRevocationList500JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
 // CertificateResponse defines model for Certificate Response.
 type CertificateResponse struct {
 	// Certificate Issued Certificate
@@ -485,6 +875,21 @@ type CertificateRevocation struct {
 	Serial string `json:"serial"`
 }
 
+// HostCertificateIssueRequest defines model for Host Certificate Issue Request.
+type HostCertificateIssueRequest struct {
+	// Identity Identity Token JWT from OIDC IdP
+	Identity string `json:"identity"`
+
+	// Lifetime Lifetime of issued Host SSH certificate
+	Lifetime *int `json:"lifetime,omitempty"`
+
+	// Principals List of principals to include on the issued certificate
+	Principals []string `json:"principals"`
+
+	// PublicKey SSH public key to sign
+	PublicKey []byte `json:"public_key"`
+}
+
 // HostCertificateRenew defines model for Host Certificate Renew.
 type HostCertificateRenew struct {
 	// Certificate SSH certificate to renew
@@ -498,6 +903,15 @@ type HostCertificateRenew struct {
 
 	// PublicKey SSH public key to sign
 	PublicKey []byte `json:"public_key"`
+}
+
+// HostCertificateRenewalRequest defines model for Host Certificate Renewal Request.
+type HostCertificateRenewalRequest struct {
+	// Certificate SSH certificate to renew, which must have the serial number in the path
+	Certificate []byte `json:"certificate"`
+
+	// Lifetime Lifetime of renewed Host SSH certificate
+	Lifetime *int `json:"lifetime,omitempty"`
 }
 
 // HostCertificateRequest defines model for Host Certificate Request.
@@ -528,6 +942,21 @@ type KeyRevocationListResponse struct {
 // RevocationResponse defines model for Revocation Response.
 type RevocationResponse struct {
 	RevokedAt time.Time `json:"revoked_at"`
+}
+
+// UserCertificateIssueRequest defines model for User Certificate Issue Request.
+type UserCertificateIssueRequest struct {
+	// Extensions Extensions to include in the issued SSH certificate
+	Extensions *[]string `json:"extensions,omitempty"`
+
+	// Identity Identity Token JWT from OIDC IdP
+	Identity string `json:"identity"`
+
+	// Lifetime Lifetime of issued SSH certificate
+	Lifetime *int `json:"lifetime,omitempty"`
+
+	// PublicKey SSH public key to sign
+	PublicKey []byte `json:"public_key"`
 }
 
 // UserCertificateRequest defines model for User Certificate Request.
@@ -650,6 +1079,120 @@ type PostUserRevoke422JSONResponseBodySuccess bool
 // PostUserRevoke500JSONResponseBodySuccess defines parameters for PostUserRevoke.
 type PostUserRevoke500JSONResponseBodySuccess bool
 
+// GetCaPublicKey500JSONResponseBodySuccess defines parameters for GetCaPublicKey.
+type GetCaPublicKey500JSONResponseBodySuccess bool
+
+// IssueHostCertificateParams defines parameters for IssueHostCertificate.
+type IssueHostCertificateParams struct {
+	// Authorization Access Token JWT from OIDC IdP
+	Authorization string `json:"Authorization"`
+
+	// ProofOfPossession Proof of possession of the private key comprising of `${timestamp}.${fingerprint}.${signature}`. The signature is a BASE64 encoded armored SSHSIG signature, made with the `request-proof-of-possession@com.github.serverless-ssh-ca.andrewheberle` namespace, of `${timestamp}.${fingerprint}.${METHOD} ${path}` where `${METHOD} ${path}` is the request the proof is for, for example `DELETE /api/v4/user/certificates/12345678901234567890`. The timestamp is in milliseconds since the Unix epoch.
+	ProofOfPossession string `json:"Proof-Of-Possession"`
+}
+
+// IssueHostCertificate400JSONResponseBodySuccess defines parameters for IssueHostCertificate.
+type IssueHostCertificate400JSONResponseBodySuccess bool
+
+// IssueHostCertificate401JSONResponseBodySuccess defines parameters for IssueHostCertificate.
+type IssueHostCertificate401JSONResponseBodySuccess bool
+
+// IssueHostCertificate403JSONResponseBodySuccess defines parameters for IssueHostCertificate.
+type IssueHostCertificate403JSONResponseBodySuccess bool
+
+// IssueHostCertificate422JSONResponseBodySuccess defines parameters for IssueHostCertificate.
+type IssueHostCertificate422JSONResponseBodySuccess bool
+
+// IssueHostCertificate500JSONResponseBodySuccess defines parameters for IssueHostCertificate.
+type IssueHostCertificate500JSONResponseBodySuccess bool
+
+// RevokeHostCertificateParams defines parameters for RevokeHostCertificate.
+type RevokeHostCertificateParams struct {
+	// ProofOfPossession Proof of possession of the private key comprising of `${timestamp}.${fingerprint}.${signature}`. The signature is a BASE64 encoded armored SSHSIG signature, made with the `request-proof-of-possession@com.github.serverless-ssh-ca.andrewheberle` namespace, of `${timestamp}.${fingerprint}.${METHOD} ${path}` where `${METHOD} ${path}` is the request the proof is for, for example `DELETE /api/v4/user/certificates/12345678901234567890`. The timestamp is in milliseconds since the Unix epoch.
+	ProofOfPossession string `json:"Proof-Of-Possession"`
+}
+
+// RevokeHostCertificate400JSONResponseBodySuccess defines parameters for RevokeHostCertificate.
+type RevokeHostCertificate400JSONResponseBodySuccess bool
+
+// RevokeHostCertificate404JSONResponseBodySuccess defines parameters for RevokeHostCertificate.
+type RevokeHostCertificate404JSONResponseBodySuccess bool
+
+// RevokeHostCertificate409JSONResponseBodySuccess defines parameters for RevokeHostCertificate.
+type RevokeHostCertificate409JSONResponseBodySuccess bool
+
+// RevokeHostCertificate500JSONResponseBodySuccess defines parameters for RevokeHostCertificate.
+type RevokeHostCertificate500JSONResponseBodySuccess bool
+
+// RenewHostCertificateParams defines parameters for RenewHostCertificate.
+type RenewHostCertificateParams struct {
+	// ProofOfPossession Proof of possession of the private key comprising of `${timestamp}.${fingerprint}.${signature}`. The signature is a BASE64 encoded armored SSHSIG signature, made with the `request-proof-of-possession@com.github.serverless-ssh-ca.andrewheberle` namespace, of `${timestamp}.${fingerprint}.${METHOD} ${path}` where `${METHOD} ${path}` is the request the proof is for, for example `DELETE /api/v4/user/certificates/12345678901234567890`. The timestamp is in milliseconds since the Unix epoch.
+	ProofOfPossession string `json:"Proof-Of-Possession"`
+}
+
+// RenewHostCertificate400JSONResponseBodySuccess defines parameters for RenewHostCertificate.
+type RenewHostCertificate400JSONResponseBodySuccess bool
+
+// RenewHostCertificate401JSONResponseBodySuccess defines parameters for RenewHostCertificate.
+type RenewHostCertificate401JSONResponseBodySuccess bool
+
+// RenewHostCertificate403JSONResponseBodySuccess defines parameters for RenewHostCertificate.
+type RenewHostCertificate403JSONResponseBodySuccess bool
+
+// RenewHostCertificate422JSONResponseBodySuccess defines parameters for RenewHostCertificate.
+type RenewHostCertificate422JSONResponseBodySuccess bool
+
+// RenewHostCertificate500JSONResponseBodySuccess defines parameters for RenewHostCertificate.
+type RenewHostCertificate500JSONResponseBodySuccess bool
+
+// GetHostRevocationList500JSONResponseBodySuccess defines parameters for GetHostRevocationList.
+type GetHostRevocationList500JSONResponseBodySuccess bool
+
+// IssueUserCertificateParams defines parameters for IssueUserCertificate.
+type IssueUserCertificateParams struct {
+	// Authorization Access Token JWT from OIDC IdP
+	Authorization string `json:"Authorization"`
+
+	// ProofOfPossession Proof of possession of the private key comprising of `${timestamp}.${fingerprint}.${signature}`. The signature is a BASE64 encoded armored SSHSIG signature, made with the `request-proof-of-possession@com.github.serverless-ssh-ca.andrewheberle` namespace, of `${timestamp}.${fingerprint}.${METHOD} ${path}` where `${METHOD} ${path}` is the request the proof is for, for example `DELETE /api/v4/user/certificates/12345678901234567890`. The timestamp is in milliseconds since the Unix epoch.
+	ProofOfPossession string `json:"Proof-Of-Possession"`
+}
+
+// IssueUserCertificate400JSONResponseBodySuccess defines parameters for IssueUserCertificate.
+type IssueUserCertificate400JSONResponseBodySuccess bool
+
+// IssueUserCertificate401JSONResponseBodySuccess defines parameters for IssueUserCertificate.
+type IssueUserCertificate401JSONResponseBodySuccess bool
+
+// IssueUserCertificate403JSONResponseBodySuccess defines parameters for IssueUserCertificate.
+type IssueUserCertificate403JSONResponseBodySuccess bool
+
+// IssueUserCertificate422JSONResponseBodySuccess defines parameters for IssueUserCertificate.
+type IssueUserCertificate422JSONResponseBodySuccess bool
+
+// IssueUserCertificate500JSONResponseBodySuccess defines parameters for IssueUserCertificate.
+type IssueUserCertificate500JSONResponseBodySuccess bool
+
+// RevokeUserCertificateParams defines parameters for RevokeUserCertificate.
+type RevokeUserCertificateParams struct {
+	// ProofOfPossession Proof of possession of the private key comprising of `${timestamp}.${fingerprint}.${signature}`. The signature is a BASE64 encoded armored SSHSIG signature, made with the `request-proof-of-possession@com.github.serverless-ssh-ca.andrewheberle` namespace, of `${timestamp}.${fingerprint}.${METHOD} ${path}` where `${METHOD} ${path}` is the request the proof is for, for example `DELETE /api/v4/user/certificates/12345678901234567890`. The timestamp is in milliseconds since the Unix epoch.
+	ProofOfPossession string `json:"Proof-Of-Possession"`
+}
+
+// RevokeUserCertificate400JSONResponseBodySuccess defines parameters for RevokeUserCertificate.
+type RevokeUserCertificate400JSONResponseBodySuccess bool
+
+// RevokeUserCertificate404JSONResponseBodySuccess defines parameters for RevokeUserCertificate.
+type RevokeUserCertificate404JSONResponseBodySuccess bool
+
+// RevokeUserCertificate409JSONResponseBodySuccess defines parameters for RevokeUserCertificate.
+type RevokeUserCertificate409JSONResponseBodySuccess bool
+
+// RevokeUserCertificate500JSONResponseBodySuccess defines parameters for RevokeUserCertificate.
+type RevokeUserCertificate500JSONResponseBodySuccess bool
+
+// GetUserRevocationList500JSONResponseBodySuccess defines parameters for GetUserRevocationList.
+type GetUserRevocationList500JSONResponseBodySuccess bool
+
 // PostHostCertificateJSONRequestBody defines body for PostHostCertificate for application/json ContentType.
 type PostHostCertificateJSONRequestBody = HostCertificateRequest
 
@@ -664,6 +1207,15 @@ type PostUserCertificateJSONRequestBody = UserCertificateRequest
 
 // PostUserRevokeJSONRequestBody defines body for PostUserRevoke for application/json ContentType.
 type PostUserRevokeJSONRequestBody = CertificateRevocation
+
+// IssueHostCertificateJSONRequestBody defines body for IssueHostCertificate for application/json ContentType.
+type IssueHostCertificateJSONRequestBody = HostCertificateIssueRequest
+
+// RenewHostCertificateJSONRequestBody defines body for RenewHostCertificate for application/json ContentType.
+type RenewHostCertificateJSONRequestBody = HostCertificateRenewalRequest
+
+// IssueUserCertificateJSONRequestBody defines body for IssueUserCertificate for application/json ContentType.
+type IssueUserCertificateJSONRequestBody = UserCertificateIssueRequest
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -739,31 +1291,59 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 // The interface specification for the client above.
 type ClientInterface interface {
 
-	// GetCa performs a GET /api/v3/ca (the `GetCa` operationId) request.
+	// GetCa Get the CA public key
+	//
+	// Returns the public key of the SSH Certificate Authority in OpenSSH format, for use in `TrustedUserCAKeys` on SSH servers or `@cert-authority` entries in `known_hosts` on SSH clients.
+	//
+	// Corresponds with GET /api/v3/ca (the `GetCa` operationId).
 	GetCa(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostHostCertificateWithBody performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request,
-	// with any type of body and a specified content type.
+	// PostHostCertificateWithBody Request a host certificate
+	//
+	// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. The user must be permitted to request host certificates by email address or role.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v3/host/certificate (the `PostHostCertificate` operationId).
 	PostHostCertificateWithBody(ctx context.Context, params *PostHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostHostCertificate performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request.
+	// PostHostCertificate Request a host certificate
+	//
+	// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. The user must be permitted to request host certificates by email address or role.
+	//
 	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v3/host/certificate (the `PostHostCertificate` operationId).
 	PostHostCertificate(ctx context.Context, params *PostHostCertificateParams, body PostHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetHostKrl Get the Key Revocation List for host certificates
 	//
+	// Returns the OpenSSH Key Revocation List (KRL) of revoked host certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
+	//
 	// Corresponds with GET /api/v3/host/krl (the `GetHostKrl` operationId).
 	GetHostKrl(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostHostRenewWithBody performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
-	// with any type of body and a specified content type.
+	// PostHostRenewWithBody Renew a host certificate
+	//
+	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v3/host/renew (the `PostHostRenew` operationId).
 	PostHostRenewWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostHostRenew performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request.
+	// PostHostRenew Renew a host certificate
+	//
+	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	//
 	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v3/host/renew (the `PostHostRenew` operationId).
 	PostHostRenew(ctx context.Context, body PostHostRenewJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostHostRevokeWithBody Revoke a host certificate
+	//
+	// Revokes a host certificate issued by this CA, identified by its serial number, and adds it to the host Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
 	//
 	// Takes any type of body and a specified content type.
 	//
@@ -772,25 +1352,41 @@ type ClientInterface interface {
 
 	// PostHostRevoke Revoke a host certificate
 	//
+	// Revokes a host certificate issued by this CA, identified by its serial number, and adds it to the host Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
+	//
 	// Takes a body of the `application/json` content type.
 	//
 	// Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
 	PostHostRevoke(ctx context.Context, body PostHostRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostUserCertificateWithBody performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request,
-	// with any type of body and a specified content type.
+	// PostUserCertificateWithBody Request a user certificate
+	//
+	// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. Principals on the issued certificate are derived from the identity token.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v3/user/certificate (the `PostUserCertificate` operationId).
 	PostUserCertificateWithBody(ctx context.Context, params *PostUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostUserCertificate performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request.
+	// PostUserCertificate Request a user certificate
+	//
+	// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. Principals on the issued certificate are derived from the identity token.
+	//
 	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v3/user/certificate (the `PostUserCertificate` operationId).
 	PostUserCertificate(ctx context.Context, params *PostUserCertificateParams, body PostUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetUserKrl Get the Key Revocation List for user certificates
+	//
+	// Returns the OpenSSH Key Revocation List (KRL) of revoked user certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
 	//
 	// Corresponds with GET /api/v3/user/krl (the `GetUserKrl` operationId).
 	GetUserKrl(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostUserRevokeWithBody Revoke a user certificate
+	//
+	// Revokes a user certificate issued by this CA, identified by its serial number, and adds it to the user Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
 	//
 	// Takes any type of body and a specified content type.
 	//
@@ -799,13 +1395,108 @@ type ClientInterface interface {
 
 	// PostUserRevoke Revoke a user certificate
 	//
+	// Revokes a user certificate issued by this CA, identified by its serial number, and adds it to the user Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
+	//
 	// Takes a body of the `application/json` content type.
 	//
 	// Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
 	PostUserRevoke(ctx context.Context, body PostUserRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetCaPublicKey Get the CA public key
+	//
+	// Returns the public key of the SSH Certificate Authority in OpenSSH format, for use in `TrustedUserCAKeys` on SSH servers or `@cert-authority` entries in `known_hosts` on SSH clients.
+	//
+	// Corresponds with GET /api/v4/ca (the `GetCaPublicKey` operationId).
+	GetCaPublicKey(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// IssueHostCertificateWithBody Request a host certificate
+	//
+	// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. The user must be permitted to request host certificates by email address or role.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v4/host/certificates (the `IssueHostCertificate` operationId).
+	IssueHostCertificateWithBody(ctx context.Context, params *IssueHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// IssueHostCertificate Request a host certificate
+	//
+	// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. The user must be permitted to request host certificates by email address or role.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v4/host/certificates (the `IssueHostCertificate` operationId).
+	IssueHostCertificate(ctx context.Context, params *IssueHostCertificateParams, body IssueHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RevokeHostCertificate Revoke a host certificate
+	//
+	// Revokes a host certificate issued by this CA and adds it to the host Key Revocation List. The `Proof-Of-Possession` header must contain a proof of possession of the private key for the public key that the certificate was issued for, made for this request. A certificate issued for a different public key is reported as not found.
+	//
+	// Corresponds with DELETE /api/v4/host/certificates/{serial} (the `RevokeHostCertificate` operationId).
+	RevokeHostCertificate(ctx context.Context, serial string, params *RevokeHostCertificateParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RenewHostCertificateWithBody Renew a host certificate
+	//
+	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v4/host/certificates/{serial}/renew (the `RenewHostCertificate` operationId).
+	RenewHostCertificateWithBody(ctx context.Context, serial string, params *RenewHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RenewHostCertificate Renew a host certificate
+	//
+	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v4/host/certificates/{serial}/renew (the `RenewHostCertificate` operationId).
+	RenewHostCertificate(ctx context.Context, serial string, params *RenewHostCertificateParams, body RenewHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetHostRevocationList Get the Key Revocation List for host certificates
+	//
+	// Returns the OpenSSH Key Revocation List (KRL) of revoked host certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
+	//
+	// Corresponds with GET /api/v4/host/krl (the `GetHostRevocationList` operationId).
+	GetHostRevocationList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// IssueUserCertificateWithBody Request a user certificate
+	//
+	// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. Principals on the issued certificate are derived from the identity token.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v4/user/certificates (the `IssueUserCertificate` operationId).
+	IssueUserCertificateWithBody(ctx context.Context, params *IssueUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// IssueUserCertificate Request a user certificate
+	//
+	// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. Principals on the issued certificate are derived from the identity token.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v4/user/certificates (the `IssueUserCertificate` operationId).
+	IssueUserCertificate(ctx context.Context, params *IssueUserCertificateParams, body IssueUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RevokeUserCertificate Revoke a user certificate
+	//
+	// Revokes a user certificate issued by this CA and adds it to the user Key Revocation List. The `Proof-Of-Possession` header must contain a proof of possession of the private key for the public key that the certificate was issued for, made for this request. A certificate issued for a different public key is reported as not found.
+	//
+	// Corresponds with DELETE /api/v4/user/certificates/{serial} (the `RevokeUserCertificate` operationId).
+	RevokeUserCertificate(ctx context.Context, serial string, params *RevokeUserCertificateParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetUserRevocationList Get the Key Revocation List for user certificates
+	//
+	// Returns the OpenSSH Key Revocation List (KRL) of revoked user certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
+	//
+	// Corresponds with GET /api/v4/user/krl (the `GetUserRevocationList` operationId).
+	GetUserRevocationList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-// GetCa performs a GET /api/v3/ca (the `GetCa` operationId) request.
+// GetCa Get the CA public key
+//
+// Returns the public key of the SSH Certificate Authority in OpenSSH format, for use in `TrustedUserCAKeys` on SSH servers or `@cert-authority` entries in `known_hosts` on SSH clients.
+//
+// Corresponds with GET /api/v3/ca (the `GetCa` operationId).
 func (c *Client) GetCa(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetCaRequest(c.Server)
 	if err != nil {
@@ -818,8 +1509,13 @@ func (c *Client) GetCa(ctx context.Context, reqEditors ...RequestEditorFn) (*htt
 	return c.Client.Do(req)
 }
 
-// PostHostCertificateWithBody performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request,
-// with any type of body and a specified content type.
+// PostHostCertificateWithBody Request a host certificate
+//
+// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. The user must be permitted to request host certificates by email address or role.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v3/host/certificate (the `PostHostCertificate` operationId).
 func (c *Client) PostHostCertificateWithBody(ctx context.Context, params *PostHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostHostCertificateRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
@@ -832,8 +1528,13 @@ func (c *Client) PostHostCertificateWithBody(ctx context.Context, params *PostHo
 	return c.Client.Do(req)
 }
 
-// PostHostCertificate performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request.
+// PostHostCertificate Request a host certificate
+//
+// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. The user must be permitted to request host certificates by email address or role.
+//
 // Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v3/host/certificate (the `PostHostCertificate` operationId).
 func (c *Client) PostHostCertificate(ctx context.Context, params *PostHostCertificateParams, body PostHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostHostCertificateRequest(c.Server, params, body)
 	if err != nil {
@@ -848,6 +1549,8 @@ func (c *Client) PostHostCertificate(ctx context.Context, params *PostHostCertif
 
 // GetHostKrl Get the Key Revocation List for host certificates
 //
+// Returns the OpenSSH Key Revocation List (KRL) of revoked host certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
+//
 // Corresponds with GET /api/v3/host/krl (the `GetHostKrl` operationId).
 func (c *Client) GetHostKrl(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetHostKrlRequest(c.Server)
@@ -861,8 +1564,13 @@ func (c *Client) GetHostKrl(ctx context.Context, reqEditors ...RequestEditorFn) 
 	return c.Client.Do(req)
 }
 
-// PostHostRenewWithBody performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
-// with any type of body and a specified content type.
+// PostHostRenewWithBody Renew a host certificate
+//
+// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v3/host/renew (the `PostHostRenew` operationId).
 func (c *Client) PostHostRenewWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostHostRenewRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -875,8 +1583,13 @@ func (c *Client) PostHostRenewWithBody(ctx context.Context, contentType string, 
 	return c.Client.Do(req)
 }
 
-// PostHostRenew performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request.
+// PostHostRenew Renew a host certificate
+//
+// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+//
 // Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v3/host/renew (the `PostHostRenew` operationId).
 func (c *Client) PostHostRenew(ctx context.Context, body PostHostRenewJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostHostRenewRequest(c.Server, body)
 	if err != nil {
@@ -890,6 +1603,8 @@ func (c *Client) PostHostRenew(ctx context.Context, body PostHostRenewJSONReques
 }
 
 // PostHostRevokeWithBody Revoke a host certificate
+//
+// Revokes a host certificate issued by this CA, identified by its serial number, and adds it to the host Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
 //
 // Takes any type of body and a specified content type.
 //
@@ -908,6 +1623,8 @@ func (c *Client) PostHostRevokeWithBody(ctx context.Context, contentType string,
 
 // PostHostRevoke Revoke a host certificate
 //
+// Revokes a host certificate issued by this CA, identified by its serial number, and adds it to the host Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
+//
 // Takes a body of the `application/json` content type.
 //
 // Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
@@ -923,8 +1640,13 @@ func (c *Client) PostHostRevoke(ctx context.Context, body PostHostRevokeJSONRequ
 	return c.Client.Do(req)
 }
 
-// PostUserCertificateWithBody performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request,
-// with any type of body and a specified content type.
+// PostUserCertificateWithBody Request a user certificate
+//
+// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. Principals on the issued certificate are derived from the identity token.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v3/user/certificate (the `PostUserCertificate` operationId).
 func (c *Client) PostUserCertificateWithBody(ctx context.Context, params *PostUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostUserCertificateRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
@@ -937,8 +1659,13 @@ func (c *Client) PostUserCertificateWithBody(ctx context.Context, params *PostUs
 	return c.Client.Do(req)
 }
 
-// PostUserCertificate performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request.
+// PostUserCertificate Request a user certificate
+//
+// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. Principals on the issued certificate are derived from the identity token.
+//
 // Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v3/user/certificate (the `PostUserCertificate` operationId).
 func (c *Client) PostUserCertificate(ctx context.Context, params *PostUserCertificateParams, body PostUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostUserCertificateRequest(c.Server, params, body)
 	if err != nil {
@@ -952,6 +1679,8 @@ func (c *Client) PostUserCertificate(ctx context.Context, params *PostUserCertif
 }
 
 // GetUserKrl Get the Key Revocation List for user certificates
+//
+// Returns the OpenSSH Key Revocation List (KRL) of revoked user certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
 //
 // Corresponds with GET /api/v3/user/krl (the `GetUserKrl` operationId).
 func (c *Client) GetUserKrl(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -967,6 +1696,8 @@ func (c *Client) GetUserKrl(ctx context.Context, reqEditors ...RequestEditorFn) 
 }
 
 // PostUserRevokeWithBody Revoke a user certificate
+//
+// Revokes a user certificate issued by this CA, identified by its serial number, and adds it to the user Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
 //
 // Takes any type of body and a specified content type.
 //
@@ -985,11 +1716,212 @@ func (c *Client) PostUserRevokeWithBody(ctx context.Context, contentType string,
 
 // PostUserRevoke Revoke a user certificate
 //
+// Revokes a user certificate issued by this CA, identified by its serial number, and adds it to the user Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
+//
 // Takes a body of the `application/json` content type.
 //
 // Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
 func (c *Client) PostUserRevoke(ctx context.Context, body PostUserRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostUserRevokeRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// GetCaPublicKey Get the CA public key
+//
+// Returns the public key of the SSH Certificate Authority in OpenSSH format, for use in `TrustedUserCAKeys` on SSH servers or `@cert-authority` entries in `known_hosts` on SSH clients.
+//
+// Corresponds with GET /api/v4/ca (the `GetCaPublicKey` operationId).
+func (c *Client) GetCaPublicKey(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetCaPublicKeyRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// IssueHostCertificateWithBody Request a host certificate
+//
+// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. The user must be permitted to request host certificates by email address or role.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v4/host/certificates (the `IssueHostCertificate` operationId).
+func (c *Client) IssueHostCertificateWithBody(ctx context.Context, params *IssueHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewIssueHostCertificateRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// IssueHostCertificate Request a host certificate
+//
+// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. The user must be permitted to request host certificates by email address or role.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v4/host/certificates (the `IssueHostCertificate` operationId).
+func (c *Client) IssueHostCertificate(ctx context.Context, params *IssueHostCertificateParams, body IssueHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewIssueHostCertificateRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// RevokeHostCertificate Revoke a host certificate
+//
+// Revokes a host certificate issued by this CA and adds it to the host Key Revocation List. The `Proof-Of-Possession` header must contain a proof of possession of the private key for the public key that the certificate was issued for, made for this request. A certificate issued for a different public key is reported as not found.
+//
+// Corresponds with DELETE /api/v4/host/certificates/{serial} (the `RevokeHostCertificate` operationId).
+func (c *Client) RevokeHostCertificate(ctx context.Context, serial string, params *RevokeHostCertificateParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRevokeHostCertificateRequest(c.Server, serial, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// RenewHostCertificateWithBody Renew a host certificate
+//
+// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v4/host/certificates/{serial}/renew (the `RenewHostCertificate` operationId).
+func (c *Client) RenewHostCertificateWithBody(ctx context.Context, serial string, params *RenewHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRenewHostCertificateRequestWithBody(c.Server, serial, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// RenewHostCertificate Renew a host certificate
+//
+// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v4/host/certificates/{serial}/renew (the `RenewHostCertificate` operationId).
+func (c *Client) RenewHostCertificate(ctx context.Context, serial string, params *RenewHostCertificateParams, body RenewHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRenewHostCertificateRequest(c.Server, serial, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// GetHostRevocationList Get the Key Revocation List for host certificates
+//
+// Returns the OpenSSH Key Revocation List (KRL) of revoked host certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
+//
+// Corresponds with GET /api/v4/host/krl (the `GetHostRevocationList` operationId).
+func (c *Client) GetHostRevocationList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetHostRevocationListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// IssueUserCertificateWithBody Request a user certificate
+//
+// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. Principals on the issued certificate are derived from the identity token.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v4/user/certificates (the `IssueUserCertificate` operationId).
+func (c *Client) IssueUserCertificateWithBody(ctx context.Context, params *IssueUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewIssueUserCertificateRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// IssueUserCertificate Request a user certificate
+//
+// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. Principals on the issued certificate are derived from the identity token.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v4/user/certificates (the `IssueUserCertificate` operationId).
+func (c *Client) IssueUserCertificate(ctx context.Context, params *IssueUserCertificateParams, body IssueUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewIssueUserCertificateRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// RevokeUserCertificate Revoke a user certificate
+//
+// Revokes a user certificate issued by this CA and adds it to the user Key Revocation List. The `Proof-Of-Possession` header must contain a proof of possession of the private key for the public key that the certificate was issued for, made for this request. A certificate issued for a different public key is reported as not found.
+//
+// Corresponds with DELETE /api/v4/user/certificates/{serial} (the `RevokeUserCertificate` operationId).
+func (c *Client) RevokeUserCertificate(ctx context.Context, serial string, params *RevokeUserCertificateParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRevokeUserCertificateRequest(c.Server, serial, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// GetUserRevocationList Get the Key Revocation List for user certificates
+//
+// Returns the OpenSSH Key Revocation List (KRL) of revoked user certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
+//
+// Corresponds with GET /api/v4/user/krl (the `GetUserRevocationList` operationId).
+func (c *Client) GetUserRevocationList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetUserRevocationListRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -1307,6 +2239,365 @@ func NewPostUserRevokeRequestWithBody(server string, contentType string, body io
 	return req, nil
 }
 
+// NewGetCaPublicKeyRequest constructs an http.Request for the GetCaPublicKey method
+func NewGetCaPublicKeyRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v4/ca")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewIssueHostCertificateRequest calls the generic IssueHostCertificate builder with application/json body
+func NewIssueHostCertificateRequest(server string, params *IssueHostCertificateParams, body IssueHostCertificateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewIssueHostCertificateRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewIssueHostCertificateRequestWithBody constructs an http.Request for the IssueHostCertificate method, with any body, and a specified content type
+func NewIssueHostCertificateRequestWithBody(server string, params *IssueHostCertificateParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v4/host/certificates")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		var headerParam0 string
+
+		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "Authorization", params.Authorization, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("Authorization", headerParam0)
+
+		var headerParam1 string
+
+		headerParam1, err = runtime.StyleParamWithOptions("simple", false, "Proof-Of-Possession", params.ProofOfPossession, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("Proof-Of-Possession", headerParam1)
+
+	}
+
+	return req, nil
+}
+
+// NewRevokeHostCertificateRequest constructs an http.Request for the RevokeHostCertificate method
+func NewRevokeHostCertificateRequest(server string, serial string, params *RevokeHostCertificateParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "serial", serial, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v4/host/certificates/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		var headerParam0 string
+
+		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "Proof-Of-Possession", params.ProofOfPossession, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("Proof-Of-Possession", headerParam0)
+
+	}
+
+	return req, nil
+}
+
+// NewRenewHostCertificateRequest calls the generic RenewHostCertificate builder with application/json body
+func NewRenewHostCertificateRequest(server string, serial string, params *RenewHostCertificateParams, body RenewHostCertificateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRenewHostCertificateRequestWithBody(server, serial, params, "application/json", bodyReader)
+}
+
+// NewRenewHostCertificateRequestWithBody constructs an http.Request for the RenewHostCertificate method, with any body, and a specified content type
+func NewRenewHostCertificateRequestWithBody(server string, serial string, params *RenewHostCertificateParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "serial", serial, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v4/host/certificates/%s/renew", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		var headerParam0 string
+
+		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "Proof-Of-Possession", params.ProofOfPossession, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("Proof-Of-Possession", headerParam0)
+
+	}
+
+	return req, nil
+}
+
+// NewGetHostRevocationListRequest constructs an http.Request for the GetHostRevocationList method
+func NewGetHostRevocationListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v4/host/krl")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewIssueUserCertificateRequest calls the generic IssueUserCertificate builder with application/json body
+func NewIssueUserCertificateRequest(server string, params *IssueUserCertificateParams, body IssueUserCertificateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewIssueUserCertificateRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewIssueUserCertificateRequestWithBody constructs an http.Request for the IssueUserCertificate method, with any body, and a specified content type
+func NewIssueUserCertificateRequestWithBody(server string, params *IssueUserCertificateParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v4/user/certificates")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		var headerParam0 string
+
+		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "Authorization", params.Authorization, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("Authorization", headerParam0)
+
+		var headerParam1 string
+
+		headerParam1, err = runtime.StyleParamWithOptions("simple", false, "Proof-Of-Possession", params.ProofOfPossession, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("Proof-Of-Possession", headerParam1)
+
+	}
+
+	return req, nil
+}
+
+// NewRevokeUserCertificateRequest constructs an http.Request for the RevokeUserCertificate method
+func NewRevokeUserCertificateRequest(server string, serial string, params *RevokeUserCertificateParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "serial", serial, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v4/user/certificates/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		var headerParam0 string
+
+		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "Proof-Of-Possession", params.ProofOfPossession, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("Proof-Of-Possession", headerParam0)
+
+	}
+
+	return req, nil
+}
+
+// NewGetUserRevocationListRequest constructs an http.Request for the GetUserRevocationList method
+func NewGetUserRevocationListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v4/user/krl")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -1351,39 +2642,63 @@ func WithBaseURL(baseURL string) ClientOption {
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
 
-	// GetCaWithResponse performs a GET /api/v3/ca (the `GetCa` operationId) request.
+	// GetCaWithResponse Get the CA public key
+	//
+	// Returns the public key of the SSH Certificate Authority in OpenSSH format, for use in `TrustedUserCAKeys` on SSH servers or `@cert-authority` entries in `known_hosts` on SSH clients.
 	//
 	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v3/ca (the `GetCa` operationId).
 	GetCaWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCaResponse, error)
 
-	// PostHostCertificateWithBodyWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request,
-	// with any type of body and a specified content type.
+	// PostHostCertificateWithBodyWithResponse Request a host certificate
 	//
-	// Returns a wrapper object for the known response body format(s).
+	// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. The user must be permitted to request host certificates by email address or role.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v3/host/certificate (the `PostHostCertificate` operationId).
 	PostHostCertificateWithBodyWithResponse(ctx context.Context, params *PostHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateResponse, error)
 
-	// PostHostCertificateWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request.
+	// PostHostCertificateWithResponse Request a host certificate
+	//
+	// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. The user must be permitted to request host certificates by email address or role.
+	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v3/host/certificate (the `PostHostCertificate` operationId).
 	PostHostCertificateWithResponse(ctx context.Context, params *PostHostCertificateParams, body PostHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateResponse, error)
 
 	// GetHostKrlWithResponse Get the Key Revocation List for host certificates
+	//
+	// Returns the OpenSSH Key Revocation List (KRL) of revoked host certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with GET /api/v3/host/krl (the `GetHostKrl` operationId).
 	GetHostKrlWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetHostKrlResponse, error)
 
-	// PostHostRenewWithBodyWithResponse performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
-	// with any type of body and a specified content type.
+	// PostHostRenewWithBodyWithResponse Renew a host certificate
 	//
-	// Returns a wrapper object for the known response body format(s).
+	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v3/host/renew (the `PostHostRenew` operationId).
 	PostHostRenewWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostRenewResponse, error)
 
-	// PostHostRenewWithResponse performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request.
+	// PostHostRenewWithResponse Renew a host certificate
+	//
+	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v3/host/renew (the `PostHostRenew` operationId).
 	PostHostRenewWithResponse(ctx context.Context, body PostHostRenewJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostRenewResponse, error)
 
 	// PostHostRevokeWithBodyWithResponse Revoke a host certificate
+	//
+	// Revokes a host certificate issued by this CA, identified by its serial number, and adds it to the host Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
@@ -1392,22 +2707,34 @@ type ClientWithResponsesInterface interface {
 
 	// PostHostRevokeWithResponse Revoke a host certificate
 	//
+	// Revokes a host certificate issued by this CA, identified by its serial number, and adds it to the host Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
+	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
 	PostHostRevokeWithResponse(ctx context.Context, body PostHostRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostRevokeResponse, error)
 
-	// PostUserCertificateWithBodyWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request,
-	// with any type of body and a specified content type.
+	// PostUserCertificateWithBodyWithResponse Request a user certificate
 	//
-	// Returns a wrapper object for the known response body format(s).
+	// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. Principals on the issued certificate are derived from the identity token.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v3/user/certificate (the `PostUserCertificate` operationId).
 	PostUserCertificateWithBodyWithResponse(ctx context.Context, params *PostUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostUserCertificateResponse, error)
 
-	// PostUserCertificateWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request.
+	// PostUserCertificateWithResponse Request a user certificate
+	//
+	// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. Principals on the issued certificate are derived from the identity token.
+	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v3/user/certificate (the `PostUserCertificate` operationId).
 	PostUserCertificateWithResponse(ctx context.Context, params *PostUserCertificateParams, body PostUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUserCertificateResponse, error)
 
 	// GetUserKrlWithResponse Get the Key Revocation List for user certificates
+	//
+	// Returns the OpenSSH Key Revocation List (KRL) of revoked user certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
@@ -1416,6 +2743,8 @@ type ClientWithResponsesInterface interface {
 
 	// PostUserRevokeWithBodyWithResponse Revoke a user certificate
 	//
+	// Revokes a user certificate issued by this CA, identified by its serial number, and adds it to the user Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
+	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
@@ -1423,10 +2752,111 @@ type ClientWithResponsesInterface interface {
 
 	// PostUserRevokeWithResponse Revoke a user certificate
 	//
+	// Revokes a user certificate issued by this CA, identified by its serial number, and adds it to the user Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
+	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
 	PostUserRevokeWithResponse(ctx context.Context, body PostUserRevokeJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUserRevokeResponse, error)
+
+	// GetCaPublicKeyWithResponse Get the CA public key
+	//
+	// Returns the public key of the SSH Certificate Authority in OpenSSH format, for use in `TrustedUserCAKeys` on SSH servers or `@cert-authority` entries in `known_hosts` on SSH clients.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v4/ca (the `GetCaPublicKey` operationId).
+	GetCaPublicKeyWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCaPublicKeyResponse, error)
+
+	// IssueHostCertificateWithBodyWithResponse Request a host certificate
+	//
+	// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. The user must be permitted to request host certificates by email address or role.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v4/host/certificates (the `IssueHostCertificate` operationId).
+	IssueHostCertificateWithBodyWithResponse(ctx context.Context, params *IssueHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IssueHostCertificateResponse, error)
+
+	// IssueHostCertificateWithResponse Request a host certificate
+	//
+	// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. The user must be permitted to request host certificates by email address or role.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v4/host/certificates (the `IssueHostCertificate` operationId).
+	IssueHostCertificateWithResponse(ctx context.Context, params *IssueHostCertificateParams, body IssueHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*IssueHostCertificateResponse, error)
+
+	// RevokeHostCertificateWithResponse Revoke a host certificate
+	//
+	// Revokes a host certificate issued by this CA and adds it to the host Key Revocation List. The `Proof-Of-Possession` header must contain a proof of possession of the private key for the public key that the certificate was issued for, made for this request. A certificate issued for a different public key is reported as not found.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with DELETE /api/v4/host/certificates/{serial} (the `RevokeHostCertificate` operationId).
+	RevokeHostCertificateWithResponse(ctx context.Context, serial string, params *RevokeHostCertificateParams, reqEditors ...RequestEditorFn) (*RevokeHostCertificateResponse, error)
+
+	// RenewHostCertificateWithBodyWithResponse Renew a host certificate
+	//
+	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v4/host/certificates/{serial}/renew (the `RenewHostCertificate` operationId).
+	RenewHostCertificateWithBodyWithResponse(ctx context.Context, serial string, params *RenewHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RenewHostCertificateResponse, error)
+
+	// RenewHostCertificateWithResponse Renew a host certificate
+	//
+	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v4/host/certificates/{serial}/renew (the `RenewHostCertificate` operationId).
+	RenewHostCertificateWithResponse(ctx context.Context, serial string, params *RenewHostCertificateParams, body RenewHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*RenewHostCertificateResponse, error)
+
+	// GetHostRevocationListWithResponse Get the Key Revocation List for host certificates
+	//
+	// Returns the OpenSSH Key Revocation List (KRL) of revoked host certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v4/host/krl (the `GetHostRevocationList` operationId).
+	GetHostRevocationListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetHostRevocationListResponse, error)
+
+	// IssueUserCertificateWithBodyWithResponse Request a user certificate
+	//
+	// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. Principals on the issued certificate are derived from the identity token.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v4/user/certificates (the `IssueUserCertificate` operationId).
+	IssueUserCertificateWithBodyWithResponse(ctx context.Context, params *IssueUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IssueUserCertificateResponse, error)
+
+	// IssueUserCertificateWithResponse Request a user certificate
+	//
+	// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. Principals on the issued certificate are derived from the identity token.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v4/user/certificates (the `IssueUserCertificate` operationId).
+	IssueUserCertificateWithResponse(ctx context.Context, params *IssueUserCertificateParams, body IssueUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*IssueUserCertificateResponse, error)
+
+	// RevokeUserCertificateWithResponse Revoke a user certificate
+	//
+	// Revokes a user certificate issued by this CA and adds it to the user Key Revocation List. The `Proof-Of-Possession` header must contain a proof of possession of the private key for the public key that the certificate was issued for, made for this request. A certificate issued for a different public key is reported as not found.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with DELETE /api/v4/user/certificates/{serial} (the `RevokeUserCertificate` operationId).
+	RevokeUserCertificateWithResponse(ctx context.Context, serial string, params *RevokeUserCertificateParams, reqEditors ...RequestEditorFn) (*RevokeUserCertificateResponse, error)
+
+	// GetUserRevocationListWithResponse Get the Key Revocation List for user certificates
+	//
+	// Returns the OpenSSH Key Revocation List (KRL) of revoked user certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v4/user/krl (the `GetUserRevocationList` operationId).
+	GetUserRevocationListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetUserRevocationListResponse, error)
 }
 
 type GetCaResponse struct {
@@ -2340,9 +3770,844 @@ func (r PostUserRevokeResponse) ContentType() string {
 	return ""
 }
 
-// GetCaWithResponse performs a GET /api/v3/ca (the `GetCa` operationId) request.
+type GetCaPublicKeyResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON500 the response for an HTTP 500 `application/json` response
+	JSON500 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success GetCaPublicKey500JSONResponseBodySuccess `json:"success"`
+	}
+}
+
+// GetJSON500 returns the response for an HTTP 500 `application/json` response
+func (r GetCaPublicKeyResponse) GetJSON500() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success GetCaPublicKey500JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON500
+}
+
+// GetBody returns the raw response body bytes
+func (r GetCaPublicKeyResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r GetCaPublicKeyResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetCaPublicKeyResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetCaPublicKeyResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type IssueHostCertificateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *CertificateResponse
+	// JSON400 the response for an HTTP 400 `application/json` response
+	JSON400 *struct {
+		Errors []struct {
+			Code    float32  `json:"code"`
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors"`
+		Success IssueHostCertificate400JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success IssueHostCertificate401JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success IssueHostCertificate403JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *struct {
+		Errors []struct {
+			Code    float32  `json:"code"`
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors"`
+		Success IssueHostCertificate422JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON500 the response for an HTTP 500 `application/json` response
+	JSON500 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success IssueHostCertificate500JSONResponseBodySuccess `json:"success"`
+	}
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r IssueHostCertificateResponse) GetJSON200() *CertificateResponse {
+	return r.JSON200
+}
+
+// GetJSON400 returns the response for an HTTP 400 `application/json` response
+func (r IssueHostCertificateResponse) GetJSON400() *struct {
+	Errors []struct {
+		Code    float32  `json:"code"`
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Success IssueHostCertificate400JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON400
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r IssueHostCertificateResponse) GetJSON401() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success IssueHostCertificate401JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r IssueHostCertificateResponse) GetJSON403() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success IssueHostCertificate403JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON403
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r IssueHostCertificateResponse) GetJSON422() *struct {
+	Errors []struct {
+		Code    float32  `json:"code"`
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Success IssueHostCertificate422JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON422
+}
+
+// GetJSON500 returns the response for an HTTP 500 `application/json` response
+func (r IssueHostCertificateResponse) GetJSON500() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success IssueHostCertificate500JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON500
+}
+
+// GetBody returns the raw response body bytes
+func (r IssueHostCertificateResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r IssueHostCertificateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r IssueHostCertificateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r IssueHostCertificateResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type RevokeHostCertificateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *RevocationResponse
+	// JSON400 the response for an HTTP 400 `application/json` response
+	JSON400 *struct {
+		Errors []struct {
+			Code    float32  `json:"code"`
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors"`
+		Success RevokeHostCertificate400JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON404 the response for an HTTP 404 `application/json` response
+	JSON404 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RevokeHostCertificate404JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON409 the response for an HTTP 409 `application/json` response
+	JSON409 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RevokeHostCertificate409JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON500 the response for an HTTP 500 `application/json` response
+	JSON500 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RevokeHostCertificate500JSONResponseBodySuccess `json:"success"`
+	}
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r RevokeHostCertificateResponse) GetJSON200() *RevocationResponse {
+	return r.JSON200
+}
+
+// GetJSON400 returns the response for an HTTP 400 `application/json` response
+func (r RevokeHostCertificateResponse) GetJSON400() *struct {
+	Errors []struct {
+		Code    float32  `json:"code"`
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Success RevokeHostCertificate400JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON400
+}
+
+// GetJSON404 returns the response for an HTTP 404 `application/json` response
+func (r RevokeHostCertificateResponse) GetJSON404() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RevokeHostCertificate404JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON404
+}
+
+// GetJSON409 returns the response for an HTTP 409 `application/json` response
+func (r RevokeHostCertificateResponse) GetJSON409() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RevokeHostCertificate409JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON409
+}
+
+// GetJSON500 returns the response for an HTTP 500 `application/json` response
+func (r RevokeHostCertificateResponse) GetJSON500() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RevokeHostCertificate500JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON500
+}
+
+// GetBody returns the raw response body bytes
+func (r RevokeHostCertificateResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r RevokeHostCertificateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RevokeHostCertificateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r RevokeHostCertificateResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type RenewHostCertificateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *CertificateResponse
+	// JSON400 the response for an HTTP 400 `application/json` response
+	JSON400 *struct {
+		Errors []struct {
+			Code    float32  `json:"code"`
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors"`
+		Success RenewHostCertificate400JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RenewHostCertificate401JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RenewHostCertificate403JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *struct {
+		Errors []struct {
+			Code    float32  `json:"code"`
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors"`
+		Success RenewHostCertificate422JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON500 the response for an HTTP 500 `application/json` response
+	JSON500 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RenewHostCertificate500JSONResponseBodySuccess `json:"success"`
+	}
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r RenewHostCertificateResponse) GetJSON200() *CertificateResponse {
+	return r.JSON200
+}
+
+// GetJSON400 returns the response for an HTTP 400 `application/json` response
+func (r RenewHostCertificateResponse) GetJSON400() *struct {
+	Errors []struct {
+		Code    float32  `json:"code"`
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Success RenewHostCertificate400JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON400
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r RenewHostCertificateResponse) GetJSON401() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RenewHostCertificate401JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r RenewHostCertificateResponse) GetJSON403() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RenewHostCertificate403JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON403
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r RenewHostCertificateResponse) GetJSON422() *struct {
+	Errors []struct {
+		Code    float32  `json:"code"`
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Success RenewHostCertificate422JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON422
+}
+
+// GetJSON500 returns the response for an HTTP 500 `application/json` response
+func (r RenewHostCertificateResponse) GetJSON500() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RenewHostCertificate500JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON500
+}
+
+// GetBody returns the raw response body bytes
+func (r RenewHostCertificateResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r RenewHostCertificateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RenewHostCertificateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r RenewHostCertificateResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type GetHostRevocationListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *KeyRevocationListResponse
+	// JSON500 the response for an HTTP 500 `application/json` response
+	JSON500 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success GetHostRevocationList500JSONResponseBodySuccess `json:"success"`
+	}
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r GetHostRevocationListResponse) GetJSON200() *KeyRevocationListResponse {
+	return r.JSON200
+}
+
+// GetJSON500 returns the response for an HTTP 500 `application/json` response
+func (r GetHostRevocationListResponse) GetJSON500() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success GetHostRevocationList500JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON500
+}
+
+// GetBody returns the raw response body bytes
+func (r GetHostRevocationListResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r GetHostRevocationListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetHostRevocationListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetHostRevocationListResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type IssueUserCertificateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *CertificateResponse
+	// JSON400 the response for an HTTP 400 `application/json` response
+	JSON400 *struct {
+		Errors []struct {
+			Code    float32  `json:"code"`
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors"`
+		Success IssueUserCertificate400JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success IssueUserCertificate401JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success IssueUserCertificate403JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *struct {
+		Errors []struct {
+			Code    float32  `json:"code"`
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors"`
+		Success IssueUserCertificate422JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON500 the response for an HTTP 500 `application/json` response
+	JSON500 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success IssueUserCertificate500JSONResponseBodySuccess `json:"success"`
+	}
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r IssueUserCertificateResponse) GetJSON200() *CertificateResponse {
+	return r.JSON200
+}
+
+// GetJSON400 returns the response for an HTTP 400 `application/json` response
+func (r IssueUserCertificateResponse) GetJSON400() *struct {
+	Errors []struct {
+		Code    float32  `json:"code"`
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Success IssueUserCertificate400JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON400
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r IssueUserCertificateResponse) GetJSON401() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success IssueUserCertificate401JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r IssueUserCertificateResponse) GetJSON403() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success IssueUserCertificate403JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON403
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r IssueUserCertificateResponse) GetJSON422() *struct {
+	Errors []struct {
+		Code    float32  `json:"code"`
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Success IssueUserCertificate422JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON422
+}
+
+// GetJSON500 returns the response for an HTTP 500 `application/json` response
+func (r IssueUserCertificateResponse) GetJSON500() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success IssueUserCertificate500JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON500
+}
+
+// GetBody returns the raw response body bytes
+func (r IssueUserCertificateResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r IssueUserCertificateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r IssueUserCertificateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r IssueUserCertificateResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type RevokeUserCertificateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *RevocationResponse
+	// JSON400 the response for an HTTP 400 `application/json` response
+	JSON400 *struct {
+		Errors []struct {
+			Code    float32  `json:"code"`
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors"`
+		Success RevokeUserCertificate400JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON404 the response for an HTTP 404 `application/json` response
+	JSON404 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RevokeUserCertificate404JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON409 the response for an HTTP 409 `application/json` response
+	JSON409 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RevokeUserCertificate409JSONResponseBodySuccess `json:"success"`
+	}
+	// JSON500 the response for an HTTP 500 `application/json` response
+	JSON500 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RevokeUserCertificate500JSONResponseBodySuccess `json:"success"`
+	}
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r RevokeUserCertificateResponse) GetJSON200() *RevocationResponse {
+	return r.JSON200
+}
+
+// GetJSON400 returns the response for an HTTP 400 `application/json` response
+func (r RevokeUserCertificateResponse) GetJSON400() *struct {
+	Errors []struct {
+		Code    float32  `json:"code"`
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Success RevokeUserCertificate400JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON400
+}
+
+// GetJSON404 returns the response for an HTTP 404 `application/json` response
+func (r RevokeUserCertificateResponse) GetJSON404() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RevokeUserCertificate404JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON404
+}
+
+// GetJSON409 returns the response for an HTTP 409 `application/json` response
+func (r RevokeUserCertificateResponse) GetJSON409() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RevokeUserCertificate409JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON409
+}
+
+// GetJSON500 returns the response for an HTTP 500 `application/json` response
+func (r RevokeUserCertificateResponse) GetJSON500() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RevokeUserCertificate500JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON500
+}
+
+// GetBody returns the raw response body bytes
+func (r RevokeUserCertificateResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r RevokeUserCertificateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RevokeUserCertificateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r RevokeUserCertificateResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type GetUserRevocationListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *KeyRevocationListResponse
+	// JSON500 the response for an HTTP 500 `application/json` response
+	JSON500 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success GetUserRevocationList500JSONResponseBodySuccess `json:"success"`
+	}
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r GetUserRevocationListResponse) GetJSON200() *KeyRevocationListResponse {
+	return r.JSON200
+}
+
+// GetJSON500 returns the response for an HTTP 500 `application/json` response
+func (r GetUserRevocationListResponse) GetJSON500() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success GetUserRevocationList500JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON500
+}
+
+// GetBody returns the raw response body bytes
+func (r GetUserRevocationListResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r GetUserRevocationListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetUserRevocationListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetUserRevocationListResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+// GetCaWithResponse Get the CA public key
+//
+// Returns the public key of the SSH Certificate Authority in OpenSSH format, for use in `TrustedUserCAKeys` on SSH servers or `@cert-authority` entries in `known_hosts` on SSH clients.
 //
 // Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v3/ca (the `GetCa` operationId).
 func (c *ClientWithResponses) GetCaWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCaResponse, error) {
 	rsp, err := c.GetCa(ctx, reqEditors...)
 	if err != nil {
@@ -2351,10 +4616,13 @@ func (c *ClientWithResponses) GetCaWithResponse(ctx context.Context, reqEditors 
 	return ParseGetCaResponse(rsp)
 }
 
-// PostHostCertificateWithBodyWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request,
-// with any type of body and a specified content type.
+// PostHostCertificateWithBodyWithResponse Request a host certificate
 //
-// Returns a wrapper object for the known response body format(s).
+// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. The user must be permitted to request host certificates by email address or role.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v3/host/certificate (the `PostHostCertificate` operationId).
 func (c *ClientWithResponses) PostHostCertificateWithBodyWithResponse(ctx context.Context, params *PostHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostCertificateResponse, error) {
 	rsp, err := c.PostHostCertificateWithBody(ctx, params, contentType, body, reqEditors...)
 	if err != nil {
@@ -2363,8 +4631,13 @@ func (c *ClientWithResponses) PostHostCertificateWithBodyWithResponse(ctx contex
 	return ParsePostHostCertificateResponse(rsp)
 }
 
-// PostHostCertificateWithResponse performs a POST /api/v3/host/certificate (the `PostHostCertificate` operationId) request.
+// PostHostCertificateWithResponse Request a host certificate
+//
+// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. The user must be permitted to request host certificates by email address or role.
+//
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v3/host/certificate (the `PostHostCertificate` operationId).
 func (c *ClientWithResponses) PostHostCertificateWithResponse(ctx context.Context, params *PostHostCertificateParams, body PostHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostCertificateResponse, error) {
 	rsp, err := c.PostHostCertificate(ctx, params, body, reqEditors...)
 	if err != nil {
@@ -2374,6 +4647,8 @@ func (c *ClientWithResponses) PostHostCertificateWithResponse(ctx context.Contex
 }
 
 // GetHostKrlWithResponse Get the Key Revocation List for host certificates
+//
+// Returns the OpenSSH Key Revocation List (KRL) of revoked host certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
 //
 // Returns a wrapper object for the known response body format(s).
 //
@@ -2386,10 +4661,13 @@ func (c *ClientWithResponses) GetHostKrlWithResponse(ctx context.Context, reqEdi
 	return ParseGetHostKrlResponse(rsp)
 }
 
-// PostHostRenewWithBodyWithResponse performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request,
-// with any type of body and a specified content type.
+// PostHostRenewWithBodyWithResponse Renew a host certificate
 //
-// Returns a wrapper object for the known response body format(s).
+// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v3/host/renew (the `PostHostRenew` operationId).
 func (c *ClientWithResponses) PostHostRenewWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostHostRenewResponse, error) {
 	rsp, err := c.PostHostRenewWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
@@ -2398,8 +4676,13 @@ func (c *ClientWithResponses) PostHostRenewWithBodyWithResponse(ctx context.Cont
 	return ParsePostHostRenewResponse(rsp)
 }
 
-// PostHostRenewWithResponse performs a POST /api/v3/host/renew (the `PostHostRenew` operationId) request.
+// PostHostRenewWithResponse Renew a host certificate
+//
+// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+//
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v3/host/renew (the `PostHostRenew` operationId).
 func (c *ClientWithResponses) PostHostRenewWithResponse(ctx context.Context, body PostHostRenewJSONRequestBody, reqEditors ...RequestEditorFn) (*PostHostRenewResponse, error) {
 	rsp, err := c.PostHostRenew(ctx, body, reqEditors...)
 	if err != nil {
@@ -2409,6 +4692,8 @@ func (c *ClientWithResponses) PostHostRenewWithResponse(ctx context.Context, bod
 }
 
 // PostHostRevokeWithBodyWithResponse Revoke a host certificate
+//
+// Revokes a host certificate issued by this CA, identified by its serial number, and adds it to the host Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
@@ -2423,6 +4708,8 @@ func (c *ClientWithResponses) PostHostRevokeWithBodyWithResponse(ctx context.Con
 
 // PostHostRevokeWithResponse Revoke a host certificate
 //
+// Revokes a host certificate issued by this CA, identified by its serial number, and adds it to the host Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
+//
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
 // Corresponds with POST /api/v3/host/revoke (the `PostHostRevoke` operationId).
@@ -2434,10 +4721,13 @@ func (c *ClientWithResponses) PostHostRevokeWithResponse(ctx context.Context, bo
 	return ParsePostHostRevokeResponse(rsp)
 }
 
-// PostUserCertificateWithBodyWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request,
-// with any type of body and a specified content type.
+// PostUserCertificateWithBodyWithResponse Request a user certificate
 //
-// Returns a wrapper object for the known response body format(s).
+// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. Principals on the issued certificate are derived from the identity token.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v3/user/certificate (the `PostUserCertificate` operationId).
 func (c *ClientWithResponses) PostUserCertificateWithBodyWithResponse(ctx context.Context, params *PostUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostUserCertificateResponse, error) {
 	rsp, err := c.PostUserCertificateWithBody(ctx, params, contentType, body, reqEditors...)
 	if err != nil {
@@ -2446,8 +4736,13 @@ func (c *ClientWithResponses) PostUserCertificateWithBodyWithResponse(ctx contex
 	return ParsePostUserCertificateResponse(rsp)
 }
 
-// PostUserCertificateWithResponse performs a POST /api/v3/user/certificate (the `PostUserCertificate` operationId) request.
+// PostUserCertificateWithResponse Request a user certificate
+//
+// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key. Principals on the issued certificate are derived from the identity token.
+//
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v3/user/certificate (the `PostUserCertificate` operationId).
 func (c *ClientWithResponses) PostUserCertificateWithResponse(ctx context.Context, params *PostUserCertificateParams, body PostUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUserCertificateResponse, error) {
 	rsp, err := c.PostUserCertificate(ctx, params, body, reqEditors...)
 	if err != nil {
@@ -2457,6 +4752,8 @@ func (c *ClientWithResponses) PostUserCertificateWithResponse(ctx context.Contex
 }
 
 // GetUserKrlWithResponse Get the Key Revocation List for user certificates
+//
+// Returns the OpenSSH Key Revocation List (KRL) of revoked user certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
 //
 // Returns a wrapper object for the known response body format(s).
 //
@@ -2471,6 +4768,8 @@ func (c *ClientWithResponses) GetUserKrlWithResponse(ctx context.Context, reqEdi
 
 // PostUserRevokeWithBodyWithResponse Revoke a user certificate
 //
+// Revokes a user certificate issued by this CA, identified by its serial number, and adds it to the user Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
+//
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
 // Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
@@ -2484,6 +4783,8 @@ func (c *ClientWithResponses) PostUserRevokeWithBodyWithResponse(ctx context.Con
 
 // PostUserRevokeWithResponse Revoke a user certificate
 //
+// Revokes a user certificate issued by this CA, identified by its serial number, and adds it to the user Key Revocation List. The request must include a proof of possession of the private key for the public key that the certificate was issued for.
+//
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
 // Corresponds with POST /api/v3/user/revoke (the `PostUserRevoke` operationId).
@@ -2493,6 +4794,171 @@ func (c *ClientWithResponses) PostUserRevokeWithResponse(ctx context.Context, bo
 		return nil, err
 	}
 	return ParsePostUserRevokeResponse(rsp)
+}
+
+// GetCaPublicKeyWithResponse Get the CA public key
+//
+// Returns the public key of the SSH Certificate Authority in OpenSSH format, for use in `TrustedUserCAKeys` on SSH servers or `@cert-authority` entries in `known_hosts` on SSH clients.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v4/ca (the `GetCaPublicKey` operationId).
+func (c *ClientWithResponses) GetCaPublicKeyWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCaPublicKeyResponse, error) {
+	rsp, err := c.GetCaPublicKey(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetCaPublicKeyResponse(rsp)
+}
+
+// IssueHostCertificateWithBodyWithResponse Request a host certificate
+//
+// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. The user must be permitted to request host certificates by email address or role.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v4/host/certificates (the `IssueHostCertificate` operationId).
+func (c *ClientWithResponses) IssueHostCertificateWithBodyWithResponse(ctx context.Context, params *IssueHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IssueHostCertificateResponse, error) {
+	rsp, err := c.IssueHostCertificateWithBody(ctx, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseIssueHostCertificateResponse(rsp)
+}
+
+// IssueHostCertificateWithResponse Request a host certificate
+//
+// Issues a signed SSH host certificate for the provided public key and principals. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. The user must be permitted to request host certificates by email address or role.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v4/host/certificates (the `IssueHostCertificate` operationId).
+func (c *ClientWithResponses) IssueHostCertificateWithResponse(ctx context.Context, params *IssueHostCertificateParams, body IssueHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*IssueHostCertificateResponse, error) {
+	rsp, err := c.IssueHostCertificate(ctx, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseIssueHostCertificateResponse(rsp)
+}
+
+// RevokeHostCertificateWithResponse Revoke a host certificate
+//
+// Revokes a host certificate issued by this CA and adds it to the host Key Revocation List. The `Proof-Of-Possession` header must contain a proof of possession of the private key for the public key that the certificate was issued for, made for this request. A certificate issued for a different public key is reported as not found.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with DELETE /api/v4/host/certificates/{serial} (the `RevokeHostCertificate` operationId).
+func (c *ClientWithResponses) RevokeHostCertificateWithResponse(ctx context.Context, serial string, params *RevokeHostCertificateParams, reqEditors ...RequestEditorFn) (*RevokeHostCertificateResponse, error) {
+	rsp, err := c.RevokeHostCertificate(ctx, serial, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRevokeHostCertificateResponse(rsp)
+}
+
+// RenewHostCertificateWithBodyWithResponse Renew a host certificate
+//
+// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v4/host/certificates/{serial}/renew (the `RenewHostCertificate` operationId).
+func (c *ClientWithResponses) RenewHostCertificateWithBodyWithResponse(ctx context.Context, serial string, params *RenewHostCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RenewHostCertificateResponse, error) {
+	rsp, err := c.RenewHostCertificateWithBody(ctx, serial, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRenewHostCertificateResponse(rsp)
+}
+
+// RenewHostCertificateWithResponse Renew a host certificate
+//
+// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v4/host/certificates/{serial}/renew (the `RenewHostCertificate` operationId).
+func (c *ClientWithResponses) RenewHostCertificateWithResponse(ctx context.Context, serial string, params *RenewHostCertificateParams, body RenewHostCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*RenewHostCertificateResponse, error) {
+	rsp, err := c.RenewHostCertificate(ctx, serial, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRenewHostCertificateResponse(rsp)
+}
+
+// GetHostRevocationListWithResponse Get the Key Revocation List for host certificates
+//
+// Returns the OpenSSH Key Revocation List (KRL) of revoked host certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v4/host/krl (the `GetHostRevocationList` operationId).
+func (c *ClientWithResponses) GetHostRevocationListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetHostRevocationListResponse, error) {
+	rsp, err := c.GetHostRevocationList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetHostRevocationListResponse(rsp)
+}
+
+// IssueUserCertificateWithBodyWithResponse Request a user certificate
+//
+// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. Principals on the issued certificate are derived from the identity token.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v4/user/certificates (the `IssueUserCertificate` operationId).
+func (c *ClientWithResponses) IssueUserCertificateWithBodyWithResponse(ctx context.Context, params *IssueUserCertificateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IssueUserCertificateResponse, error) {
+	rsp, err := c.IssueUserCertificateWithBody(ctx, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseIssueUserCertificateResponse(rsp)
+}
+
+// IssueUserCertificateWithResponse Request a user certificate
+//
+// Issues a signed SSH user certificate for the provided public key. The request must be authenticated with an access token and include an identity token from the OIDC IdP for the same subject, along with a proof of possession of the private key for `public_key` in the `Proof-Of-Possession` header made for this request. Principals on the issued certificate are derived from the identity token.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v4/user/certificates (the `IssueUserCertificate` operationId).
+func (c *ClientWithResponses) IssueUserCertificateWithResponse(ctx context.Context, params *IssueUserCertificateParams, body IssueUserCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*IssueUserCertificateResponse, error) {
+	rsp, err := c.IssueUserCertificate(ctx, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseIssueUserCertificateResponse(rsp)
+}
+
+// RevokeUserCertificateWithResponse Revoke a user certificate
+//
+// Revokes a user certificate issued by this CA and adds it to the user Key Revocation List. The `Proof-Of-Possession` header must contain a proof of possession of the private key for the public key that the certificate was issued for, made for this request. A certificate issued for a different public key is reported as not found.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with DELETE /api/v4/user/certificates/{serial} (the `RevokeUserCertificate` operationId).
+func (c *ClientWithResponses) RevokeUserCertificateWithResponse(ctx context.Context, serial string, params *RevokeUserCertificateParams, reqEditors ...RequestEditorFn) (*RevokeUserCertificateResponse, error) {
+	rsp, err := c.RevokeUserCertificate(ctx, serial, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRevokeUserCertificateResponse(rsp)
+}
+
+// GetUserRevocationListWithResponse Get the Key Revocation List for user certificates
+//
+// Returns the OpenSSH Key Revocation List (KRL) of revoked user certificates issued by this CA, along with an SSHSIG signature made by the CA key so the KRL can be verified before use.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v4/user/krl (the `GetUserRevocationList` operationId).
+func (c *ClientWithResponses) GetUserRevocationListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetUserRevocationListResponse, error) {
+	rsp, err := c.GetUserRevocationList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetUserRevocationListResponse(rsp)
 }
 
 // ParseGetCaResponse parses an HTTP response from a GetCaWithResponse call
@@ -3085,6 +5551,553 @@ func ParsePostUserRevokeResponse(rsp *http.Response) (*PostUserRevokeResponse, e
 				Message string  `json:"message"`
 			} `json:"errors"`
 			Success PostUserRevoke500JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetCaPublicKeyResponse parses an HTTP response from a GetCaPublicKeyWithResponse call
+func ParseGetCaPublicKeyResponse(rsp *http.Response) (*GetCaPublicKeyResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetCaPublicKeyResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success GetCaPublicKey500JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseIssueHostCertificateResponse parses an HTTP response from a IssueHostCertificateWithResponse call
+func ParseIssueHostCertificateResponse(rsp *http.Response) (*IssueHostCertificateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &IssueHostCertificateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CertificateResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Errors []struct {
+				Code    float32  `json:"code"`
+				Message string   `json:"message"`
+				Path    []string `json:"path"`
+			} `json:"errors"`
+			Success IssueHostCertificate400JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success IssueHostCertificate401JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success IssueHostCertificate403JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Errors []struct {
+				Code    float32  `json:"code"`
+				Message string   `json:"message"`
+				Path    []string `json:"path"`
+			} `json:"errors"`
+			Success IssueHostCertificate422JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success IssueHostCertificate500JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRevokeHostCertificateResponse parses an HTTP response from a RevokeHostCertificateWithResponse call
+func ParseRevokeHostCertificateResponse(rsp *http.Response) (*RevokeHostCertificateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RevokeHostCertificateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RevocationResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Errors []struct {
+				Code    float32  `json:"code"`
+				Message string   `json:"message"`
+				Path    []string `json:"path"`
+			} `json:"errors"`
+			Success RevokeHostCertificate400JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RevokeHostCertificate404JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RevokeHostCertificate409JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RevokeHostCertificate500JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRenewHostCertificateResponse parses an HTTP response from a RenewHostCertificateWithResponse call
+func ParseRenewHostCertificateResponse(rsp *http.Response) (*RenewHostCertificateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RenewHostCertificateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CertificateResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Errors []struct {
+				Code    float32  `json:"code"`
+				Message string   `json:"message"`
+				Path    []string `json:"path"`
+			} `json:"errors"`
+			Success RenewHostCertificate400JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RenewHostCertificate401JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RenewHostCertificate403JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Errors []struct {
+				Code    float32  `json:"code"`
+				Message string   `json:"message"`
+				Path    []string `json:"path"`
+			} `json:"errors"`
+			Success RenewHostCertificate422JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RenewHostCertificate500JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetHostRevocationListResponse parses an HTTP response from a GetHostRevocationListWithResponse call
+func ParseGetHostRevocationListResponse(rsp *http.Response) (*GetHostRevocationListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetHostRevocationListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest KeyRevocationListResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success GetHostRevocationList500JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseIssueUserCertificateResponse parses an HTTP response from a IssueUserCertificateWithResponse call
+func ParseIssueUserCertificateResponse(rsp *http.Response) (*IssueUserCertificateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &IssueUserCertificateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CertificateResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Errors []struct {
+				Code    float32  `json:"code"`
+				Message string   `json:"message"`
+				Path    []string `json:"path"`
+			} `json:"errors"`
+			Success IssueUserCertificate400JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success IssueUserCertificate401JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success IssueUserCertificate403JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Errors []struct {
+				Code    float32  `json:"code"`
+				Message string   `json:"message"`
+				Path    []string `json:"path"`
+			} `json:"errors"`
+			Success IssueUserCertificate422JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success IssueUserCertificate500JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRevokeUserCertificateResponse parses an HTTP response from a RevokeUserCertificateWithResponse call
+func ParseRevokeUserCertificateResponse(rsp *http.Response) (*RevokeUserCertificateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RevokeUserCertificateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RevocationResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Errors []struct {
+				Code    float32  `json:"code"`
+				Message string   `json:"message"`
+				Path    []string `json:"path"`
+			} `json:"errors"`
+			Success RevokeUserCertificate400JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RevokeUserCertificate404JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RevokeUserCertificate409JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RevokeUserCertificate500JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetUserRevocationListResponse parses an HTTP response from a GetUserRevocationListWithResponse call
+func ParseGetUserRevocationListResponse(rsp *http.Response) (*GetUserRevocationListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetUserRevocationListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest KeyRevocationListResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success GetUserRevocationList500JSONResponseBodySuccess `json:"success"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err

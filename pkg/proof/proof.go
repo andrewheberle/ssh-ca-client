@@ -23,6 +23,11 @@ type Proof struct {
 // The namespace used for signing the proof
 const Namespace = "proof-of-possession@com.github.serverless-ssh-ca.andrewheberle"
 
+// The namespace used for signing a proof that is bound to a request, which is
+// kept separate from [Namespace] so a proof made for one form can never be
+// accepted as the other
+const RequestNamespace = "request-proof-of-possession@com.github.serverless-ssh-ca.andrewheberle"
+
 // getTimestamp is a variable so it can be overridden in tests
 var getTimestamp = func() int64 {
 	return time.Now().UnixMilli()
@@ -33,14 +38,41 @@ var getTimestamp = func() int64 {
 //
 // The proof is returned as a string in the format:
 // <timestamp>.<fingerprint>.<base64 armored_signature>
+//
+// This form of proof is used by the v3 API of the CA. See [GenerateForRequest]
+// for the form used by the v4 API.
 func Generate(signer ssh.Signer) (*Proof, error) {
+	return generate(signer, Namespace, func(timestamp int64, fingerprint string) []byte {
+		return data(timestamp, fingerprint)
+	})
+}
+
+// GenerateForRequest creates a proof that is bound to a request, so it cannot
+// be replayed against another endpoint or with other path parameters (such as
+// a different certificate serial), by signing the current timestamp, the
+// public key fingerprint and the request using SSHSIG with the provided
+// signer and the [RequestNamespace] namespace.
+//
+// The method is the HTTP method of the request and path is the path of the
+// request as the CA serves it, with any parameters filled in, for example
+// "/api/v4/user/certificates/12345678901234567890".
+//
+// The signed data is "<timestamp>.<fingerprint>.<METHOD> <path>" and the proof
+// is returned in the same format as [Generate].
+func GenerateForRequest(signer ssh.Signer, method, path string) (*Proof, error) {
+	return generate(signer, RequestNamespace, func(timestamp int64, fingerprint string) []byte {
+		return requestData(timestamp, fingerprint, method, path)
+	})
+}
+
+func generate(signer ssh.Signer, namespace string, signed func(timestamp int64, fingerprint string) []byte) (*Proof, error) {
 	// generate data to sign
 	timestamp := getTimestamp()
 	fingerprint := ssh.FingerprintSHA256(signer.PublicKey())
-	data := data(timestamp, fingerprint)
+	data := signed(timestamp, fingerprint)
 
 	// generate signature of data
-	sig, err := sshsig.Sign(bytes.NewReader(data), signer, sshsig.HashSHA512, Namespace)
+	sig, err := sshsig.Sign(bytes.NewReader(data), signer, sshsig.HashSHA512, namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -61,6 +93,10 @@ func Parse(proof string) (Proof, error) {
 
 func data(timestamp int64, fingerprint string) []byte {
 	return fmt.Appendf(nil, "%d.%s", timestamp, fingerprint)
+}
+
+func requestData(timestamp int64, fingerprint, method, path string) []byte {
+	return fmt.Appendf(data(timestamp, fingerprint), ".%s %s", strings.ToUpper(method), path)
 }
 
 func parse(proof string) (timestamp int64, fingerprint string, signature *sshsig.Signature, err error) {
@@ -94,7 +130,23 @@ func parse(proof string) (timestamp int64, fingerprint string, signature *sshsig
 }
 
 // Verify checks the proof is valid by verifying the signature and that the timestamp is within the allowed range.
+//
+// This verifies a proof made by [Generate]. See [Proof.VerifyRequest] to
+// verify a proof made by [GenerateForRequest].
 func (p Proof) Verify(pub ssh.PublicKey, allowedrange time.Duration) error {
+	return p.verify(pub, allowedrange, data(p.timestamp, p.fingerprint), Namespace)
+}
+
+// VerifyRequest checks the proof is valid for the request with the provided
+// method and path by verifying the signature and that the timestamp is within
+// the allowed range.
+//
+// This verifies a proof made by [GenerateForRequest].
+func (p Proof) VerifyRequest(pub ssh.PublicKey, method, path string, allowedrange time.Duration) error {
+	return p.verify(pub, allowedrange, requestData(p.timestamp, p.fingerprint, method, path), RequestNamespace)
+}
+
+func (p Proof) verify(pub ssh.PublicKey, allowedrange time.Duration, data []byte, namespace string) error {
 	// verify timestamp is within allowed range (this is to prevent replay attacks, but allows for some clock skew between client and server)
 	proofTime := time.UnixMilli(p.timestamp)
 	now := getTimestamp()
@@ -109,8 +161,7 @@ func (p Proof) Verify(pub ssh.PublicKey, allowedrange time.Duration) error {
 	}
 
 	// verify signature
-	data := data(p.timestamp, p.fingerprint)
-	if err := sshsig.Verify(bytes.NewReader(data), p.signature, pub, sshsig.HashSHA512, Namespace); err != nil {
+	if err := sshsig.Verify(bytes.NewReader(data), p.signature, pub, sshsig.HashSHA512, namespace); err != nil {
 		return fmt.Errorf("signature did not verify: %v", err)
 	}
 

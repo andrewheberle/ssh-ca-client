@@ -137,6 +137,113 @@ func TestGenerate(t *testing.T) {
 	}
 }
 
+func TestGenerateForRequest(t *testing.T) {
+	_, ed25519Key, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		panic(err)
+	}
+	signer, err := ssh.NewSignerFromKey(ed25519Key)
+	if err != nil {
+		panic(err)
+	}
+
+	now := time.Now()
+	getTimestamp = func() int64 {
+		return now.UnixMilli()
+	}
+	t.Cleanup(func() {
+		getTimestamp = func() int64 {
+			return time.Now().UnixMilli()
+		}
+	})
+
+	const (
+		method = "DELETE"
+		path   = "/api/v4/user/certificates/12345678901234567890"
+	)
+
+	got, err := GenerateForRequest(signer, strings.ToLower(method), path)
+	if err != nil {
+		t.Fatalf("GenerateForRequest() failed: %v", err)
+	}
+
+	// check the signed data and namespace manually
+	parts := strings.Split(got.String(), ".")
+	if len(parts) != 3 {
+		t.Fatalf("GenerateForRequest() generated wrong number of parts: %v", len(parts))
+	}
+	signature, err := base64.StdEncoding.DecodeString(parts[2])
+	if err != nil {
+		t.Fatalf("GenerateForRequest() signature was not base64: %v", err)
+	}
+	sig, err := sshsig.Unarmor(signature)
+	if err != nil {
+		t.Fatalf("GenerateForRequest() could not dearmor signature: %v", err)
+	}
+	signed := fmt.Appendf(nil, "%d.%s.%s %s", now.UnixMilli(), ssh.FingerprintSHA256(signer.PublicKey()), method, path)
+	if err := sshsig.Verify(bytes.NewReader(signed), sig, signer.PublicKey(), sshsig.HashSHA512, RequestNamespace); err != nil {
+		t.Fatalf("GenerateForRequest() signature did not verify: %v", err)
+	}
+
+	// a proof for a request must only verify for that request
+	tests := []struct {
+		name    string
+		method  string
+		path    string
+		wantErr bool
+	}{
+		{"same request", method, path, false},
+		{"lowercase method", strings.ToLower(method), path, false},
+		{"different method", "POST", path, true},
+		{"different path", method, "/api/v4/host/certificates/12345678901234567890", true},
+		{"different serial", method, "/api/v4/user/certificates/1", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parsed, err := Parse(got.String())
+			if err != nil {
+				t.Fatalf("Parse() failed: %v", err)
+			}
+			gotErr := parsed.VerifyRequest(signer.PublicKey(), tt.method, tt.path, 5*time.Minute)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("Proof.VerifyRequest() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("Proof.VerifyRequest() succeeded unexpectedly")
+			}
+		})
+	}
+
+	// the two forms of proof must not be accepted as each other
+	t.Run("not a plain proof", func(t *testing.T) {
+		if err := got.Verify(signer.PublicKey(), 5*time.Minute); err == nil {
+			t.Fatal("Proof.Verify() succeeded unexpectedly for a request proof")
+		}
+	})
+	t.Run("plain proof is not a request proof", func(t *testing.T) {
+		plain, err := Generate(signer)
+		if err != nil {
+			t.Fatalf("Generate() failed: %v", err)
+		}
+		if err := plain.VerifyRequest(signer.PublicKey(), method, path, 5*time.Minute); err == nil {
+			t.Fatal("Proof.VerifyRequest() succeeded unexpectedly for a plain proof")
+		}
+	})
+
+	// the timestamp is still checked
+	t.Run("old timestamp", func(t *testing.T) {
+		getTimestamp = func() int64 {
+			return now.Add(10 * time.Minute).UnixMilli()
+		}
+		if err := got.VerifyRequest(signer.PublicKey(), method, path, 5*time.Minute); err == nil {
+			t.Fatal("Proof.VerifyRequest() succeeded unexpectedly with old timestamp")
+		}
+	})
+}
+
 func TestParse(t *testing.T) {
 	tests := []struct {
 		name    string

@@ -21,7 +21,7 @@ func TestCA_PublicKey(t *testing.T) {
 
 	ca := newCA(t)
 
-	res, err := ca.client(t).GetCaWithResponse(context.Background())
+	res, err := ca.client(t).GetCaPublicKeyWithResponse(context.Background())
 	if err != nil {
 		t.Fatalf("getting CA public key: %v", err)
 	}

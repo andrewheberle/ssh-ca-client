@@ -161,8 +161,8 @@ func TestGet(t *testing.T) {
 		certificateType krl.CertificateType
 		wantPath        string
 	}{
-		{"host", krl.Host, "/api/v3/host/krl"},
-		{"user", krl.User, "/api/v3/user/krl"},
+		{"host", krl.Host, "/api/v4/host/krl"},
+		{"user", krl.User, "/api/v4/user/krl"},
 	}
 
 	for _, tt := range tests {

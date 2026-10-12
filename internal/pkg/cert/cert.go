@@ -121,6 +121,11 @@ func RenewalDue(c *ssh.Certificate, at float64, now time.Time) bool {
 	return float64(elapsed) >= float64(lifetime)*at
 }
 
+// apiBasePath is the path the CA serves the v4 API under. A proof of
+// possession is bound to the path of the request as the CA serves it, which is
+// below this path regardless of any path in the server URL.
+const apiBasePath = "/api/v4"
+
 type BaseCertificate struct {
 	// options
 	store Storage
