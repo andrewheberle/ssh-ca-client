@@ -17,14 +17,18 @@ type revocableCertificate struct {
 	name     string
 	path     string
 	certType uint32
-	new      func(t *testing.T, server string, store Storage) Revocable
+	// fromAgent is set when the certificate is removed from the SSH agent
+	// once revoked, which is not done for host certificates
+	fromAgent bool
+	new       func(t *testing.T, server string, store Storage) Revocable
 }
 
 var revocableCertificates = []revocableCertificate{
 	{
-		name:     "user",
-		path:     userCertificatePath,
-		certType: ssh.UserCert,
+		name:      "user",
+		path:      userCertificatePath,
+		certType:  ssh.UserCert,
+		fromAgent: true,
 		new: func(t *testing.T, server string, store Storage) Revocable {
 			return newTestUserCertificate(t, server, store)
 		},
@@ -106,11 +110,21 @@ func TestRevokeContext(t *testing.T) {
 					store.certErr = ErrCertificateNotFound
 				}
 
+				// the agent is not contacted for host certificates, so
+				// failures removing from it cannot occur
+				wantErr, wantAgent := tt.wantErr, tt.wantAgent
+				if !rc.fromAgent {
+					wantAgent = false
+					if errors.Is(wantErr, ErrRemovingFromAgent) {
+						wantErr = nil
+					}
+				}
+
 				got, err := rc.new(t, ca.URL, store).RevokeContext(context.Background())
 				switch {
-				case tt.wantErr != nil:
-					if !errors.Is(err, tt.wantErr) {
-						t.Errorf("RevokeContext() error = %v, want %v", err, tt.wantErr)
+				case wantErr != nil:
+					if !errors.Is(err, wantErr) {
+						t.Errorf("RevokeContext() error = %v, want %v", err, wantErr)
 					}
 				case tt.wantAnyErr:
 					if err == nil {
@@ -140,8 +154,11 @@ func TestRevokeContext(t *testing.T) {
 				if store.deleted != tt.wantRemoved {
 					t.Errorf("certificate deleted = %v, want %v", store.deleted, tt.wantRemoved)
 				}
-				if store.removedFromAgent != tt.wantAgent {
-					t.Errorf("certificate removed from agent = %v, want %v", store.removedFromAgent, tt.wantAgent)
+				if store.removedFromAgent != wantAgent {
+					t.Errorf("certificate removed from agent = %v, want %v", store.removedFromAgent, wantAgent)
+				}
+				if !rc.fromAgent && store.agentContacted {
+					t.Error("agent contacted for a certificate that is not held in an agent")
 				}
 			})
 		}
@@ -176,8 +193,11 @@ func TestRevokeSerialContext(t *testing.T) {
 				if store.deleted != tt.wantRemoved {
 					t.Errorf("certificate deleted = %v, want %v", store.deleted, tt.wantRemoved)
 				}
-				if store.removedFromAgent != tt.wantRemoved {
-					t.Errorf("certificate removed from agent = %v, want %v", store.removedFromAgent, tt.wantRemoved)
+				if want := tt.wantRemoved && rc.fromAgent; store.removedFromAgent != want {
+					t.Errorf("certificate removed from agent = %v, want %v", store.removedFromAgent, want)
+				}
+				if !rc.fromAgent && store.agentContacted {
+					t.Error("agent contacted for a certificate that is not held in an agent")
 				}
 			})
 		}

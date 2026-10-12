@@ -143,7 +143,7 @@ func (u *UserCertificate) RevokeContext(ctx context.Context) (time.Time, error) 
 	u.mu.Lock()
 	defer u.mu.Unlock()
 
-	revokedAt, err := u.revokeCurrent(ctx, "/user/certificates", u.revokeRequest)
+	revokedAt, err := u.revokeCurrent(ctx, "/user/certificates", u.revokeRequest, true)
 	if err != nil {
 		return revokedAt, fmt.Errorf("user certificate revocation: %w", err)
 	}
@@ -160,7 +160,7 @@ func (u *UserCertificate) RevokeSerialContext(ctx context.Context, serial uint64
 	u.mu.Lock()
 	defer u.mu.Unlock()
 
-	revokedAt, err := u.revoke(ctx, "/user/certificates", serial, u.revokeRequest)
+	revokedAt, err := u.revoke(ctx, "/user/certificates", serial, u.revokeRequest, true)
 	if err != nil {
 		return revokedAt, fmt.Errorf("user certificate revocation: %w", err)
 	}

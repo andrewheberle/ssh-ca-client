@@ -444,8 +444,10 @@ sudo ssh-ca-client-cli revoke --host
 The certificates to be revoked are shown and confirmation is asked for, which
 can be skipped with `--yes` (required when there is no terminal). Revocation
 uses a proof of possession of the private key the certificate was issued for, so
-no login is needed. Once revoked, the certificate is removed from the SSH agent
-and deleted, so a new certificate can be requested with `login` or `host`.
+no login is needed. Once revoked, the certificate is deleted so a new certificate
+can be requested with `login` or `host`. A user certificate is also removed from
+the SSH agent, while host certificates are not held in an SSH agent so it is not
+contacted with `--host`.
 
 Revoking host certificates is not available on Windows or when installed as a
 snap.

@@ -226,19 +226,18 @@ func (h *HostCertificate) Revoke() (time.Time, error) {
 
 // RevokeContext revokes the current host certificate at the CA using proof of
 // possession of the private key, which needs no authentication. Once revoked
-// the certificate is removed from the SSH agent and deleted from the store.
-// The time of revocation is returned. Cancelling ctx aborts the request to the
-// CA.
+// the certificate is deleted from the store. Host certificates are not held in
+// an SSH agent, so unlike [UserCertificate.RevokeContext] no agent is
+// contacted. The time of revocation is returned. Cancelling ctx aborts the
+// request to the CA.
 //
 // If the certificate was already revoked the error wraps [ErrAlreadyRevoked],
-// although the certificate is still removed. If the certificate was revoked
-// but could not be removed from the SSH agent the error wraps
-// [ErrRemovingFromAgent].
+// although the certificate is still removed.
 func (h *HostCertificate) RevokeContext(ctx context.Context) (time.Time, error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	revokedAt, err := h.revokeCurrent(ctx, "/host/certificates", h.revokeRequest)
+	revokedAt, err := h.revokeCurrent(ctx, "/host/certificates", h.revokeRequest, false)
 	if err != nil {
 		return revokedAt, fmt.Errorf("host certificate revocation: %w", err)
 	}
@@ -255,7 +254,7 @@ func (h *HostCertificate) RevokeSerialContext(ctx context.Context, serial uint64
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	revokedAt, err := h.revoke(ctx, "/host/certificates", serial, h.revokeRequest)
+	revokedAt, err := h.revoke(ctx, "/host/certificates", serial, h.revokeRequest, false)
 	if err != nil {
 		return revokedAt, fmt.Errorf("host certificate revocation: %w", err)
 	}

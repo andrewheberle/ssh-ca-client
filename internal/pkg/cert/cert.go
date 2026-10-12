@@ -211,13 +211,13 @@ type revokeResponse struct {
 type revokeRequest func(ctx context.Context, serial, proof string) (revokeResponse, error)
 
 // revokeCurrent revokes the certificate in the store. See [BaseCertificate.revoke].
-func (base *BaseCertificate) revokeCurrent(ctx context.Context, path string, do revokeRequest) (time.Time, error) {
+func (base *BaseCertificate) revokeCurrent(ctx context.Context, path string, do revokeRequest, fromAgent bool) (time.Time, error) {
 	c, err := base.store.Certificate()
 	if err != nil {
 		return time.Time{}, err
 	}
 
-	return base.revoke(ctx, path, c.Serial, do)
+	return base.revoke(ctx, path, c.Serial, do, fromAgent)
 }
 
 // revoke revokes the certificate with serial at the CA using do, with a
@@ -230,11 +230,11 @@ func (base *BaseCertificate) revokeCurrent(ctx context.Context, path string, do 
 // [ErrUnknownCertificate].
 //
 // Once the CA confirms the certificate is revoked, if it is the certificate
-// in the store it is removed from the SSH agent and deleted from the store.
-// If removing it from the agent fails the certificate is still deleted and
-// the error wraps [ErrRemovingFromAgent]. If deleting it fails the error wraps
-// [ErrDeletingCertificate].
-func (base *BaseCertificate) revoke(ctx context.Context, path string, serial uint64, do revokeRequest) (time.Time, error) {
+// in the store it is deleted from the store, and first removed from the SSH
+// agent if fromAgent is set. If removing it from the agent fails the
+// certificate is still deleted and the error wraps [ErrRemovingFromAgent]. If
+// deleting it fails the error wraps [ErrDeletingCertificate].
+func (base *BaseCertificate) revoke(ctx context.Context, path string, serial uint64, do revokeRequest, fromAgent bool) (time.Time, error) {
 	signer, err := base.store.Signer()
 	if err != nil {
 		return time.Time{}, fmt.Errorf("could not get signer: %w", err)
@@ -270,19 +270,22 @@ func (base *BaseCertificate) revoke(ctx context.Context, path string, serial uin
 		return time.Time{}, api.StatusError(res.statusCode, res.body)
 	}
 
-	return revokedAt, errors.Join(revokeErr, base.removeRevoked(serial))
+	return revokedAt, errors.Join(revokeErr, base.removeRevoked(serial, fromAgent))
 }
 
-// removeRevoked removes the certificate in the store from the SSH agent and
-// deletes it from the store if it has serial, as it has been revoked
-func (base *BaseCertificate) removeRevoked(serial uint64) error {
+// removeRevoked deletes the certificate in the store if it has serial, as it
+// has been revoked, removing it from the SSH agent first if fromAgent is set
+func (base *BaseCertificate) removeRevoked(serial uint64, fromAgent bool) error {
 	c, err := base.store.Certificate()
 	if err != nil || c.Serial != serial {
 		// the revoked certificate is not the one in the store
 		return nil
 	}
 
-	agentErr := base.store.RemoveFromAgent()
+	var agentErr error
+	if fromAgent {
+		agentErr = base.store.RemoveFromAgent()
+	}
 
 	if err := base.store.DeleteCertificate(); err != nil {
 		return errors.Join(fmt.Errorf("%w: %w", ErrDeletingCertificate, err), agentErr)
