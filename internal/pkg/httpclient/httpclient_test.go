@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/version"
 )
@@ -15,6 +16,14 @@ func TestGenerateUserAgent(t *testing.T) {
 
 	if got := GenerateUserAgent(UserAgent); got != want {
 		t.Errorf("GenerateUserAgent() = %q, want %q", got, want)
+	}
+}
+
+func TestTimeout(t *testing.T) {
+	// a request that starts the CA, fetches the identity provider's keys and
+	// signs a certificate can take several seconds
+	if minimum := 10 * time.Second; Timeout < minimum {
+		t.Errorf("Timeout = %v, want at least %v", Timeout, minimum)
 	}
 }
 
