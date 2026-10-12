@@ -29,6 +29,7 @@ import (
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/filestore"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/httpclient"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
 	sshkrl "github.com/forfuncsake/krl"
@@ -51,7 +52,22 @@ const (
 	// logTimeout is how long to wait for a request to appear in the CA log,
 	// as the test server writes it shortly after the response under workerd
 	logTimeout = time.Second * 2
+
+	// requestTimeout is the timeout for requests to the CA. It is longer than
+	// [httpclient.Timeout] as many tests run in parallel, each with its own
+	// CA, and under workerd on Windows runners a response can take longer
+	// than that, which fails the test without anything being wrong
+	requestTimeout = time.Second * 30
 )
+
+// httpClient returns the client the tests make requests to the CA with, which
+// is the client's own [httpclient.New] with a timeout of [requestTimeout]
+func httpClient() *http.Client {
+	h := httpclient.New()
+	h.Timeout = requestTimeout
+
+	return h
+}
 
 // testIDP is an OIDC identity provider that serves a JWKS for the CA to
 // verify tokens with and signs tokens for the tests
@@ -503,7 +519,7 @@ func (ca *testCA) newStore(t *testing.T, opts ...filestore.Option) *filestore.St
 func (ca *testCA) userCertificate(t *testing.T, store cert.Storage, tokens *auth.Tokens) *cert.UserCertificate {
 	t.Helper()
 
-	u, err := cert.NewUserCertificate(ca.URL, store)
+	u, err := cert.NewUserCertificate(ca.URL, store, cert.WithHTTPClient(httpClient()))
 	if err != nil {
 		t.Fatalf("creating user certificate: %v", err)
 	}
@@ -516,7 +532,7 @@ func (ca *testCA) userCertificate(t *testing.T, store cert.Storage, tokens *auth
 func (ca *testCA) hostCertificate(t *testing.T, store cert.Storage, tokens *auth.Tokens, principals ...string) *cert.HostCertificate {
 	t.Helper()
 
-	h, err := cert.NewHostCertificate(ca.URL, store)
+	h, err := cert.NewHostCertificate(ca.URL, store, cert.WithHTTPClient(httpClient()))
 	if err != nil {
 		t.Fatalf("creating host certificate: %v", err)
 	}
@@ -549,9 +565,9 @@ func (ca *testCA) revoke(t *testing.T, certificateType krl.CertificateType, seri
 	)
 	switch certificateType {
 	case krl.User:
-		r, err = cert.NewUserCertificate(ca.URL, store)
+		r, err = cert.NewUserCertificate(ca.URL, store, cert.WithHTTPClient(httpClient()))
 	case krl.Host:
-		r, err = cert.NewHostCertificate(ca.URL, store)
+		r, err = cert.NewHostCertificate(ca.URL, store, cert.WithHTTPClient(httpClient()))
 	default:
 		t.Fatalf("unsupported certificate type: %q", certificateType)
 	}
@@ -568,7 +584,7 @@ func (ca *testCA) revoke(t *testing.T, certificateType krl.CertificateType, seri
 func (ca *testCA) krlResponse(t *testing.T, certificateType krl.CertificateType) *krl.Response {
 	t.Helper()
 
-	res, err := krl.Get(context.Background(), ca.URL, certificateType)
+	res, err := krl.Get(context.Background(), ca.URL, certificateType, api.WithHTTPClient(httpClient()))
 	if err != nil {
 		t.Fatalf("getting %s KRL: %v", certificateType, err)
 	}
