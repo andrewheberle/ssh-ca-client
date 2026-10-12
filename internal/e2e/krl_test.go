@@ -5,7 +5,6 @@ package e2e
 import (
 	"errors"
 	"testing"
-	"time"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
@@ -63,7 +62,8 @@ func TestKRL(t *testing.T) {
 }
 
 // TestKRL_NotOlder checks the CA generates KRLs that CheckNotOlder orders
-// correctly, as the CA does not increase the KRL version
+// correctly: a KRL fetched again is not older than the KRL fetched before it,
+// and a KRL from before a revocation is older than one from after it
 func TestKRL_NotOlder(t *testing.T) {
 	t.Parallel()
 
@@ -74,17 +74,24 @@ func TestKRL_NotOlder(t *testing.T) {
 			t.Parallel()
 
 			first := ca.krlResponse(t, ct.kind)
+			again := ca.krlResponse(t, ct.kind)
 
-			// the generated date has a resolution of one second
-			time.Sleep(time.Until(time.Now().Truncate(time.Second).Add(time.Second + time.Millisecond*50)))
+			if err := again.CheckNotOlder(first.Krl); err != nil {
+				t.Errorf("CheckNotOlder() of KRL fetched again error = %v, want nil", err)
+			}
 
-			second := ca.krlResponse(t, ct.kind)
+			store := ca.request(t, ct)
+			if err := ca.revoke(t, ct.kind, certificate(t, store).Serial, store); err != nil {
+				t.Fatalf("revoking certificate: %v", err)
+			}
 
-			if err := second.CheckNotOlder(first.Krl); err != nil {
+			revoked := ca.krlResponse(t, ct.kind)
+
+			if err := revoked.CheckNotOlder(first.Krl); err != nil {
 				t.Errorf("CheckNotOlder() of later KRL error = %v, want nil", err)
 			}
 
-			if err := first.CheckNotOlder(second.Krl); !errors.Is(err, krl.ErrOlderKRL) {
+			if err := first.CheckNotOlder(revoked.Krl); !errors.Is(err, krl.ErrOlderKRL) {
 				t.Errorf("CheckNotOlder() of earlier KRL error = %v, want %v", err, krl.ErrOlderKRL)
 			}
 		})
