@@ -4,7 +4,6 @@ package e2e
 
 import (
 	"errors"
-	"net/http"
 	"testing"
 	"time"
 
@@ -112,8 +111,12 @@ func TestRevocation(t *testing.T) {
 			store := ca.request(t, tt.ct)
 			c := certificate(t, store)
 
-			if code := ca.revoke(t, tt.ct.kind, c.Serial, store); code != http.StatusOK {
-				t.Fatalf("revocation status code = %d, want %d", code, http.StatusOK)
+			if err := ca.revoke(t, tt.ct.kind, c.Serial, store); err != nil {
+				t.Fatalf("revoking certificate: %v", err)
+			}
+
+			if store.HasCertificate() {
+				t.Error("certificate was not deleted after it was revoked")
 			}
 
 			if !ca.krl(t, tt.ct.kind).IsRevoked(c) {
@@ -124,8 +127,8 @@ func TestRevocation(t *testing.T) {
 				t.Errorf("certificate is revoked by the %s KRL", tt.other.name)
 			}
 
-			if code := ca.revoke(t, tt.ct.kind, c.Serial, store); code != http.StatusConflict {
-				t.Errorf("repeated revocation status code = %d, want %d", code, http.StatusConflict)
+			if err := ca.revoke(t, tt.ct.kind, c.Serial, store); !errors.Is(err, cert.ErrAlreadyRevoked) {
+				t.Errorf("repeated revocation error = %v, want %v", err, cert.ErrAlreadyRevoked)
 			}
 		})
 	}
@@ -140,8 +143,7 @@ func TestRevocation_Rejected(t *testing.T) {
 		name string
 		// returns the type and serial of the certificate to revoke and the
 		// store with the private key to prove possession of
-		revoke   func(t *testing.T) (certificateType, uint64, cert.Storage)
-		wantCode int
+		revoke func(t *testing.T) (certificateType, uint64, cert.Storage)
 	}{
 		{
 			name: "wrong certificate type",
@@ -149,7 +151,6 @@ func TestRevocation_Rejected(t *testing.T) {
 				store := ca.request(t, userType)
 				return hostType, certificate(t, store).Serial, store
 			},
-			wantCode: http.StatusNotFound,
 		},
 		{
 			name: "certificate for another key",
@@ -157,7 +158,6 @@ func TestRevocation_Rejected(t *testing.T) {
 				store := ca.request(t, userType)
 				return userType, certificate(t, store).Serial, ca.newStore(t)
 			},
-			wantCode: http.StatusNotFound,
 		},
 		{
 			name: "unknown serial",
@@ -165,7 +165,6 @@ func TestRevocation_Rejected(t *testing.T) {
 				store := ca.request(t, userType)
 				return userType, certificate(t, store).Serial + 1, store
 			},
-			wantCode: http.StatusNotFound,
 		},
 	}
 
@@ -175,8 +174,9 @@ func TestRevocation_Rejected(t *testing.T) {
 
 			ct, serial, store := tt.revoke(t)
 
-			if code := ca.revoke(t, ct.kind, serial, store); code != tt.wantCode {
-				t.Errorf("revocation status code = %d, want %d", code, tt.wantCode)
+			// the CA does not say which, so all are reported as unknown
+			if err := ca.revoke(t, ct.kind, serial, store); !errors.Is(err, cert.ErrUnknownCertificate) {
+				t.Errorf("revocation error = %v, want %v", err, cert.ErrUnknownCertificate)
 			}
 		})
 	}

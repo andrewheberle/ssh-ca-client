@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"crypto/ed25519"
 	"crypto/rand"
+	"errors"
 	"testing"
 	"time"
 
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/agent"
 )
 
 // newSigner generates a new ed25519 private key and matching SSH signer
@@ -160,6 +162,96 @@ func TestAddedKey(t *testing.T) {
 			}
 			if got.Comment != tt.cert.KeyId {
 				t.Errorf("AddedKey() Comment = %q, want %q", got.Comment, tt.cert.KeyId)
+			}
+		})
+	}
+}
+
+// failingAgent is an [agent.Agent] whose List or Remove return an error
+type failingAgent struct {
+	agent.Agent
+
+	listErr   error
+	removeErr error
+}
+
+func (a *failingAgent) List() ([]*agent.Key, error) {
+	if a.listErr != nil {
+		return nil, a.listErr
+	}
+
+	return a.Agent.List()
+}
+
+func (a *failingAgent) Remove(key ssh.PublicKey) error {
+	if a.removeErr != nil {
+		return a.removeErr
+	}
+
+	return a.Agent.Remove(key)
+}
+
+func TestRemoveFromAgent(t *testing.T) {
+	_, ca := newSigner(t)
+	priv, key := newSigner(t)
+	cert := signCert(t, ca, key, ssh.UserCert, time.Hour)
+	other := signCert(t, ca, key, ssh.UserCert, 2*time.Hour)
+
+	tests := []struct {
+		name     string
+		add      []*ssh.Certificate
+		addPlain bool
+		failing  *failingAgent
+		want     [][]byte
+		wantErr  bool
+	}{
+		{"removes certificate", []*ssh.Certificate{cert}, false, nil, nil, false},
+		{"keeps plain key", []*ssh.Certificate{cert}, true, nil, [][]byte{key.PublicKey().Marshal()}, false},
+		{"keeps other certificate", []*ssh.Certificate{cert, other}, false, nil, [][]byte{other.Marshal()}, false},
+		{"not in agent", []*ssh.Certificate{other}, false, nil, [][]byte{other.Marshal()}, false},
+		{"empty agent", nil, false, nil, nil, false},
+		{"list error", []*ssh.Certificate{cert}, false, &failingAgent{listErr: errors.New("list failed")}, nil, true},
+		{"remove error", []*ssh.Certificate{cert}, false, &failingAgent{removeErr: errors.New("remove failed")}, nil, true},
+		{"remove error not attempted when absent", []*ssh.Certificate{other}, false, &failingAgent{removeErr: errors.New("remove failed")}, [][]byte{other.Marshal()}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := agent.NewKeyring()
+			for _, c := range tt.add {
+				if err := a.Add(agent.AddedKey{PrivateKey: priv, Certificate: c}); err != nil {
+					t.Fatalf("agent Add() error = %v", err)
+				}
+			}
+			if tt.addPlain {
+				if err := a.Add(agent.AddedKey{PrivateKey: priv}); err != nil {
+					t.Fatalf("agent Add() error = %v", err)
+				}
+			}
+			under := a
+			if tt.failing != nil {
+				tt.failing.Agent = a
+				under = tt.failing
+			}
+
+			err := RemoveFromAgent(under, cert)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("RemoveFromAgent() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantErr {
+				return
+			}
+
+			keys, err := a.List()
+			if err != nil {
+				t.Fatalf("agent List() error = %v", err)
+			}
+			if len(keys) != len(tt.want) {
+				t.Fatalf("agent holds %d keys, want %d", len(keys), len(tt.want))
+			}
+			for i, k := range keys {
+				if !bytes.Equal(k.Marshal(), tt.want[i]) {
+					t.Errorf("agent key %d = %s, want %s", i, k.Format, ssh.MarshalAuthorizedKey(k))
+				}
 			}
 		})
 	}

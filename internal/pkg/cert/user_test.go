@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -87,6 +88,9 @@ type fakeCA struct {
 
 	release chan struct{} // closed when the test finishes
 
+	revokeKey ssh.PublicKey // key that revocation proofs are verified with
+	revokedAt time.Time     // time returned for a revocation
+
 	mu       sync.Mutex
 	requests int
 	path     string
@@ -112,6 +116,11 @@ func newFakeCA(t *testing.T) *fakeCA {
 func (ca *fakeCA) handle(w http.ResponseWriter, r *http.Request) {
 	ca.mu.Lock()
 	defer ca.mu.Unlock()
+
+	if r.Method == http.MethodDelete {
+		ca.handleRevoke(w, r)
+		return
+	}
 
 	renew := strings.HasPrefix(r.URL.Path, hostCertificatePath+"/") && strings.HasSuffix(r.URL.Path, "/renew")
 	if r.URL.Path != userCertificatePath && r.URL.Path != hostCertificatePath && !renew {
@@ -221,6 +230,54 @@ func (ca *fakeCA) handle(w http.ResponseWriter, r *http.Request) {
 	ca.issued = c
 
 	_ = json.NewEncoder(w).Encode(api.CertificateResponse{Certificate: ssh.MarshalAuthorizedKey(c)})
+}
+
+// handleRevoke handles revocation of user and host certificates. By default
+// it verifies the proof with revokeKey and reports the certificate as revoked
+// at revokedAt.
+func (ca *fakeCA) handleRevoke(w http.ResponseWriter, r *http.Request) {
+	serial, ok := strings.CutPrefix(r.URL.Path, userCertificatePath+"/")
+	if !ok {
+		serial, ok = strings.CutPrefix(r.URL.Path, hostCertificatePath+"/")
+	}
+	if _, err := strconv.ParseUint(serial, 10, 64); !ok || err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	ca.requests++
+	ca.path = r.URL.Path
+
+	// record whether the proof of possession verifies for the key and this
+	// request
+	p, err := proof.Parse(r.Header.Get("Proof-Of-Possession"))
+	if err == nil {
+		err = p.VerifyRequest(ca.revokeKey, r.Method, r.URL.Path, time.Minute)
+	}
+	ca.proofErr = err
+
+	contentType := "application/json"
+	if ca.contentType != "" {
+		contentType = ca.contentType
+	}
+	w.Header().Set("Content-Type", contentType)
+
+	if ca.status != 0 {
+		w.WriteHeader(ca.status)
+		body := `{"success":false,"errors":[]}`
+		if ca.body != "" {
+			body = ca.body
+		}
+		_, _ = w.Write([]byte(body))
+		return
+	}
+
+	if ca.body != "" {
+		_, _ = w.Write([]byte(ca.body))
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(api.RevocationResponse{RevokedAt: ca.revokedAt})
 }
 
 // requestCount returns the number of certificate requests the CA received

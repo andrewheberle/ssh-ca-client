@@ -24,10 +24,10 @@ type rootCommand struct {
 }
 
 var (
-	ErrCommandNotImplemented = errors.New("command not implemented")
-	ErrNoPrivateKey          = errors.New("no private key found")
+	ErrNoPrivateKey = errors.New("no private key found")
 
-	// to allow output redirection for tests
+	// to allow input and output redirection for tests
+	stdin  io.Reader     = os.Stdin
 	stdout io.ReadWriter = os.Stdout
 )
 

@@ -10,7 +10,7 @@ func TestExecute_NoSnapFlags(t *testing.T) {
 	runFlagTests(t, []flagTest{
 		{"krl", []string{"krl", "--host", "--out", "krl.bin", "--force"}},
 		{"krl short flags", []string{"krl", "-f", "krl.bin"}},
-		{"revoke", []string{"revoke", "--host"}},
+		{"revoke", []string{"revoke", "--host", "--key", "a", "--key", "b,c"}},
 		{"host", []string{"host"}},
 	})
 

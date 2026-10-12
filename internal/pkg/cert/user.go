@@ -21,7 +21,10 @@ type UserCertificate struct {
 	Lifetime    time.Duration
 }
 
-var _ Requestable = &UserCertificate{}
+var (
+	_ Requestable = &UserCertificate{}
+	_ Revocable   = &UserCertificate{}
+)
 
 const DefaultUserCertificateLifetime = time.Hour * 24
 
@@ -119,4 +122,64 @@ func (u *UserCertificate) RequestContext(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// Revoke revokes the current user certificate. See [UserCertificate.RevokeContext].
+func (u *UserCertificate) Revoke() (time.Time, error) {
+	return u.RevokeContext(context.Background())
+}
+
+// RevokeContext revokes the current user certificate at the CA using proof of
+// possession of the private key, which needs no authentication. Once revoked
+// the certificate is removed from the SSH agent and deleted from the store.
+// The time of revocation is returned. Cancelling ctx aborts the request to the
+// CA.
+//
+// If the certificate was already revoked the error wraps [ErrAlreadyRevoked],
+// although the certificate is still removed. If the certificate was revoked
+// but could not be removed from the SSH agent the error wraps
+// [ErrRemovingFromAgent].
+func (u *UserCertificate) RevokeContext(ctx context.Context) (time.Time, error) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
+	revokedAt, err := u.revokeCurrent(ctx, "/user/certificates", u.revokeRequest)
+	if err != nil {
+		return revokedAt, fmt.Errorf("user certificate revocation: %w", err)
+	}
+
+	return revokedAt, nil
+}
+
+// RevokeSerialContext revokes the user certificate with serial at the CA, which
+// must have been issued for the private key in the store. If serial is the
+// current certificate it is removed as for [UserCertificate.RevokeContext]. If the CA
+// has no certificate with serial for the key the error wraps
+// [ErrUnknownCertificate].
+func (u *UserCertificate) RevokeSerialContext(ctx context.Context, serial uint64) (time.Time, error) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
+	revokedAt, err := u.revoke(ctx, "/user/certificates", serial, u.revokeRequest)
+	if err != nil {
+		return revokedAt, fmt.Errorf("user certificate revocation: %w", err)
+	}
+
+	return revokedAt, nil
+}
+
+func (u *UserCertificate) revokeRequest(ctx context.Context, serial, proof string) (revokeResponse, error) {
+	res, err := u.client.RevokeUserCertificateWithResponse(ctx, serial, &api.RevokeUserCertificateParams{
+		ProofOfPossession: proof,
+	})
+	if err != nil {
+		return revokeResponse{}, err
+	}
+
+	return revokeResponse{
+		statusCode:  res.StatusCode(),
+		body:        res.Body,
+		contentType: res.HTTPResponse.Header.Get("Content-Type"),
+		result:      res.JSON200,
+	}, nil
 }

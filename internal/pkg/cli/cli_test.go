@@ -2,7 +2,6 @@ package cli_test
 
 import (
 	"context"
-	"errors"
 	"os"
 	"testing"
 
@@ -58,6 +57,8 @@ func TestExecute_Flags(t *testing.T) {
 		{"generate", []string{"generate", "--force", "--dryrun"}},
 		{"generate short flags", []string{"generate", "-n"}},
 		{"login", []string{"login", "--add", "--force", "--life", "1h", "--skip-agent"}},
+		{"revoke", []string{"revoke", "--serial", "1", "--serial", "2,3", "--yes"}},
+		{"revoke short flags", []string{"revoke", "-y"}},
 		{"show", []string{"show", "--certificate", "--git"}},
 		{"show private", []string{"show", "--private"}},
 		{"show public", []string{"show", "--public"}},
@@ -100,6 +101,7 @@ func TestExecute(t *testing.T) {
 		{"generate with missing config", []string{"--config", missingConfig, "generate", "--dryrun"}, true},
 		{"login with missing config", []string{"--config", missingConfig, "login"}, true},
 		{"show with missing config", []string{"--config", missingConfig, "show"}, true},
+		{"revoke with missing config", []string{"--config", missingConfig, "revoke", "--yes"}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -109,10 +111,4 @@ func TestExecute(t *testing.T) {
 			}
 		})
 	}
-
-	t.Run("revoke not implemented", func(t *testing.T) {
-		if err := execute(t, "revoke"); !errors.Is(err, cli.ErrCommandNotImplemented) {
-			t.Errorf("Execute() error = %v, want %v", err, cli.ErrCommandNotImplemented)
-		}
-	})
 }

@@ -65,7 +65,7 @@ func (c *hostCommand) Init(cd *simplecobra.Commandeer) error {
 	cmd := cd.CobraCommand
 	cmd.Flags().DurationVar(&c.lifetime, "life", cert.DefaultHostCertificateLifetime, "Lifetime of SSH certificate")
 	cmd.Flags().DurationVar(&c.delay, "delay", defaultHostDelay, "Delay between requests/renewals (randomised between 50% and 150%, 0 disables)")
-	cmd.Flags().StringSliceVar(&c.keypath, "key", []string{"/etc/ssh/ssh_host_ed25519_key", "/etc/ssh/ssh_host_ecdsa_key", "/etc/ssh/ssh_host_rsa_key"}, "Path to private key(s)")
+	cmd.Flags().StringSliceVar(&c.keypath, "key", defaultHostKeys, "Path to private key(s)")
 	cmd.Flags().StringSliceVar(&c.principals, "principals", principals, "Principals to add to the host certificate request")
 	cmd.Flags().BoolVar(&c.renew, "renew", false, "Renew existing certificate")
 	cmd.MarkFlagsMutuallyExclusive("renew", "principals")

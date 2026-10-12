@@ -3,9 +3,11 @@
 package sshcert
 
 import (
+	"bytes"
 	"fmt"
 
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/agent"
 )
 
 // ParseCert will parse the provided byte slice (in OpenSSH certificate format)
@@ -30,4 +32,27 @@ func ParseCert(certBytes []byte) (*ssh.Certificate, error) {
 	}
 
 	return cert, nil
+}
+
+// RemoveFromAgent removes cert from the agent a, leaving any other identities
+// (such as the plain private key for the certificate) in place. It does
+// nothing if the agent does not hold cert.
+func RemoveFromAgent(a agent.Agent, cert *ssh.Certificate) error {
+	keys, err := a.List()
+	if err != nil {
+		return fmt.Errorf("could not list agent keys: %w", err)
+	}
+
+	want := cert.Marshal()
+	for _, k := range keys {
+		if bytes.Equal(k.Marshal(), want) {
+			if err := a.Remove(cert); err != nil {
+				return fmt.Errorf("could not remove certificate from agent: %w", err)
+			}
+
+			return nil
+		}
+	}
+
+	return nil
 }

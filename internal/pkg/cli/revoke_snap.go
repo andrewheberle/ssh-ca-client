@@ -11,5 +11,7 @@ func (c *revokeCommand) Init(cd *simplecobra.Commandeer) error {
 		return err
 	}
 
+	c.initCommonFlags(cd.CobraCommand)
+
 	return nil
 }
