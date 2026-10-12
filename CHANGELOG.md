@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.25.0](https://github.com/andrewheberle/ssh-ca-client/compare/v0.24.0...v0.25.0) (2026-10-12)
+
+
+### Features
+
+* **systemd:** add a user timer to refresh the host KRL ([#109](https://github.com/andrewheberle/ssh-ca-client/issues/109)) ([49244cf](https://github.com/andrewheberle/ssh-ca-client/commit/49244cfd4542aee9700ef58241f9ae7d36417d73))
+
+
+### Bug Fixes
+
+* **httpclient:** allow 15 seconds for requests to the CA ([#107](https://github.com/andrewheberle/ssh-ca-client/issues/107)) ([d22ea2a](https://github.com/andrewheberle/ssh-ca-client/commit/d22ea2a99a3521bbc5b1eb9a303abbc3300ed3aa))
+* **krl:** don't rewrite the output file when the KRL is unchanged ([#108](https://github.com/andrewheberle/ssh-ca-client/issues/108)) ([7f6b730](https://github.com/andrewheberle/ssh-ca-client/commit/7f6b73033e7a71c58dfed9e8d0df6e0126713dd7))
+
 ## [0.24.0](https://github.com/andrewheberle/ssh-ca-client/compare/v0.23.1...v0.24.0) (2026-10-12)
 
 
