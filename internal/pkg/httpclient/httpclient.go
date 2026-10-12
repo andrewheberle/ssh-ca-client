@@ -15,8 +15,11 @@ const (
 	// UserAgent is the product name sent in the User-Agent header
 	UserAgent = "Serverless-SSH-CA-Client"
 
-	// Timeout is the timeout for requests made by the client
-	Timeout = time.Second * 3
+	// Timeout is the timeout for requests made by the client. A request may
+	// need the CA to start, query its database, fetch the identity
+	// provider's keys and sign a certificate, so it allows for a slow
+	// response rather than failing a request that would succeed.
+	Timeout = time.Second * 15
 )
 
 // New returns a [*http.Client] that sets the User-Agent header on all
