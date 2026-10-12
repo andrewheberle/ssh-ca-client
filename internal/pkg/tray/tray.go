@@ -45,6 +45,13 @@ type Certificate interface {
 	RequestContext(ctx context.Context) error
 }
 
+// menuItem is the part of a [*systray.MenuItem] updated as the state changes
+type menuItem interface {
+	SetTitle(title string)
+	Enable()
+	Disable()
+}
+
 type Application struct {
 	cert    Certificate
 	config  *config.ClientConfig
@@ -61,10 +68,20 @@ type Application struct {
 	notificationIcons map[string][]byte
 	state             appState
 
-	mExpiry   *systray.MenuItem
-	mGenerate *systray.MenuItem
-	mRenew    *systray.MenuItem
-	mQuit     *systray.MenuItem
+	mExpiry   menuItem
+	mGenerate menuItem
+	mRenew    menuItem
+
+	// channels notified when the menu items are clicked
+	renewClicked    <-chan struct{}
+	generateClicked <-chan struct{}
+	quitClicked     <-chan struct{}
+
+	// these update the system tray and send desktop notifications, which are
+	// replaced in tests
+	setIcon    func(icon []byte)
+	setTooltip func(tooltip string)
+	notifier   func(title, message string, icon any) error
 
 	mu             sync.Mutex
 	refreshBackOff int
@@ -89,7 +106,10 @@ func New(title string, fs embed.FS, c Certificate, conf *config.ClientConfig, re
 		done:              make(chan bool),
 		logger:            slog.New(slog.DiscardHandler),
 		notificationIcons: make(map[string][]byte),
+		notifier:          beeep.Notify,
 		renewAt:           renewAt,
+		setIcon:           systray.SetIcon,
+		setTooltip:        systray.SetTooltip,
 		state:             stateInit,
 		title:             title,
 		trayIcons:         make(map[string][]byte),
@@ -134,7 +154,7 @@ func (app *Application) notify(title string, message string, icon string) {
 	b := app.getIcon(icon)
 
 	// set notification
-	if err := beeep.Notify(title, message, b); err != nil {
+	if err := app.notifier(title, message, b); err != nil {
 		app.logger.Error("could not send notification", "error", err)
 	}
 }
@@ -157,13 +177,18 @@ func (app *Application) onReady() {
 	systray.SetTitle(app.title)
 
 	// build menu
-	app.mRenew = systray.AddMenuItem("Renew", "Renew certificate")
-	app.mGenerate = systray.AddMenuItem("Generate", "Generate private key")
+	mRenew := systray.AddMenuItem("Renew", "Renew certificate")
+	mGenerate := systray.AddMenuItem("Generate", "Generate private key")
 	systray.AddSeparator()
-	app.mExpiry = systray.AddMenuItem("Unknown", "Current expiry unknown")
-	app.mExpiry.Disable()
+	mExpiry := systray.AddMenuItem("Unknown", "Current expiry unknown")
+	mExpiry.Disable()
 	systray.AddSeparator()
-	app.mQuit = systray.AddMenuItem("Quit", "Close application")
+	mQuit := systray.AddMenuItem("Quit", "Close application")
+
+	app.mRenew, app.renewClicked = mRenew, mRenew.ClickedCh
+	app.mGenerate, app.generateClicked = mGenerate, mGenerate.ClickedCh
+	app.mExpiry = mExpiry
+	app.quitClicked = mQuit.ClickedCh
 
 	// set initial state
 	app.setState()
@@ -263,8 +288,8 @@ func (app *Application) setState() {
 		app.mGenerate.Enable()
 		app.mRenew.Disable()
 		app.mExpiry.SetTitle("No certificate")
-		app.setTooltip("No private key found")
-		systray.SetIcon(app.trayIcons["error"])
+		app.setStatus("No private key found")
+		app.setIcon(app.trayIcons["error"])
 	case stateKeyOK:
 		// we have a key so check the state of the certificate
 		app.logger.Info("private key found")
@@ -298,8 +323,8 @@ func (app *Application) setState() {
 		app.mRenew.SetTitle("Renew")
 		app.mRenew.Enable()
 		app.mExpiry.SetTitle("Certificate expired")
-		app.setTooltip("Certificate expired")
-		systray.SetIcon(app.trayIcons["warning"])
+		app.setStatus("Certificate expired")
+		app.setIcon(app.trayIcons["warning"])
 	case stateCertificateMissing:
 		// check we haven't renewed
 		if app.certificateValid() {
@@ -313,8 +338,8 @@ func (app *Application) setState() {
 		app.mRenew.SetTitle("Request")
 		app.mRenew.Enable()
 		app.mExpiry.SetTitle("No certificate")
-		app.setTooltip("No certificate found")
-		systray.SetIcon(app.trayIcons["warning"])
+		app.setStatus("No certificate found")
+		app.setIcon(app.trayIcons["warning"])
 	case stateCertificateOK:
 		// check we haven't expired
 		if !app.certificateValid() {
@@ -380,8 +405,8 @@ func (app *Application) setState() {
 		app.mRenew.SetTitle("Renew")
 		app.mRenew.Enable()
 		app.mExpiry.SetTitle(fmt.Sprintf("%s left", timeLeft(app.certificateExpiry())))
-		app.setTooltip("Current certificate valid")
-		systray.SetIcon(app.trayIcons[okIcon])
+		app.setStatus("Current certificate valid")
+		app.setIcon(app.trayIcons[okIcon])
 	}
 }
 
@@ -405,7 +430,7 @@ func (app *Application) eventloop() {
 		case <-t.C:
 			// this is a noop
 			continue
-		case <-app.mRenew.ClickedCh:
+		case <-app.renewClicked:
 			if renewDone != nil {
 				// a renewal is already in progress
 				continue
@@ -435,7 +460,7 @@ func (app *Application) eventloop() {
 				app.logger.Error("could not renew certificate", "error", err)
 				app.notify("Error", "The certificate renewal failed", errorIcon)
 			}
-		case <-app.mGenerate.ClickedCh:
+		case <-app.generateClicked:
 			// start by disabling menu item so we aren't overlapping
 			app.mGenerate.Disable()
 
@@ -448,7 +473,7 @@ func (app *Application) eventloop() {
 
 			app.notify("Key Generated", "A private key was successfully generated", okIcon)
 			app.state = stateKeyOK
-		case <-app.mQuit.ClickedCh:
+		case <-app.quitClicked:
 			app.logger.Info("application shutting down")
 			// abort any interactive login in progress
 			app.cancel()
@@ -580,8 +605,8 @@ func timeLeft(t time.Time) string {
 	return fmt.Sprintf("%02dh%02dm", int(timeLeft.Hours()), int(timeLeft.Minutes())%60)
 }
 
-func (app *Application) setTooltip(message string) {
-	// set tooltip
+// setStatus sets the tray tooltip to show message
+func (app *Application) setStatus(message string) {
 	tooltip := fmt.Sprintf("SSH CA Client (%s) - %s", version.Version(), message)
-	systray.SetTooltip(tooltip)
+	app.setTooltip(tooltip)
 }
