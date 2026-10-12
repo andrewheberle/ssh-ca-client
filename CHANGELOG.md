@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.24.0](https://github.com/andrewheberle/ssh-ca-client/compare/v0.23.1...v0.24.0) (2026-10-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* **api:** migrate to the v4 CA API- #97
+
+### Features
+
+* **api:** migrate to the v4 CA API- [#97](https://github.com/andrewheberle/ssh-ca-client/issues/97) ([7c40e1f](https://github.com/andrewheberle/ssh-ca-client/commit/7c40e1fc484b64e4ca8df8b28e05f7be81df1a98))
+* **cli:** implement certificate revocation ([#100](https://github.com/andrewheberle/ssh-ca-client/issues/100)) ([e1d826c](https://github.com/andrewheberle/ssh-ca-client/commit/e1d826c5d4d2e0b7004b795689dd56bcc632a9cd))
+
+
+### Bug Fixes
+
+* **cert:** don't contact the SSH agent when revoking host certificates ([#101](https://github.com/andrewheberle/ssh-ca-client/issues/101)) ([2e7c05a](https://github.com/andrewheberle/ssh-ca-client/commit/2e7c05ab6cf939016fc1e1f6f4c1c02f8611f7c3))
+
 ## [0.23.1](https://github.com/andrewheberle/ssh-ca-client/compare/v0.23.0...v0.23.1) (2026-10-11)
 
 
