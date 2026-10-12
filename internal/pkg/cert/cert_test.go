@@ -279,6 +279,7 @@ type fakeStore struct {
 	deleted   bool
 	deleteErr error
 
+	agentContacted   bool // RemoveFromAgent was called, even if it failed
 	removedFromAgent bool
 	removeErr        error
 }
@@ -316,6 +317,7 @@ func (s *fakeStore) DeleteCertificate() error {
 }
 
 func (s *fakeStore) RemoveFromAgent() error {
+	s.agentContacted = true
 	if s.removeErr != nil {
 		return s.removeErr
 	}

@@ -156,9 +156,10 @@ read access to the host private keys so should be run as root. Revoking host
 certificates is not available on Windows or when installed as a snap.
 
 Revocation uses a proof of possession of the private key the certificate was
-issued for, so no login is needed. Once revoked, the certificate is removed
-from the SSH agent and deleted, so a new certificate can be requested with
-login or host.
+issued for, so no login is needed. Once revoked, the certificate is deleted so
+a new certificate can be requested with login or host. A user certificate is
+also removed from the SSH agent, while host certificates are not held in an
+SSH agent so it is not contacted with --host.
 
 The --serial option revokes the certificates with those serial numbers instead
 of the current certificate. They must have been issued for the same private key,
