@@ -84,8 +84,17 @@ trusted_ca: %s`, srv.URL, ssh.MarshalAuthorizedKey(ca.signer.PublicKey()))
 }
 
 // issue generates a key in store and saves a certificate of certType for it
-// with serial issued by ca
+// with serial issued by ca, which is valid for the next hour
 func (ca *testRevokeCA) issue(t *testing.T, store cert.Storage, certType uint32, serial uint64) {
+	t.Helper()
+
+	now := time.Now()
+	ca.issueValid(t, store, certType, serial, now.Add(-time.Minute), now.Add(time.Hour))
+}
+
+// issueValid is as for issue with a certificate valid between after and
+// before
+func (ca *testRevokeCA) issueValid(t *testing.T, store cert.Storage, certType uint32, serial uint64, after, before time.Time) {
 	t.Helper()
 
 	if err := store.GeneratePrivateKey(); err != nil {
@@ -96,15 +105,14 @@ func (ca *testRevokeCA) issue(t *testing.T, store cert.Storage, certType uint32,
 		t.Fatalf("getting public key: %v", err)
 	}
 
-	now := time.Now()
 	c := &ssh.Certificate{
 		Key:             pub,
 		Serial:          serial,
 		CertType:        certType,
 		KeyId:           "test",
 		ValidPrincipals: []string{"test"},
-		ValidAfter:      uint64(now.Add(-time.Minute).Unix()),
-		ValidBefore:     uint64(now.Add(time.Hour).Unix()),
+		ValidAfter:      uint64(after.Unix()),
+		ValidBefore:     uint64(before.Unix()),
 	}
 	if err := c.SignCert(rand.Reader, ca.signer); err != nil {
 		t.Fatalf("signing certificate: %v", err)
