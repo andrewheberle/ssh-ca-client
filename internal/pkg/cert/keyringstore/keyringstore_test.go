@@ -1261,3 +1261,115 @@ func TestStorage_LargeKey(t *testing.T) {
 		t.Errorf("HasCertificate() = false, want true")
 	}
 }
+
+func TestStorage_DeleteCertificate(t *testing.T) {
+	ca := newCA(t)
+
+	tests := []struct {
+		name     string
+		withCert bool
+	}{
+		{"deletes certificate", true},
+		{"no certificate", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newStorage(t, ca)
+			if tt.withCert {
+				if err := s.SaveCertificate(validCert(t, s, ca)); err != nil {
+					t.Fatalf("SaveCertificate() error = %v", err)
+				}
+			} else {
+				generatePrivateKey(t, s)
+			}
+
+			if err := s.DeleteCertificate(); err != nil {
+				t.Fatalf("DeleteCertificate() error = %v", err)
+			}
+			if s.HasCertificate() {
+				t.Error("HasCertificate() = true after DeleteCertificate()")
+			}
+			if !s.HasPrivateKey() {
+				t.Error("HasPrivateKey() = false after DeleteCertificate(), want the key kept")
+			}
+		})
+	}
+}
+
+// listFailingAgent is an agent whose List always fails
+type listFailingAgent struct {
+	agent.ExtendedAgent
+}
+
+func (listFailingAgent) List() ([]*agent.Key, error) {
+	return nil, errors.New("list failed")
+}
+
+func TestStorage_RemoveFromAgent(t *testing.T) {
+	ca := newCA(t)
+
+	t.Run("no certificate", func(t *testing.T) {
+		s := newStorage(t, ca, WithAgent(listFailingAgent{newAgent()}))
+		generatePrivateKey(t, s)
+
+		if err := s.RemoveFromAgent(); err != nil {
+			t.Errorf("RemoveFromAgent() error = %v, want nil", err)
+		}
+	})
+
+	t.Run("removes certificate and keeps key", func(t *testing.T) {
+		a := newAgent()
+		s := newStorage(t, ca, WithAgent(a))
+		c := validCert(t, s, ca)
+		if err := s.SaveCertificate(c); err != nil {
+			t.Fatalf("SaveCertificate() error = %v", err)
+		}
+		if err := s.AddToAgent(); err != nil {
+			t.Fatalf("AddToAgent() error = %v", err)
+		}
+		key, err := s.PrivateKey()
+		if err != nil {
+			t.Fatalf("PrivateKey() error = %v", err)
+		}
+		if err := a.Add(agent.AddedKey{PrivateKey: key}); err != nil {
+			t.Fatalf("agent Add() error = %v", err)
+		}
+
+		if err := s.RemoveFromAgent(); err != nil {
+			t.Fatalf("RemoveFromAgent() error = %v", err)
+		}
+
+		keys, err := a.List()
+		if err != nil {
+			t.Fatalf("agent List() error = %v", err)
+		}
+		if len(keys) != 1 || !bytes.Equal(keys[0].Marshal(), c.Key.Marshal()) {
+			t.Errorf("agent holds %d keys, want only the plain key", len(keys))
+		}
+	})
+
+	t.Run("no agent running", func(t *testing.T) {
+		s := newStorage(t, ca)
+		if err := s.SaveCertificate(validCert(t, s, ca)); err != nil {
+			t.Fatalf("SaveCertificate() error = %v", err)
+		}
+		s.dial = func() (agent.ExtendedAgent, func() error, error) {
+			return nil, nil, errors.New("no agent")
+		}
+
+		if err := s.RemoveFromAgent(); err != nil {
+			t.Errorf("RemoveFromAgent() error = %v, want nil", err)
+		}
+	})
+
+	t.Run("agent error", func(t *testing.T) {
+		s := newStorage(t, ca, WithAgent(listFailingAgent{newAgent()}))
+		if err := s.SaveCertificate(validCert(t, s, ca)); err != nil {
+			t.Fatalf("SaveCertificate() error = %v", err)
+		}
+
+		if err := s.RemoveFromAgent(); !errors.Is(err, ErrRemovingFromAgent) {
+			t.Errorf("RemoveFromAgent() error = %v, want %v", err, ErrRemovingFromAgent)
+		}
+	})
+}

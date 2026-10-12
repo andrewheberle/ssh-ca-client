@@ -37,6 +37,7 @@ func commands() []simplecobra.Commander {
 		&revokeCommand{
 			Command: simplecommand.New("revoke", "Revoke a certificate",
 				simplecommand.WithLong(revokeLong),
+				simplecommand.WithExample(revokeExample),
 			),
 		},
 	}

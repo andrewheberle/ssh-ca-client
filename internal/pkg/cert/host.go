@@ -25,7 +25,10 @@ type HostCertificate struct {
 	Principals  []string
 }
 
-var _ Renewable = &HostCertificate{}
+var (
+	_ Renewable = &HostCertificate{}
+	_ Revocable = &HostCertificate{}
+)
 
 const DefaultHostCertificateLifetime = (time.Hour * 24) * 30
 
@@ -214,4 +217,64 @@ func (h *HostCertificate) RequestContext(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// Revoke revokes the current host certificate. See [HostCertificate.RevokeContext].
+func (h *HostCertificate) Revoke() (time.Time, error) {
+	return h.RevokeContext(context.Background())
+}
+
+// RevokeContext revokes the current host certificate at the CA using proof of
+// possession of the private key, which needs no authentication. Once revoked
+// the certificate is removed from the SSH agent and deleted from the store.
+// The time of revocation is returned. Cancelling ctx aborts the request to the
+// CA.
+//
+// If the certificate was already revoked the error wraps [ErrAlreadyRevoked],
+// although the certificate is still removed. If the certificate was revoked
+// but could not be removed from the SSH agent the error wraps
+// [ErrRemovingFromAgent].
+func (h *HostCertificate) RevokeContext(ctx context.Context) (time.Time, error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	revokedAt, err := h.revokeCurrent(ctx, "/host/certificates", h.revokeRequest)
+	if err != nil {
+		return revokedAt, fmt.Errorf("host certificate revocation: %w", err)
+	}
+
+	return revokedAt, nil
+}
+
+// RevokeSerialContext revokes the host certificate with serial at the CA, which
+// must have been issued for the private key in the store. If serial is the
+// current certificate it is removed as for [HostCertificate.RevokeContext]. If the CA
+// has no certificate with serial for the key the error wraps
+// [ErrUnknownCertificate].
+func (h *HostCertificate) RevokeSerialContext(ctx context.Context, serial uint64) (time.Time, error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	revokedAt, err := h.revoke(ctx, "/host/certificates", serial, h.revokeRequest)
+	if err != nil {
+		return revokedAt, fmt.Errorf("host certificate revocation: %w", err)
+	}
+
+	return revokedAt, nil
+}
+
+func (h *HostCertificate) revokeRequest(ctx context.Context, serial, proof string) (revokeResponse, error) {
+	res, err := h.client.RevokeHostCertificateWithResponse(ctx, serial, &api.RevokeHostCertificateParams{
+		ProofOfPossession: proof,
+	})
+	if err != nil {
+		return revokeResponse{}, err
+	}
+
+	return revokeResponse{
+		statusCode:  res.StatusCode(),
+		body:        res.Body,
+		contentType: res.HTTPResponse.Header.Get("Content-Type"),
+		result:      res.JSON200,
+	}, nil
 }

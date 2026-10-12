@@ -21,7 +21,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -31,12 +30,12 @@ import (
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/filestore"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
-	"github.com/andrewheberle/ssh-ca-client/pkg/proof"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
 	sshkrl "github.com/forfuncsake/krl"
 	"github.com/go-jose/go-jose/v4"
 	"github.com/go-jose/go-jose/v4/jwt"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/agent"
 )
 
 const (
@@ -485,6 +484,9 @@ func logContents(t *testing.T, name, path string) {
 func (ca *testCA) newStore(t *testing.T, opts ...filestore.Option) *filestore.Storage {
 	t.Helper()
 
+	// an in-memory agent keeps any running agent out of the tests
+	opts = append([]filestore.Option{filestore.WithAgent(agent.NewKeyring().(agent.ExtendedAgent))}, opts...)
+
 	store, err := filestore.New(ca.PublicKey, filepath.Join(t.TempDir(), "id"), opts...)
 	if err != nil {
 		t.Fatalf("creating store: %v", err)
@@ -536,44 +538,30 @@ func (ca *testCA) client(t *testing.T) *api.ClientWithResponses {
 	return client
 }
 
-// revoke revokes the certificate with serial using the API, with proof of
-// possession of the private key in store, as the client does not implement
-// revocation. The status code of the response is returned.
-func (ca *testCA) revoke(t *testing.T, certificateType krl.CertificateType, serial uint64, store cert.Storage) int {
+// revoke revokes the certificate with serial using the client, with proof of
+// possession of the private key in store
+func (ca *testCA) revoke(t *testing.T, certificateType krl.CertificateType, serial uint64, store cert.Storage) error {
 	t.Helper()
 
-	signer, err := store.Signer()
-	if err != nil {
-		t.Fatalf("getting signer: %v", err)
-	}
-
-	id := strconv.FormatUint(serial, 10)
-
+	var (
+		r   cert.Revocable
+		err error
+	)
 	switch certificateType {
 	case krl.User:
-		p, err := proof.GenerateForRequest(signer, http.MethodDelete, "/api/v4/user/certificates/"+id)
-		if err != nil {
-			t.Fatalf("generating proof: %v", err)
-		}
-		res, err := ca.client(t).RevokeUserCertificateWithResponse(context.Background(), id, &api.RevokeUserCertificateParams{ProofOfPossession: p.String()})
-		if err != nil {
-			t.Fatalf("revoking certificate: %v", err)
-		}
-		return res.StatusCode()
+		r, err = cert.NewUserCertificate(ca.URL, store)
 	case krl.Host:
-		p, err := proof.GenerateForRequest(signer, http.MethodDelete, "/api/v4/host/certificates/"+id)
-		if err != nil {
-			t.Fatalf("generating proof: %v", err)
-		}
-		res, err := ca.client(t).RevokeHostCertificateWithResponse(context.Background(), id, &api.RevokeHostCertificateParams{ProofOfPossession: p.String()})
-		if err != nil {
-			t.Fatalf("revoking certificate: %v", err)
-		}
-		return res.StatusCode()
+		r, err = cert.NewHostCertificate(ca.URL, store)
 	default:
 		t.Fatalf("unsupported certificate type: %q", certificateType)
-		return 0
 	}
+	if err != nil {
+		t.Fatalf("creating %s certificate: %v", certificateType, err)
+	}
+
+	_, err = r.RevokeSerialContext(context.Background(), serial)
+
+	return err
 }
 
 // krlResponse fetches and verifies the KRL for certificateType

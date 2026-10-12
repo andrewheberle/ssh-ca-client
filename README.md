@@ -212,8 +212,8 @@ above.
 Sensitive data such as the users SSH private key and the OIDC refresh token are
 stored in the operating system keyring, which protects them using the
 platforms own mechanisms. A keyring/secret service must therefore be available
-to use the GUI and the `login`, `generate` and `show` sub-commands of the CLI.
-The `host` sub-command does not use the keyring.
+to use the GUI and the `login`, `generate`, `show` and `revoke` sub-commands of
+the CLI. The `host` and `revoke --host` sub-commands do not use the keyring.
 
 **Note:** Previous versions stored this data in a user configuration file
 (`user.yml`), protected using DPAPI on Windows or a key held in the keyring on
@@ -428,7 +428,54 @@ RevokedHostKeys ~/.ssh/revocation_list
 See [docs/ssh-ca-client-cli-krl.md](docs/ssh-ca-client-cli-krl.md) for all
 options.
 
+### Revoking Certificates
+
+The `revoke` sub-command revokes a certificate at the CA, which adds it to the
+KRL. Revocation cannot be undone and is only available via the CLI, not the GUI.
+
+```sh
+# revoke the current user certificate
+ssh-ca-client-cli revoke
+
+# revoke the current host certificates
+sudo ssh-ca-client-cli revoke --host
+```
+
+The certificates to be revoked are shown and confirmation is asked for, which
+can be skipped with `--yes` (required when there is no terminal). Revocation
+uses a proof of possession of the private key the certificate was issued for, so
+no login is needed. Once revoked, the certificate is removed from the SSH agent
+and deleted, so a new certificate can be requested with `login` or `host`.
+
+Revoking host certificates is not available on Windows or when installed as a
+snap.
+
+A revoked certificate is only rejected by `sshd` or `ssh` once they use a KRL
+that includes it (see [Key Revocation Lists](#key-revocation-lists)).
+
+Revoking the current certificate does not revoke any previous certificates
+issued for the same private key that have not yet expired, such as the
+certificate that was replaced by a renewal. These can be revoked by serial
+number with `--serial`:
+
+```sh
+ssh-ca-client-cli revoke --serial 12345678901234567890
+
+# with --host only a single --key may be given
+sudo ssh-ca-client-cli revoke --host --key /etc/ssh/ssh_host_ed25519_key --serial 12345678901234567890
+```
+
+If a private key may have been compromised, as well as revoking its
+certificates generate a new private key (`ssh-ca-client-cli generate --force`)
+or new host keys before requesting a new certificate.
+
+See [docs/ssh-ca-client-cli-revoke.md](docs/ssh-ca-client-cli-revoke.md) for
+all options.
+
 ## As a GUI
+
+The GUI requests and renews user certificates. Revoking a certificate is only
+available via the CLI (see [Revoking Certificates](#revoking-certificates)).
 
 The GUI supports the following command line flags:
 

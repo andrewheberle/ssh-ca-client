@@ -300,12 +300,15 @@ func TestHostCertificate_Renew_Rejected(t *testing.T) {
 			name: "revoked",
 			store: func(t *testing.T, ca *testCA) cert.Storage {
 				store := issued(t, ca)
+				c := certificate(t, store)
 
-				if code := ca.revoke(t, krl.Host, certificate(t, store).Serial, store); code != http.StatusOK {
-					t.Fatalf("revocation status code = %d, want %d", code, http.StatusOK)
+				if err := ca.revoke(t, krl.Host, c.Serial, store); err != nil {
+					t.Fatalf("revoking certificate: %v", err)
 				}
 
-				return store
+				// revocation deletes the certificate, so it is presented
+				// for renewal as it would be from a copy
+				return &certStore{Storage: store, certificate: c}
 			},
 			wantReason: "the provided certificate is revoked",
 		},

@@ -275,6 +275,12 @@ type fakeStore struct {
 
 	saved   *ssh.Certificate
 	saveErr error
+
+	deleted   bool
+	deleteErr error
+
+	removedFromAgent bool
+	removeErr        error
 }
 
 var _ Storage = &fakeStore{}
@@ -296,6 +302,24 @@ func (s *fakeStore) SaveCertificate(c *ssh.Certificate) error {
 		return s.saveErr
 	}
 	s.saved = c
+
+	return nil
+}
+
+func (s *fakeStore) DeleteCertificate() error {
+	if s.deleteErr != nil {
+		return s.deleteErr
+	}
+	s.deleted = true
+
+	return nil
+}
+
+func (s *fakeStore) RemoveFromAgent() error {
+	if s.removeErr != nil {
+		return s.removeErr
+	}
+	s.removedFromAgent = true
 
 	return nil
 }

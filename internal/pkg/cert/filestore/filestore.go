@@ -25,6 +25,7 @@ var (
 	ErrCertificateNotFound            = cert.ErrCertificateNotFound
 	ErrCertificateNotValid            = cert.ErrCertificateNotValid
 	ErrAddingToAgent                  = cert.ErrAddingToAgent
+	ErrRemovingFromAgent              = cert.ErrRemovingFromAgent
 	ErrKeyNotFound                    = cert.ErrKeyNotFound
 	ErrSignerNotFound                 = cert.ErrSignerNotFound
 	ErrUnexpectedCertificateAuthority = cert.ErrUnexpectedCertificateAuthority
@@ -148,6 +149,19 @@ func (s *Storage) CertificateBytes() ([]byte, error) {
 	return cert, nil
 }
 
+// DeleteCertificate deletes the current certificate. It is not an error if
+// there is no certificate.
+func (s *Storage) DeleteCertificate() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if err := os.Remove(s.keypath + "-cert.pub"); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("could not delete certificate: %w", err)
+	}
+
+	return nil
+}
+
 // GeneratePrivateKey generates a new SSH private key of the configured type
 // (see [WithKeyType]). This returns [ErrPrivateKeyExists] rather than
 // overwrite an existing key file.
@@ -268,6 +282,36 @@ func (s *Storage) PublicKeyBytes() ([]byte, error) {
 
 	// return as public key without a newline
 	return bytes.TrimSuffix(pubBytes, []byte("\n")), nil
+}
+
+// RemoveFromAgent removes the current certificate from the SSH Agent, leaving
+// the private key and any other identities in place. Nothing is done if there
+// is no certificate, if no agent can be connected to or if the agent does not
+// hold the certificate. Other failures are returned as [ErrRemovingFromAgent].
+func (s *Storage) RemoveFromAgent() error {
+	s.mu.RLock()
+	cert, _, err := s.cert()
+	s.mu.RUnlock()
+
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return fmt.Errorf("%w: %w", ErrRemovingFromAgent, err)
+	}
+
+	// a certificate cannot be held by an agent that is not running
+	a, closeAgent, err := s.dial()
+	if err != nil {
+		return nil
+	}
+	defer func() { _ = closeAgent() }()
+
+	if err := sshcert.RemoveFromAgent(a, cert); err != nil {
+		return fmt.Errorf("%w: %w", ErrRemovingFromAgent, err)
+	}
+
+	return nil
 }
 
 // Saves the provided [ssh.Certificate]
