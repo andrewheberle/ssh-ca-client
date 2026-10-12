@@ -136,6 +136,8 @@ nfpms:
     contents:
       - src: systemd/
         dst: /usr/lib/systemd/system
+      - src: systemd-user/
+        dst: /usr/lib/systemd/user
       - src: deb/ssh-ca-client.desktop
         dst: /usr/share/applications/ssh-ca-client.desktop
       - src: cmd/ssh-ca-client/winres/icon32.png

@@ -1,0 +1,6 @@
+[Unit]
+Description=Refresh SSH Host Certificate Revocation List
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ssh-ca-client-cli krl --host --out %h/.ssh/revocation_list
