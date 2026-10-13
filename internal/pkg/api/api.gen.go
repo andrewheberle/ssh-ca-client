@@ -92,6 +92,21 @@ func (e PostHostCertificate422JSONResponseBodySuccess) Valid() bool {
 	}
 }
 
+// Defines values for PostHostCertificate429JSONResponseBodySuccess.
+const (
+	PostHostCertificate429JSONResponseBodySuccessFalse PostHostCertificate429JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the PostHostCertificate429JSONResponseBodySuccess enum.
+func (e PostHostCertificate429JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case PostHostCertificate429JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for PostHostCertificate500JSONResponseBodySuccess.
 const (
 	PostHostCertificate500JSONResponseBodySuccessFalse PostHostCertificate500JSONResponseBodySuccess = false
@@ -176,6 +191,21 @@ const (
 func (e PostHostRenew422JSONResponseBodySuccess) Valid() bool {
 	switch e {
 	case PostHostRenew422JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PostHostRenew429JSONResponseBodySuccess.
+const (
+	PostHostRenew429JSONResponseBodySuccessFalse PostHostRenew429JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the PostHostRenew429JSONResponseBodySuccess enum.
+func (e PostHostRenew429JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case PostHostRenew429JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
@@ -272,6 +302,21 @@ func (e PostHostRevoke422JSONResponseBodySuccess) Valid() bool {
 	}
 }
 
+// Defines values for PostHostRevoke429JSONResponseBodySuccess.
+const (
+	PostHostRevoke429JSONResponseBodySuccessFalse PostHostRevoke429JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the PostHostRevoke429JSONResponseBodySuccess enum.
+func (e PostHostRevoke429JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case PostHostRevoke429JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for PostHostRevoke500JSONResponseBodySuccess.
 const (
 	PostHostRevoke500JSONResponseBodySuccessFalse PostHostRevoke500JSONResponseBodySuccess = false
@@ -341,6 +386,21 @@ const (
 func (e PostUserCertificate422JSONResponseBodySuccess) Valid() bool {
 	switch e {
 	case PostUserCertificate422JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PostUserCertificate429JSONResponseBodySuccess.
+const (
+	PostUserCertificate429JSONResponseBodySuccessFalse PostUserCertificate429JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the PostUserCertificate429JSONResponseBodySuccess enum.
+func (e PostUserCertificate429JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case PostUserCertificate429JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
@@ -452,6 +512,21 @@ func (e PostUserRevoke422JSONResponseBodySuccess) Valid() bool {
 	}
 }
 
+// Defines values for PostUserRevoke429JSONResponseBodySuccess.
+const (
+	PostUserRevoke429JSONResponseBodySuccessFalse PostUserRevoke429JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the PostUserRevoke429JSONResponseBodySuccess enum.
+func (e PostUserRevoke429JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case PostUserRevoke429JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for PostUserRevoke500JSONResponseBodySuccess.
 const (
 	PostUserRevoke500JSONResponseBodySuccessFalse PostUserRevoke500JSONResponseBodySuccess = false
@@ -542,6 +617,21 @@ func (e IssueHostCertificate422JSONResponseBodySuccess) Valid() bool {
 	}
 }
 
+// Defines values for IssueHostCertificate429JSONResponseBodySuccess.
+const (
+	IssueHostCertificate429JSONResponseBodySuccessFalse IssueHostCertificate429JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueHostCertificate429JSONResponseBodySuccess enum.
+func (e IssueHostCertificate429JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueHostCertificate429JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for IssueHostCertificate500JSONResponseBodySuccess.
 const (
 	IssueHostCertificate500JSONResponseBodySuccessFalse IssueHostCertificate500JSONResponseBodySuccess = false
@@ -596,6 +686,21 @@ const (
 func (e RevokeHostCertificate409JSONResponseBodySuccess) Valid() bool {
 	switch e {
 	case RevokeHostCertificate409JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RevokeHostCertificate429JSONResponseBodySuccess.
+const (
+	RevokeHostCertificate429JSONResponseBodySuccessFalse RevokeHostCertificate429JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RevokeHostCertificate429JSONResponseBodySuccess enum.
+func (e RevokeHostCertificate429JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RevokeHostCertificate429JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
@@ -671,6 +776,21 @@ const (
 func (e RenewHostCertificate422JSONResponseBodySuccess) Valid() bool {
 	switch e {
 	case RenewHostCertificate422JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RenewHostCertificate429JSONResponseBodySuccess.
+const (
+	RenewHostCertificate429JSONResponseBodySuccessFalse RenewHostCertificate429JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RenewHostCertificate429JSONResponseBodySuccess enum.
+func (e RenewHostCertificate429JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RenewHostCertificate429JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
@@ -767,6 +887,21 @@ func (e IssueUserCertificate422JSONResponseBodySuccess) Valid() bool {
 	}
 }
 
+// Defines values for IssueUserCertificate429JSONResponseBodySuccess.
+const (
+	IssueUserCertificate429JSONResponseBodySuccessFalse IssueUserCertificate429JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueUserCertificate429JSONResponseBodySuccess enum.
+func (e IssueUserCertificate429JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueUserCertificate429JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for IssueUserCertificate500JSONResponseBodySuccess.
 const (
 	IssueUserCertificate500JSONResponseBodySuccessFalse IssueUserCertificate500JSONResponseBodySuccess = false
@@ -821,6 +956,21 @@ const (
 func (e RevokeUserCertificate409JSONResponseBodySuccess) Valid() bool {
 	switch e {
 	case RevokeUserCertificate409JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RevokeUserCertificate429JSONResponseBodySuccess.
+const (
+	RevokeUserCertificate429JSONResponseBodySuccessFalse RevokeUserCertificate429JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RevokeUserCertificate429JSONResponseBodySuccess enum.
+func (e RevokeUserCertificate429JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RevokeUserCertificate429JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
@@ -998,6 +1148,9 @@ type PostHostCertificate403JSONResponseBodySuccess bool
 // PostHostCertificate422JSONResponseBodySuccess defines parameters for PostHostCertificate.
 type PostHostCertificate422JSONResponseBodySuccess bool
 
+// PostHostCertificate429JSONResponseBodySuccess defines parameters for PostHostCertificate.
+type PostHostCertificate429JSONResponseBodySuccess bool
+
 // PostHostCertificate500JSONResponseBodySuccess defines parameters for PostHostCertificate.
 type PostHostCertificate500JSONResponseBodySuccess bool
 
@@ -1016,6 +1169,9 @@ type PostHostRenew403JSONResponseBodySuccess bool
 // PostHostRenew422JSONResponseBodySuccess defines parameters for PostHostRenew.
 type PostHostRenew422JSONResponseBodySuccess bool
 
+// PostHostRenew429JSONResponseBodySuccess defines parameters for PostHostRenew.
+type PostHostRenew429JSONResponseBodySuccess bool
+
 // PostHostRenew500JSONResponseBodySuccess defines parameters for PostHostRenew.
 type PostHostRenew500JSONResponseBodySuccess bool
 
@@ -1033,6 +1189,9 @@ type PostHostRevoke409JSONResponseBodySuccess bool
 
 // PostHostRevoke422JSONResponseBodySuccess defines parameters for PostHostRevoke.
 type PostHostRevoke422JSONResponseBodySuccess bool
+
+// PostHostRevoke429JSONResponseBodySuccess defines parameters for PostHostRevoke.
+type PostHostRevoke429JSONResponseBodySuccess bool
 
 // PostHostRevoke500JSONResponseBodySuccess defines parameters for PostHostRevoke.
 type PostHostRevoke500JSONResponseBodySuccess bool
@@ -1055,6 +1214,9 @@ type PostUserCertificate403JSONResponseBodySuccess bool
 // PostUserCertificate422JSONResponseBodySuccess defines parameters for PostUserCertificate.
 type PostUserCertificate422JSONResponseBodySuccess bool
 
+// PostUserCertificate429JSONResponseBodySuccess defines parameters for PostUserCertificate.
+type PostUserCertificate429JSONResponseBodySuccess bool
+
 // PostUserCertificate500JSONResponseBodySuccess defines parameters for PostUserCertificate.
 type PostUserCertificate500JSONResponseBodySuccess bool
 
@@ -1075,6 +1237,9 @@ type PostUserRevoke409JSONResponseBodySuccess bool
 
 // PostUserRevoke422JSONResponseBodySuccess defines parameters for PostUserRevoke.
 type PostUserRevoke422JSONResponseBodySuccess bool
+
+// PostUserRevoke429JSONResponseBodySuccess defines parameters for PostUserRevoke.
+type PostUserRevoke429JSONResponseBodySuccess bool
 
 // PostUserRevoke500JSONResponseBodySuccess defines parameters for PostUserRevoke.
 type PostUserRevoke500JSONResponseBodySuccess bool
@@ -1103,6 +1268,9 @@ type IssueHostCertificate403JSONResponseBodySuccess bool
 // IssueHostCertificate422JSONResponseBodySuccess defines parameters for IssueHostCertificate.
 type IssueHostCertificate422JSONResponseBodySuccess bool
 
+// IssueHostCertificate429JSONResponseBodySuccess defines parameters for IssueHostCertificate.
+type IssueHostCertificate429JSONResponseBodySuccess bool
+
 // IssueHostCertificate500JSONResponseBodySuccess defines parameters for IssueHostCertificate.
 type IssueHostCertificate500JSONResponseBodySuccess bool
 
@@ -1120,6 +1288,9 @@ type RevokeHostCertificate404JSONResponseBodySuccess bool
 
 // RevokeHostCertificate409JSONResponseBodySuccess defines parameters for RevokeHostCertificate.
 type RevokeHostCertificate409JSONResponseBodySuccess bool
+
+// RevokeHostCertificate429JSONResponseBodySuccess defines parameters for RevokeHostCertificate.
+type RevokeHostCertificate429JSONResponseBodySuccess bool
 
 // RevokeHostCertificate500JSONResponseBodySuccess defines parameters for RevokeHostCertificate.
 type RevokeHostCertificate500JSONResponseBodySuccess bool
@@ -1141,6 +1312,9 @@ type RenewHostCertificate403JSONResponseBodySuccess bool
 
 // RenewHostCertificate422JSONResponseBodySuccess defines parameters for RenewHostCertificate.
 type RenewHostCertificate422JSONResponseBodySuccess bool
+
+// RenewHostCertificate429JSONResponseBodySuccess defines parameters for RenewHostCertificate.
+type RenewHostCertificate429JSONResponseBodySuccess bool
 
 // RenewHostCertificate500JSONResponseBodySuccess defines parameters for RenewHostCertificate.
 type RenewHostCertificate500JSONResponseBodySuccess bool
@@ -1169,6 +1343,9 @@ type IssueUserCertificate403JSONResponseBodySuccess bool
 // IssueUserCertificate422JSONResponseBodySuccess defines parameters for IssueUserCertificate.
 type IssueUserCertificate422JSONResponseBodySuccess bool
 
+// IssueUserCertificate429JSONResponseBodySuccess defines parameters for IssueUserCertificate.
+type IssueUserCertificate429JSONResponseBodySuccess bool
+
 // IssueUserCertificate500JSONResponseBodySuccess defines parameters for IssueUserCertificate.
 type IssueUserCertificate500JSONResponseBodySuccess bool
 
@@ -1186,6 +1363,9 @@ type RevokeUserCertificate404JSONResponseBodySuccess bool
 
 // RevokeUserCertificate409JSONResponseBodySuccess defines parameters for RevokeUserCertificate.
 type RevokeUserCertificate409JSONResponseBodySuccess bool
+
+// RevokeUserCertificate429JSONResponseBodySuccess defines parameters for RevokeUserCertificate.
+type RevokeUserCertificate429JSONResponseBodySuccess bool
 
 // RevokeUserCertificate500JSONResponseBodySuccess defines parameters for RevokeUserCertificate.
 type RevokeUserCertificate500JSONResponseBodySuccess bool
@@ -1325,7 +1505,7 @@ type ClientInterface interface {
 
 	// PostHostRenewWithBody Renew a host certificate
 	//
-	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 	//
 	// Takes any type of body and a specified content type.
 	//
@@ -1334,7 +1514,7 @@ type ClientInterface interface {
 
 	// PostHostRenew Renew a host certificate
 	//
-	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 	//
 	// Takes a body of the `application/json` content type.
 	//
@@ -1436,7 +1616,7 @@ type ClientInterface interface {
 
 	// RenewHostCertificateWithBody Renew a host certificate
 	//
-	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 	//
 	// Takes any type of body and a specified content type.
 	//
@@ -1445,7 +1625,7 @@ type ClientInterface interface {
 
 	// RenewHostCertificate Renew a host certificate
 	//
-	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 	//
 	// Takes a body of the `application/json` content type.
 	//
@@ -1566,7 +1746,7 @@ func (c *Client) GetHostKrl(ctx context.Context, reqEditors ...RequestEditorFn) 
 
 // PostHostRenewWithBody Renew a host certificate
 //
-// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 //
 // Takes any type of body and a specified content type.
 //
@@ -1585,7 +1765,7 @@ func (c *Client) PostHostRenewWithBody(ctx context.Context, contentType string, 
 
 // PostHostRenew Renew a host certificate
 //
-// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 //
 // Takes a body of the `application/json` content type.
 //
@@ -1807,7 +1987,7 @@ func (c *Client) RevokeHostCertificate(ctx context.Context, serial string, param
 
 // RenewHostCertificateWithBody Renew a host certificate
 //
-// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 //
 // Takes any type of body and a specified content type.
 //
@@ -1826,7 +2006,7 @@ func (c *Client) RenewHostCertificateWithBody(ctx context.Context, serial string
 
 // RenewHostCertificate Renew a host certificate
 //
-// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 //
 // Takes a body of the `application/json` content type.
 //
@@ -2680,7 +2860,7 @@ type ClientWithResponsesInterface interface {
 
 	// PostHostRenewWithBodyWithResponse Renew a host certificate
 	//
-	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
@@ -2689,7 +2869,7 @@ type ClientWithResponsesInterface interface {
 
 	// PostHostRenewWithResponse Renew a host certificate
 	//
-	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
@@ -2797,7 +2977,7 @@ type ClientWithResponsesInterface interface {
 
 	// RenewHostCertificateWithBodyWithResponse Renew a host certificate
 	//
-	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
@@ -2806,7 +2986,7 @@ type ClientWithResponsesInterface interface {
 
 	// RenewHostCertificateWithResponse Renew a host certificate
 	//
-	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+	// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
@@ -2951,6 +3131,14 @@ type PostHostCertificateResponse struct {
 		} `json:"errors"`
 		Success PostHostCertificate422JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON429 the response for an HTTP 429 `application/json` response
+	JSON429 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success PostHostCertificate429JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
 		Errors []struct {
@@ -3010,6 +3198,17 @@ func (r PostHostCertificateResponse) GetJSON422() *struct {
 	Success PostHostCertificate422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
+}
+
+// GetJSON429 returns the response for an HTTP 429 `application/json` response
+func (r PostHostCertificateResponse) GetJSON429() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success PostHostCertificate429JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON429
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
@@ -3151,6 +3350,14 @@ type PostHostRenewResponse struct {
 		} `json:"errors"`
 		Success PostHostRenew422JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON429 the response for an HTTP 429 `application/json` response
+	JSON429 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success PostHostRenew429JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
 		Errors []struct {
@@ -3210,6 +3417,17 @@ func (r PostHostRenewResponse) GetJSON422() *struct {
 	Success PostHostRenew422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
+}
+
+// GetJSON429 returns the response for an HTTP 429 `application/json` response
+func (r PostHostRenewResponse) GetJSON429() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success PostHostRenew429JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON429
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
@@ -3299,6 +3517,14 @@ type PostHostRevokeResponse struct {
 		} `json:"errors"`
 		Success PostHostRevoke422JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON429 the response for an HTTP 429 `application/json` response
+	JSON429 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success PostHostRevoke429JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
 		Errors []struct {
@@ -3369,6 +3595,17 @@ func (r PostHostRevokeResponse) GetJSON422() *struct {
 	Success PostHostRevoke422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
+}
+
+// GetJSON429 returns the response for an HTTP 429 `application/json` response
+func (r PostHostRevokeResponse) GetJSON429() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success PostHostRevoke429JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON429
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
@@ -3450,6 +3687,14 @@ type PostUserCertificateResponse struct {
 		} `json:"errors"`
 		Success PostUserCertificate422JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON429 the response for an HTTP 429 `application/json` response
+	JSON429 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success PostUserCertificate429JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
 		Errors []struct {
@@ -3509,6 +3754,17 @@ func (r PostUserCertificateResponse) GetJSON422() *struct {
 	Success PostUserCertificate422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
+}
+
+// GetJSON429 returns the response for an HTTP 429 `application/json` response
+func (r PostUserCertificateResponse) GetJSON429() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success PostUserCertificate429JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON429
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
@@ -3658,6 +3914,14 @@ type PostUserRevokeResponse struct {
 		} `json:"errors"`
 		Success PostUserRevoke422JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON429 the response for an HTTP 429 `application/json` response
+	JSON429 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success PostUserRevoke429JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
 		Errors []struct {
@@ -3728,6 +3992,17 @@ func (r PostUserRevokeResponse) GetJSON422() *struct {
 	Success PostUserRevoke422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
+}
+
+// GetJSON429 returns the response for an HTTP 429 `application/json` response
+func (r PostUserRevokeResponse) GetJSON429() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success PostUserRevoke429JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON429
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
@@ -3862,6 +4137,14 @@ type IssueHostCertificateResponse struct {
 		} `json:"errors"`
 		Success IssueHostCertificate422JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON429 the response for an HTTP 429 `application/json` response
+	JSON429 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success IssueHostCertificate429JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
 		Errors []struct {
@@ -3921,6 +4204,17 @@ func (r IssueHostCertificateResponse) GetJSON422() *struct {
 	Success IssueHostCertificate422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
+}
+
+// GetJSON429 returns the response for an HTTP 429 `application/json` response
+func (r IssueHostCertificateResponse) GetJSON429() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success IssueHostCertificate429JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON429
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
@@ -3993,6 +4287,14 @@ type RevokeHostCertificateResponse struct {
 		} `json:"errors"`
 		Success RevokeHostCertificate409JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON429 the response for an HTTP 429 `application/json` response
+	JSON429 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RevokeHostCertificate429JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
 		Errors []struct {
@@ -4040,6 +4342,17 @@ func (r RevokeHostCertificateResponse) GetJSON409() *struct {
 	Success RevokeHostCertificate409JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON409
+}
+
+// GetJSON429 returns the response for an HTTP 429 `application/json` response
+func (r RevokeHostCertificateResponse) GetJSON429() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RevokeHostCertificate429JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON429
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
@@ -4121,6 +4434,14 @@ type RenewHostCertificateResponse struct {
 		} `json:"errors"`
 		Success RenewHostCertificate422JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON429 the response for an HTTP 429 `application/json` response
+	JSON429 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RenewHostCertificate429JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
 		Errors []struct {
@@ -4180,6 +4501,17 @@ func (r RenewHostCertificateResponse) GetJSON422() *struct {
 	Success RenewHostCertificate422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
+}
+
+// GetJSON429 returns the response for an HTTP 429 `application/json` response
+func (r RenewHostCertificateResponse) GetJSON429() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RenewHostCertificate429JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON429
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
@@ -4321,6 +4653,14 @@ type IssueUserCertificateResponse struct {
 		} `json:"errors"`
 		Success IssueUserCertificate422JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON429 the response for an HTTP 429 `application/json` response
+	JSON429 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success IssueUserCertificate429JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
 		Errors []struct {
@@ -4380,6 +4720,17 @@ func (r IssueUserCertificateResponse) GetJSON422() *struct {
 	Success IssueUserCertificate422JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON422
+}
+
+// GetJSON429 returns the response for an HTTP 429 `application/json` response
+func (r IssueUserCertificateResponse) GetJSON429() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success IssueUserCertificate429JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON429
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
@@ -4452,6 +4803,14 @@ type RevokeUserCertificateResponse struct {
 		} `json:"errors"`
 		Success RevokeUserCertificate409JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON429 the response for an HTTP 429 `application/json` response
+	JSON429 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RevokeUserCertificate429JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON500 the response for an HTTP 500 `application/json` response
 	JSON500 *struct {
 		Errors []struct {
@@ -4499,6 +4858,17 @@ func (r RevokeUserCertificateResponse) GetJSON409() *struct {
 	Success RevokeUserCertificate409JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON409
+}
+
+// GetJSON429 returns the response for an HTTP 429 `application/json` response
+func (r RevokeUserCertificateResponse) GetJSON429() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RevokeUserCertificate429JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON429
 }
 
 // GetJSON500 returns the response for an HTTP 500 `application/json` response
@@ -4663,7 +5033,7 @@ func (c *ClientWithResponses) GetHostKrlWithResponse(ctx context.Context, reqEdi
 
 // PostHostRenewWithBodyWithResponse Renew a host certificate
 //
-// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
@@ -4678,7 +5048,7 @@ func (c *ClientWithResponses) PostHostRenewWithBodyWithResponse(ctx context.Cont
 
 // PostHostRenewWithResponse Renew a host certificate
 //
-// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+// Issues a new SSH host certificate with the same principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the public key must match the existing certificate and the proof of possession must be made with its private key. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
@@ -4858,7 +5228,7 @@ func (c *ClientWithResponses) RevokeHostCertificateWithResponse(ctx context.Cont
 
 // RenewHostCertificateWithBodyWithResponse Renew a host certificate
 //
-// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
@@ -4873,7 +5243,7 @@ func (c *ClientWithResponses) RenewHostCertificateWithBodyWithResponse(ctx conte
 
 // RenewHostCertificateWithResponse Renew a host certificate
 //
-// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate.
+// Issues a new SSH host certificate for the same public key and principals as an existing, unexpired and unrevoked host certificate issued by this CA. No OIDC authentication is required; instead the `Proof-Of-Possession` header must contain a proof of possession of the private key for the existing certificate made for this request. The lifetime of the renewed certificate is no longer than that of the existing certificate. The existing certificate is revoked, so it cannot be used or renewed again once the renewed certificate is installed.
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
@@ -5068,6 +5438,19 @@ func ParsePostHostCertificateResponse(rsp *http.Response) (*PostHostCertificateR
 		}
 		response.JSON422 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success PostHostCertificate429JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
 			Errors []struct {
@@ -5200,6 +5583,19 @@ func ParsePostHostRenewResponse(rsp *http.Response) (*PostHostRenewResponse, err
 		}
 		response.JSON422 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success PostHostRenew429JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
 			Errors []struct {
@@ -5306,6 +5702,19 @@ func ParsePostHostRevokeResponse(rsp *http.Response) (*PostHostRevokeResponse, e
 		}
 		response.JSON422 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success PostHostRevoke429JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
 			Errors []struct {
@@ -5398,6 +5807,19 @@ func ParsePostUserCertificateResponse(rsp *http.Response) (*PostUserCertificateR
 			return nil, err
 		}
 		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success PostUserCertificate429JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
@@ -5544,6 +5966,19 @@ func ParsePostUserRevokeResponse(rsp *http.Response) (*PostUserRevokeResponse, e
 		}
 		response.JSON422 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success PostUserRevoke429JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
 			Errors []struct {
@@ -5669,6 +6104,19 @@ func ParseIssueHostCertificateResponse(rsp *http.Response) (*IssueHostCertificat
 		}
 		response.JSON422 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success IssueHostCertificate429JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
 			Errors []struct {
@@ -5747,6 +6195,19 @@ func ParseRevokeHostCertificateResponse(rsp *http.Response) (*RevokeHostCertific
 			return nil, err
 		}
 		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RevokeHostCertificate429JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
@@ -5840,6 +6301,19 @@ func ParseRenewHostCertificateResponse(rsp *http.Response) (*RenewHostCertificat
 			return nil, err
 		}
 		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RenewHostCertificate429JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
@@ -5973,6 +6447,19 @@ func ParseIssueUserCertificateResponse(rsp *http.Response) (*IssueUserCertificat
 		}
 		response.JSON422 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success IssueUserCertificate429JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
 			Errors []struct {
@@ -6051,6 +6538,19 @@ func ParseRevokeUserCertificateResponse(rsp *http.Response) (*RevokeUserCertific
 			return nil, err
 		}
 		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RevokeUserCertificate429JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
