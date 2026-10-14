@@ -21,9 +21,6 @@ import (
 // Namespace is the SSHSIG namespace the CA signs KRLs with
 const Namespace = "krl@com.github.serverless-ssh-ca.andrewheberle"
 
-// FileMode is the mode of an installed KRL
-const FileMode fs.FileMode = 0440
-
 // CertificateType is the type of certificate a KRL revokes
 type CertificateType string
 
@@ -144,6 +141,7 @@ func (v *Verified) Install(path string) (Outcome, error) {
 	outcome := Written
 
 	existing, err := os.ReadFile(path)
+	exists := err == nil
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
 		// nothing to compare against
@@ -154,7 +152,7 @@ func (v *Verified) Install(path string) (Outcome, error) {
 		if err != nil {
 			return Written, fmt.Errorf("could not check existing krl: %w", err)
 		}
-		if info.Mode().Perm() == FileMode {
+		if info.Mode().Perm() == installedPerm {
 			return Unchanged, nil
 		}
 	default:
@@ -166,6 +164,12 @@ func (v *Verified) Install(path string) (Outcome, error) {
 		if v.olderThan(current) {
 			return Written, fmt.Errorf("%w: got version %d generated at %d, existing is version %d generated at %d",
 				ErrOlderKRL, v.parsed.Version, v.parsed.GeneratedDate, current.Version, current.GeneratedDate)
+		}
+	}
+
+	if exists {
+		if err := makeReplaceable(path); err != nil {
+			return Written, fmt.Errorf("could not prepare existing krl to be replaced: %w", err)
 		}
 	}
 
