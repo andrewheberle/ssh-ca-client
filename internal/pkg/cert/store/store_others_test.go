@@ -1,26 +1,27 @@
 //go:build !windows
 
-package filestore
+package store
 
 import (
 	"errors"
 	"net"
-	"os"
+
 	"path/filepath"
 	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
 )
 
-// newDefaultStorage returns a *Storage that connects to the agent from the
+// newDefaultStorage returns a *Store that connects to the agent from the
 // environment
-func newDefaultStorage(t *testing.T, ca ssh.Signer) *Storage {
+func newDefaultStorage(t *testing.T, ca ssh.Signer) *Store {
 	t.Helper()
 
-	s, err := New(ca.PublicKey(), filepath.Join(t.TempDir(), "id_ecdsa"))
+	s, err := New(ca.PublicKey(), NewMemoryBackend())
 	if err != nil {
 		t.Fatalf("New() error = %v", err)
 	}
@@ -99,11 +100,11 @@ func (a *testAgent) waitClosed(t *testing.T) {
 	}
 }
 
-func TestStorage_AddToAgent_DefaultAgent(t *testing.T) {
+func TestStore_AddToAgent_DefaultAgent(t *testing.T) {
 	ca := newCA(t)
 
 	// saveValidCert saves a valid certificate to s and returns it
-	saveValidCert := func(t *testing.T, s *Storage) *ssh.Certificate {
+	saveValidCert := func(t *testing.T, s *Store) *ssh.Certificate {
 		t.Helper()
 
 		c := validCert(t, s, ca)
@@ -159,8 +160,8 @@ func TestStorage_AddToAgent_DefaultAgent(t *testing.T) {
 		saveValidCert(t, s)
 
 		err := s.AddToAgent()
-		if !errors.Is(err, ErrAddingToAgent) {
-			t.Errorf("AddToAgent() error = %v, want %v", err, ErrAddingToAgent)
+		if !errors.Is(err, cert.ErrAddingToAgent) {
+			t.Errorf("AddToAgent() error = %v, want %v", err, cert.ErrAddingToAgent)
 		}
 		var opErr *net.OpError
 		if !errors.As(err, &opErr) {
@@ -206,47 +207,17 @@ func TestStorage_AddToAgent_DefaultAgent(t *testing.T) {
 		a := serveAgent(t)
 		s := newDefaultStorage(t, ca)
 
-		if err := s.AddToAgent(); !errors.Is(err, ErrKeyNotFound) {
-			t.Errorf("AddToAgent() error = %v, want %v", err, ErrKeyNotFound)
+		if err := s.AddToAgent(); !errors.Is(err, cert.ErrKeyNotFound) {
+			t.Errorf("AddToAgent() error = %v, want %v", err, cert.ErrKeyNotFound)
 		}
 
 		generatePrivateKey(t, s)
-		if err := s.AddToAgent(); !errors.Is(err, ErrCertificateNotFound) {
-			t.Errorf("AddToAgent() error = %v, want %v", err, ErrCertificateNotFound)
+		if err := s.AddToAgent(); !errors.Is(err, cert.ErrCertificateNotFound) {
+			t.Errorf("AddToAgent() error = %v, want %v", err, cert.ErrCertificateNotFound)
 		}
 
 		if got := a.opened.Load(); got != 0 {
 			t.Errorf("AddToAgent() opened %d agent connections, want 0", got)
 		}
 	})
-}
-
-func TestStorage_FilePermissions(t *testing.T) {
-	ca := newCA(t)
-	s := newStorage(t, ca)
-
-	c := validCert(t, s, ca)
-	if err := s.SaveCertificate(c); err != nil {
-		t.Fatalf("SaveCertificate() error = %v", err)
-	}
-
-	tests := []struct {
-		name string
-		path string
-		want os.FileMode
-	}{
-		{"private key", s.keypath, 0600},
-		{"certificate", certPath(s), 0644},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			fi, err := os.Stat(tt.path)
-			if err != nil {
-				t.Fatalf("Stat() error = %v", err)
-			}
-			if got := fi.Mode().Perm(); got != tt.want {
-				t.Errorf("mode = %v, want %v", got, tt.want)
-			}
-		})
-	}
 }

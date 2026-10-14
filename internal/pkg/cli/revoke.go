@@ -14,8 +14,7 @@ import (
 
 	"github.com/andrewheberle/simplecommand"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/filestore"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/keyringstore"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
 	"github.com/bep/simplecobra"
 	"github.com/spf13/cobra"
 )
@@ -91,7 +90,7 @@ func (c *revokeCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 	// revocation uses proof of possession of the private key, so no
 	// authentication is set up
 	if !c.host {
-		store, err := keyringstore.New(config.CertificateAuthorityPublicKey())
+		store, err := store.NewKeyring(config.CertificateAuthorityPublicKey())
 		if err != nil {
 			return err
 		}
@@ -110,7 +109,7 @@ func (c *revokeCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 	}
 
 	for _, k := range c.keypath {
-		store, err := filestore.New(config.CertificateAuthorityPublicKey(), k)
+		store, err := store.NewFile(config.CertificateAuthorityPublicKey(), k)
 		if err != nil {
 			return fmt.Errorf("%s: %w", k, err)
 		}

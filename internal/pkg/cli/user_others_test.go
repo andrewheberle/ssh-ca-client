@@ -7,18 +7,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/keyringstore"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
 	"github.com/zalando/go-keyring"
 	"golang.org/x/crypto/ssh"
 )
 
 // userStore returns an empty user key store in a mocked keyring that trusts
 // the key of ca, which is the store the CLI uses with ca.config
-func userStore(t *testing.T, ca *testRevokeCA) *keyringstore.Storage {
+func userStore(t *testing.T, ca *testRevokeCA) *store.Store {
 	t.Helper()
 
 	keyring.MockInit()
-	store, err := keyringstore.New(ca.signer.PublicKey())
+	store, err := store.NewKeyring(ca.signer.PublicKey())
 	if err != nil {
 		t.Fatalf("creating store: %v", err)
 	}
@@ -27,7 +27,7 @@ func userStore(t *testing.T, ca *testRevokeCA) *keyringstore.Storage {
 }
 
 // publicKey returns the stored public key, or nil if there is no private key
-func publicKey(t *testing.T, store *keyringstore.Storage) []byte {
+func publicKey(t *testing.T, store *store.Store) []byte {
 	t.Helper()
 
 	if !store.HasPrivateKey() {

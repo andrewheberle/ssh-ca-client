@@ -19,8 +19,7 @@ import (
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/filestore"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/keyringstore"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cli"
 	"github.com/zalando/go-keyring"
 	"golang.org/x/crypto/ssh"
@@ -159,7 +158,7 @@ func TestExecute_Revoke(t *testing.T) {
 			args:     func(string) []string { return nil },
 			store: func(t *testing.T, ca *testRevokeCA, _ string) cert.Storage {
 				keyring.MockInit()
-				store, err := keyringstore.New(ca.signer.PublicKey())
+				store, err := store.NewKeyring(ca.signer.PublicKey())
 				if err != nil {
 					t.Fatalf("creating store: %v", err)
 				}
@@ -172,7 +171,7 @@ func TestExecute_Revoke(t *testing.T) {
 			certType: ssh.HostCert,
 			args:     func(keypath string) []string { return []string{"--host", "--key", keypath} },
 			store: func(t *testing.T, ca *testRevokeCA, keypath string) cert.Storage {
-				store, err := filestore.New(ca.signer.PublicKey(), keypath)
+				store, err := store.NewFile(ca.signer.PublicKey(), keypath)
 				if err != nil {
 					t.Fatalf("creating store: %v", err)
 				}
@@ -232,7 +231,7 @@ func TestExecute_Revoke(t *testing.T) {
 		withCert := filepath.Join(dir, "ssh_host_ed25519_key")
 		withoutCert := filepath.Join(dir, "ssh_host_ecdsa_key")
 
-		store, err := filestore.New(ca.signer.PublicKey(), withCert)
+		store, err := store.NewFile(ca.signer.PublicKey(), withCert)
 		if err != nil {
 			t.Fatalf("creating store: %v", err)
 		}
