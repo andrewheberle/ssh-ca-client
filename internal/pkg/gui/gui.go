@@ -13,11 +13,8 @@ import (
 	"time"
 
 	"github.com/allan-simon/go-singleinstance"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth/tokenstore"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/identity"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/pageant"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/tray"
@@ -140,41 +137,15 @@ func Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	// the key and certificate are kept in the users keyring
-	store, err := store.NewKeyring(conf.CertificateAuthorityPublicKey())
+	// the key, certificate and refresh token are kept in the users keyring
+	user, err := identity.NewUser(conf, identity.WithLifetime(lifetime), identity.WithLogger(logger))
 	if err != nil {
-		logger.Error("could not set up key store", "error", err)
+		logger.Error("could not set up user identity", "error", err)
 		return err
 	}
-
-	// the refresh token is persisted in the users keyring
-	ts, err := tokenstore.NewKeyringStore()
-	if err != nil {
-		logger.Error("could not set up token store", "error", err)
-		return err
-	}
-
-	handler, err := auth.NewOidcHandler(auth.OidcConfig{
-		ClientID:    conf.ClientID,
-		Issuer:      conf.Issuer,
-		RedirectURL: conf.RedirectURL,
-		Scopes:      conf.Scopes,
-	}, auth.WithTokenStore(ts), auth.WithLogger(logger))
-	if err != nil {
-		logger.Error("could not set up OIDC authentication", "error", err)
-		return err
-	}
-
-	userCert, err := cert.NewUserCertificate(conf.CertificateAuthorityURL, store)
-	if err != nil {
-		logger.Error("could not set up certificate", "error", err)
-		return err
-	}
-	userCert.AuthHandler = handler
-	userCert.Lifetime = lifetime
 
 	// set up tray app
-	app, err := tray.New(names.FriendlyAppName, resources, userCert, conf, renewAt)
+	app, err := tray.New(names.FriendlyAppName, resources, user, conf, renewAt)
 	if err != nil {
 		logger.Error("could not set up tray application", "error", err)
 		return err
@@ -197,9 +168,9 @@ func Execute(ctx context.Context, args []string) error {
 	}
 
 	// try to add to agent on start
-	if addOnStart && store.HasCertificate() {
+	if _, err := user.Certificate(); addOnStart && err == nil {
 		logger.Info("attempting to add current certificate to ssh agent")
-		if err := store.AddToAgent(); err != nil {
+		if err := user.AddToAgent(); err != nil {
 			logger.Warn("could not add current certificate to ssh agent", "error", err)
 		}
 	}

@@ -16,6 +16,10 @@ _Avoid_: Storage, key store, keyring store, file store
 Where a Certificate store physically keeps its private key and certificate, such as a key file on disk or the system keyring.
 _Avoid_: Storage, provider
 
+**User identity**:
+A user's SSH private key and current certificate, together with the means to obtain a new certificate for that key after logging in to the identity provider.
+_Avoid_: Session, user certificate, account
+
 **KRL**:
 A key revocation list signed by the Trusted CA, listing the revoked certificates of one type (user or host).
 _Avoid_: Revocation list, CRL, blocklist

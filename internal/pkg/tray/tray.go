@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"fyne.io/systray"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/identity"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/version"
 	"github.com/gen2brain/beeep"
 	"golang.org/x/crypto/ssh"
@@ -38,11 +38,13 @@ const (
 	errorIcon   = "error"
 )
 
-// Certificate is the user certificate managed by the application, such as a
-// [*cert.UserCertificate]
-type Certificate interface {
-	Store() cert.Storage
-	RequestContext(ctx context.Context) error
+// Identity is the user identity managed by the application, such as a
+// [*identity.User]
+type Identity interface {
+	HasPrivateKey() bool
+	GeneratePrivateKey() error
+	Certificate() (*ssh.Certificate, error)
+	Obtain(ctx context.Context, opts ...identity.ObtainOption) error
 }
 
 // menuItem is the part of a [*systray.MenuItem] updated as the state changes
@@ -53,11 +55,11 @@ type menuItem interface {
 }
 
 type Application struct {
-	cert    Certificate
-	config  *config.ClientConfig
-	done    chan bool
-	title   string
-	renewAt time.Duration
+	identity Identity
+	config   *config.ClientConfig
+	done     chan bool
+	title    string
+	renewAt  time.Duration
 
 	// ctx is cancelled when the application quits, which aborts any
 	// interactive login in progress
@@ -95,11 +97,11 @@ var (
 	ErrRenewRunning = errors.New("a renew was already in progress")
 )
 
-func New(title string, fs embed.FS, c Certificate, conf *config.ClientConfig, renewAt time.Duration) (*Application, error) {
+func New(title string, fs embed.FS, id Identity, conf *config.ClientConfig, renewAt time.Duration) (*Application, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	app := &Application{
-		cert:              c,
+		identity:          id,
 		config:            conf,
 		ctx:               ctx,
 		cancel:            cancel,
@@ -209,18 +211,20 @@ func (app *Application) onReady() {
 
 // hasPrivateKey reports whether a private key is stored
 func (app *Application) hasPrivateKey() bool {
-	return app.cert.Store().HasPrivateKey()
+	return app.identity.HasPrivateKey()
 }
 
 // hasCertificate reports whether a certificate is stored
 func (app *Application) hasCertificate() bool {
-	return app.cert.Store().HasCertificate()
+	_, err := app.identity.Certificate()
+
+	return err == nil
 }
 
 // certificateExpiry returns when the stored certificate expires, or the zero
 // time if there is no certificate
 func (app *Application) certificateExpiry() time.Time {
-	c, err := app.cert.Store().Certificate()
+	c, err := app.identity.Certificate()
 	if err != nil {
 		return time.Time{}
 	}
@@ -514,7 +518,7 @@ func (app *Application) refreshWithBackoff() error {
 	}
 
 	// we are ok to attempt a refresh
-	if err := app.request(auth.NonInteractive(app.ctx)); err != nil {
+	if err := app.identity.Obtain(app.ctx, identity.WithoutInteractiveLogin); err != nil {
 		// increment our failure count and set a backoff of double our failure count
 		app.refreshFailure++
 		app.refreshBackOff = app.refreshFailure * 2
@@ -540,7 +544,7 @@ func (app *Application) refresh() error {
 
 	app.logger.Info("attempting a refresh")
 
-	if err := app.request(auth.NonInteractive(app.ctx)); err != nil {
+	if err := app.identity.Obtain(app.ctx, identity.WithoutInteractiveLogin); err != nil {
 		return err
 	}
 
@@ -560,7 +564,7 @@ func (app *Application) renew() error {
 	}
 	defer app.mu.Unlock()
 
-	if err := app.request(app.ctx); err != nil {
+	if err := app.identity.Obtain(app.ctx); err != nil {
 		return err
 	}
 
@@ -571,23 +575,8 @@ func (app *Application) renew() error {
 	return nil
 }
 
-// request requests a new certificate and adds it to the SSH agent. If the
-// certificate is issued but cannot be added to the agent the returned error
-// wraps [cert.ErrAddingToAgent].
-func (app *Application) request(ctx context.Context) error {
-	if err := app.cert.RequestContext(ctx); err != nil {
-		return err
-	}
-
-	if err := app.cert.Store().AddToAgent(); err != nil {
-		return fmt.Errorf("certificate issued but %w", err)
-	}
-
-	return nil
-}
-
 func (app *Application) generate() error {
-	return app.cert.Store().GeneratePrivateKey()
+	return app.identity.GeneratePrivateKey()
 }
 
 func (app *Application) getIcon(icon string) []byte {

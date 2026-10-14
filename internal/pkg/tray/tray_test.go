@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -14,77 +15,23 @@ import (
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/identity"
 	"golang.org/x/crypto/ssh"
 )
 
-// fakeStore is a [cert.Storage] with results controlled by the test. Methods
-// not implemented here are not used by the application.
-type fakeStore struct {
-	cert.Storage
-
-	mu        sync.Mutex
-	hasKey    bool
-	cert      *ssh.Certificate
-	agentErr  error
-	agentAdds int
-	generated int
-	genErr    error
-}
-
-func (s *fakeStore) HasPrivateKey() bool {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	return s.hasKey
-}
-
-func (s *fakeStore) HasCertificate() bool {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	return s.cert != nil
-}
-
-func (s *fakeStore) Certificate() (*ssh.Certificate, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if s.cert == nil {
-		return nil, cert.ErrCertificateNotFound
-	}
-
-	return s.cert, nil
-}
-
-func (s *fakeStore) AddToAgent() error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.agentAdds++
-
-	return s.agentErr
-}
-
-func (s *fakeStore) GeneratePrivateKey() error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.generated++
-	if s.genErr != nil {
-		return s.genErr
-	}
-	s.hasKey = true
-
-	return nil
-}
-
-// fakeCertificate is a [Certificate] that records each request. A request
-// without a NonInteractive context fails with interactiveErr, otherwise with
-// refreshErr. Successful requests store a certificate valid for validFor.
-type fakeCertificate struct {
-	store *fakeStore
-
+// fakeIdentity is an [Identity] that records each request. A request
+// without [identity.WithoutInteractiveLogin] fails with interactiveErr,
+// otherwise with refreshErr. Successful requests store a certificate valid
+// for validFor and, unless [identity.WithoutAgent] is given, add it to the
+// agent, which fails with agentErr.
+type fakeIdentity struct {
 	mu             sync.Mutex
+	hasKey         bool
+	cert           *ssh.Certificate
+	agentErr       error
+	agentAdds      int
+	generated      int
+	genErr         error
 	refreshErr     error
 	interactiveErr error
 	validFor       time.Duration
@@ -92,12 +39,39 @@ type fakeCertificate struct {
 	requests       []bool
 }
 
-func (c *fakeCertificate) Store() cert.Storage {
-	return c.store
+func (c *fakeIdentity) HasPrivateKey() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return c.hasKey
 }
 
-func (c *fakeCertificate) RequestContext(ctx context.Context) error {
-	nonInteractive := auth.IsNonInteractive(ctx)
+func (c *fakeIdentity) Certificate() (*ssh.Certificate, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.cert == nil {
+		return nil, cert.ErrCertificateNotFound
+	}
+
+	return c.cert, nil
+}
+
+func (c *fakeIdentity) GeneratePrivateKey() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.generated++
+	if c.genErr != nil {
+		return c.genErr
+	}
+	c.hasKey = true
+
+	return nil
+}
+
+func (c *fakeIdentity) Obtain(ctx context.Context, opts ...identity.ObtainOption) error {
+	nonInteractive := slices.Contains(opts, identity.WithoutInteractiveLogin)
 
 	c.mu.Lock()
 	c.requests = append(c.requests, nonInteractive)
@@ -115,15 +89,25 @@ func (c *fakeCertificate) RequestContext(ctx context.Context) error {
 		return err
 	}
 
-	c.store.mu.Lock()
-	c.store.cert = &ssh.Certificate{ValidBefore: uint64(time.Now().Add(c.validFor).Unix())}
-	c.store.mu.Unlock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.cert = &ssh.Certificate{ValidBefore: uint64(time.Now().Add(c.validFor).Unix())}
+
+	if slices.Contains(opts, identity.WithoutAgent) {
+		return nil
+	}
+
+	c.agentAdds++
+	if c.agentErr != nil {
+		return fmt.Errorf("certificate issued but %w", c.agentErr)
+	}
 
 	return nil
 }
 
 // requestKinds returns whether each request was non-interactive
-func (c *fakeCertificate) requestKinds() []bool {
+func (c *fakeIdentity) requestKinds() []bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -152,12 +136,11 @@ type fakeTray struct {
 	notifications []string
 }
 
-// newTestApp returns an Application using a fake certificate, store and
-// system tray
-func newTestApp(t *testing.T) (*Application, *fakeCertificate, *fakeTray) {
+// newTestApp returns an Application using a fake identity and system tray
+func newTestApp(t *testing.T) (*Application, *fakeIdentity, *fakeTray) {
 	t.Helper()
 
-	c := &fakeCertificate{store: &fakeStore{hasKey: true}, validFor: 24 * time.Hour}
+	c := &fakeIdentity{hasKey: true, validFor: 24 * time.Hour}
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
@@ -169,7 +152,7 @@ func newTestApp(t *testing.T) (*Application, *fakeCertificate, *fakeTray) {
 
 	tray := &fakeTray{}
 	app := &Application{
-		cert:              c,
+		identity:          c,
 		ctx:               ctx,
 		cancel:            cancel,
 		logger:            slog.New(slog.DiscardHandler),
@@ -208,7 +191,7 @@ func TestApplication_certificateExpiry(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, c, _ := newTestApp(t)
-			c.store.cert = tt.cert
+			c.cert = tt.cert
 
 			if got := app.certificateValid(); got != tt.wantValid {
 				t.Errorf("certificateValid() = %v, want %v", got, tt.wantValid)
@@ -225,50 +208,10 @@ func TestApplication_certificateExpiry(t *testing.T) {
 	t.Run("expiry matches certificate", func(t *testing.T) {
 		app, c, _ := newTestApp(t)
 		want := time.Unix(now.Add(time.Hour).Unix(), 0)
-		c.store.cert = &ssh.Certificate{ValidBefore: uint64(want.Unix())}
+		c.cert = &ssh.Certificate{ValidBefore: uint64(want.Unix())}
 
 		if got := app.certificateExpiry(); !got.Equal(want) {
 			t.Errorf("certificateExpiry() = %v, want %v", got, want)
-		}
-	})
-}
-
-func TestApplication_request(t *testing.T) {
-	requestErr := errors.New("request failed")
-	agentErr := fmt.Errorf("%w: agent unavailable", cert.ErrAddingToAgent)
-
-	t.Run("adds certificate to agent", func(t *testing.T) {
-		app, c, _ := newTestApp(t)
-
-		if err := app.request(context.Background()); err != nil {
-			t.Fatalf("request() error = %v", err)
-		}
-		if c.store.agentAdds != 1 {
-			t.Errorf("AddToAgent() called %d times, want 1", c.store.agentAdds)
-		}
-	})
-
-	t.Run("request failure does not add to agent", func(t *testing.T) {
-		app, c, _ := newTestApp(t)
-		c.interactiveErr = requestErr
-
-		if err := app.request(context.Background()); !errors.Is(err, requestErr) {
-			t.Errorf("request() error = %v, want %v", err, requestErr)
-		}
-		if c.store.agentAdds != 0 {
-			t.Errorf("AddToAgent() called %d times, want 0", c.store.agentAdds)
-		}
-	})
-
-	t.Run("agent failure", func(t *testing.T) {
-		app, c, _ := newTestApp(t)
-		c.store.agentErr = agentErr
-
-		if err := app.request(context.Background()); !errors.Is(err, cert.ErrAddingToAgent) {
-			t.Errorf("request() error = %v, want %v", err, cert.ErrAddingToAgent)
-		}
-		if !app.certificateValid() {
-			t.Errorf("certificate not stored although it was issued")
 		}
 	})
 }
@@ -380,7 +323,7 @@ func TestApplication_refreshOrRenew(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, c, _ := newTestApp(t)
-			c.refreshErr, c.interactiveErr, c.store.agentErr = tt.refreshErr, tt.renewErr, tt.agentErr
+			c.refreshErr, c.interactiveErr, c.agentErr = tt.refreshErr, tt.renewErr, tt.agentErr
 
 			err := app.refreshOrRenew()
 			if !errors.Is(err, tt.wantErr) {
@@ -447,13 +390,13 @@ func TestApplication_refreshWithBackoff(t *testing.T) {
 
 func TestApplication_generate(t *testing.T) {
 	app, c, _ := newTestApp(t)
-	c.store.hasKey = false
+	c.hasKey = false
 
 	if err := app.generate(); err != nil {
 		t.Fatalf("generate() error = %v", err)
 	}
-	if c.store.generated != 1 || !app.hasPrivateKey() {
-		t.Errorf("GeneratePrivateKey() called %d times, hasPrivateKey() = %v", c.store.generated, app.hasPrivateKey())
+	if c.generated != 1 || !app.hasPrivateKey() {
+		t.Errorf("GeneratePrivateKey() called %d times, hasPrivateKey() = %v", c.generated, app.hasPrivateKey())
 	}
 }
 
@@ -628,8 +571,8 @@ func TestApplication_setState(t *testing.T) {
 			if tt.state != "" {
 				app.state = tt.state
 			}
-			c.store.hasKey = !tt.noKey
-			c.store.cert = tt.cert
+			c.hasKey = !tt.noKey
+			c.cert = tt.cert
 			c.refreshErr = tt.refreshErr
 			if tt.validFor != 0 {
 				c.validFor = tt.validFor
@@ -683,7 +626,7 @@ func TestApplication_setState(t *testing.T) {
 // close to expiry is not retried on every tick of the event loop
 func TestApplication_setState_backoff(t *testing.T) {
 	app, c, _ := newTestApp(t)
-	c.store.cert = expiresIn(30 * time.Minute)
+	c.cert = expiresIn(30 * time.Minute)
 	c.refreshErr = errors.New("refresh failed")
 
 	// the first failure backs off for two ticks

@@ -7,11 +7,10 @@ import (
 	"time"
 
 	"github.com/andrewheberle/simplecommand"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth/tokenstore"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/identity"
 	"github.com/bep/simplecobra"
+	"golang.org/x/crypto/ssh"
 )
 
 type loginCommand struct {
@@ -20,12 +19,19 @@ type loginCommand struct {
 	add       bool
 	force     bool
 
-	cert  *cert.UserCertificate
-	store *store.Store
+	identity loginIdentity
 
 	logger *slog.Logger
 
 	*simplecommand.Command
+}
+
+// loginIdentity is the part of the user identity used by the login command,
+// such as an [*identity.User]
+type loginIdentity interface {
+	Obtain(ctx context.Context, opts ...identity.ObtainOption) error
+	AddToAgent() error
+	Certificate() (*ssh.Certificate, error)
 }
 
 func (c *loginCommand) Init(cd *simplecobra.Commandeer) error {
@@ -62,34 +68,11 @@ func (c *loginCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 		return err
 	}
 
-	store, err := store.NewKeyring(config.CertificateAuthorityPublicKey())
+	user, err := identity.NewUser(config, identity.WithLifetime(c.lifetime), identity.WithLogger(c.logger))
 	if err != nil {
 		return err
 	}
-	c.store = store
-
-	ts, err := tokenstore.NewKeyringStore()
-	if err != nil {
-		return err
-	}
-
-	auth, err := auth.NewOidcHandler(auth.OidcConfig{
-		ClientID:    config.ClientID,
-		Issuer:      config.Issuer,
-		RedirectURL: config.RedirectURL,
-		Scopes:      config.Scopes,
-	}, auth.WithTokenStore(ts), auth.WithLogger(c.logger))
-	if err != nil {
-		return err
-	}
-
-	cert, err := cert.NewUserCertificate(config.CertificateAuthorityURL, c.store)
-	if err != nil {
-		return err
-	}
-	cert.AuthHandler = auth
-	cert.Lifetime = c.lifetime
-	c.cert = cert
+	c.identity = user
 
 	return nil
 }
@@ -98,18 +81,11 @@ func (c *loginCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args
 	// just add if requested
 	if c.add {
 		c.logger.Info("attempting to add current certificate to ssh-agent")
-		return c.store.AddToAgent()
+		return c.identity.AddToAgent()
 	}
 
 	// check life is not more than 50% done
-	if c.store.HasCertificate() {
-		existing, err := c.store.Certificate()
-		if err != nil {
-			c.logger.Error("error getting certificate", "error", err)
-
-			return err
-		}
-
+	if existing, err := c.identity.Certificate(); err == nil {
 		// check expiry
 		if !cert.RenewalDue(existing, 0.5, time.Now()) {
 			if !c.force {
@@ -125,7 +101,7 @@ func (c *loginCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args
 
 	// this blocks until any interactive login completes, times out or is
 	// cancelled (CTRL-C)
-	reqErr := c.cert.RequestContext(ctx)
+	reqErr := c.identity.Obtain(ctx, identity.WithoutAgent)
 
 	if reqErr != nil {
 		if ctx.Err() != nil {
@@ -139,7 +115,7 @@ func (c *loginCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args
 
 	if !c.skipAgent {
 		c.logger.Info("attempting to add certificate to ssh-agent")
-		if err := c.store.AddToAgent(); err != nil {
+		if err := c.identity.AddToAgent(); err != nil {
 			return fmt.Errorf("could not add certificate to ssh-agent: %w", err)
 		}
 	}
