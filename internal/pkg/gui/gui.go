@@ -16,7 +16,7 @@ import (
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth/tokenstore"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/keyringstore"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/pageant"
@@ -141,7 +141,7 @@ func Execute(ctx context.Context, args []string) error {
 	}
 
 	// the key and certificate are kept in the users keyring
-	store, err := keyringstore.New(conf.CertificateAuthorityPublicKey())
+	store, err := store.NewKeyring(conf.CertificateAuthorityPublicKey())
 	if err != nil {
 		logger.Error("could not set up key store", "error", err)
 		return err

@@ -12,8 +12,7 @@ import (
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/filestore"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/keyringstore"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
 	"github.com/zalando/go-keyring"
 	"golang.org/x/crypto/ssh"
@@ -197,7 +196,7 @@ func TestUserCertificate_KeyTypes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			store := ca.newStore(t, filestore.WithKeyType(tt.keyType), filestore.WithCurve(tt.curve))
+			store := ca.newStore(t, store.WithKeyType(tt.keyType), store.WithCurve(tt.curve))
 			u := ca.userCertificate(t, store, ca.IDP.tokens(t, "alice@example.com"))
 			if err := u.Request(); err != nil {
 				t.Fatalf("requesting user certificate: %v", err)
@@ -222,7 +221,7 @@ func TestUserCertificate_KeyringStore(t *testing.T) {
 
 	ca := newCA(t)
 
-	store, err := keyringstore.New(ca.PublicKey, keyringstore.WithKeyType(sshkey.KeyTypeEd25519))
+	store, err := store.NewKeyring(ca.PublicKey, store.WithKeyType(sshkey.KeyTypeEd25519))
 	if err != nil {
 		t.Fatalf("creating store: %v", err)
 	}

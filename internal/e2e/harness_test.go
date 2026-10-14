@@ -28,7 +28,7 @@ import (
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/filestore"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/httpclient"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
@@ -496,14 +496,14 @@ func logContents(t *testing.T, name, path string) {
 	t.Logf("%s:\n%s", name, b)
 }
 
-// newStore returns a [filestore.Storage] with a newly generated private key
-func (ca *testCA) newStore(t *testing.T, opts ...filestore.Option) *filestore.Storage {
+// newStore returns a [store.Store] with a newly generated private key
+func (ca *testCA) newStore(t *testing.T, opts ...store.Option) *store.Store {
 	t.Helper()
 
 	// an in-memory agent keeps any running agent out of the tests
-	opts = append([]filestore.Option{filestore.WithAgent(agent.NewKeyring().(agent.ExtendedAgent))}, opts...)
+	opts = append([]store.Option{store.WithAgent(agent.NewKeyring().(agent.ExtendedAgent))}, opts...)
 
-	store, err := filestore.New(ca.PublicKey, filepath.Join(t.TempDir(), "id"), opts...)
+	store, err := store.NewFile(ca.PublicKey, filepath.Join(t.TempDir(), "id"), opts...)
 	if err != nil {
 		t.Fatalf("creating store: %v", err)
 	}

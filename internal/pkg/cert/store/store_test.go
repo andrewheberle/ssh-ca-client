@@ -1,4 +1,4 @@
-package keyringstore
+package store
 
 import (
 	"bytes"
@@ -17,9 +17,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/keyringutil"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
-	"github.com/zalando/go-keyring"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
 )
@@ -46,19 +45,73 @@ func newAgent() agent.ExtendedAgent {
 	return agent.NewKeyring().(agent.ExtendedAgent)
 }
 
-// newStorage returns a *Storage backed by a freshly initialised mock keyring
-// and an in-memory agent (unless overridden by opts)
-func newStorage(t *testing.T, ca ssh.Signer, opts ...Option) *Storage {
+// newStorage returns a *Store using a memory backend and an in-memory agent
+// (unless overridden by opts)
+func newStorage(t *testing.T, ca ssh.Signer, opts ...Option) *Store {
 	t.Helper()
 
-	keyring.MockInit()
+	return newStorageWith(t, ca, NewMemoryBackend(), opts...)
+}
 
-	s, err := New(ca.PublicKey(), append([]Option{WithAgent(newAgent())}, opts...)...)
+// newStorageWith returns a *Store using backend b and an in-memory agent
+// (unless overridden by opts)
+func newStorageWith(t *testing.T, ca ssh.Signer, b Backend, opts ...Option) *Store {
+	t.Helper()
+
+	s, err := New(ca.PublicKey(), b, append([]Option{WithAgent(newAgent())}, opts...)...)
 	if err != nil {
 		t.Fatalf("New() error = %v", err)
 	}
 
 	return s
+}
+
+// failingBackend is a [Backend] that returns the configured errors and
+// otherwise behaves like a memory backend
+type failingBackend struct {
+	*MemoryBackend
+
+	get, put, del error
+}
+
+func (b *failingBackend) Get(slot Slot) ([]byte, error) {
+	if b.get != nil {
+		return nil, b.get
+	}
+
+	return b.MemoryBackend.Get(slot)
+}
+
+func (b *failingBackend) Put(slot Slot, value []byte) error {
+	if b.put != nil {
+		return b.put
+	}
+
+	return b.MemoryBackend.Put(slot, value)
+}
+
+func (b *failingBackend) Delete(slot Slot) error {
+	if b.del != nil {
+		return b.del
+	}
+
+	return b.MemoryBackend.Delete(slot)
+}
+
+// stored returns the value in slot of the store's backend, or nil if there
+// is none
+func stored(t *testing.T, s *Store, slot Slot) []byte {
+	t.Helper()
+
+	v, err := s.backend.Get(slot)
+	if errors.Is(err, ErrNotFound) {
+		return nil
+	}
+	if err != nil {
+		t.Fatalf("backend Get() error = %v", err)
+	}
+
+	return v
 }
 
 // pemEncode PEM encodes block and fails the test on error
@@ -74,7 +127,7 @@ func pemEncode(t *testing.T, block *pem.Block) []byte {
 }
 
 // generatePrivateKey generates a key in the store and fails the test on error
-func generatePrivateKey(t *testing.T, s *Storage) {
+func generatePrivateKey(t *testing.T, s *Store) {
 	t.Helper()
 
 	if err := s.GeneratePrivateKey(); err != nil {
@@ -82,21 +135,21 @@ func generatePrivateKey(t *testing.T, s *Storage) {
 	}
 }
 
-// storeKey writes raw private key data to the keyring
-func storeKey(t *testing.T, s *Storage, data []byte) {
+// storeKey writes raw private key data to the store's backend
+func storeKey(t *testing.T, s *Store, data []byte) {
 	t.Helper()
 
-	if err := keyring.Set(storeKeyService, s.user, string(data)); err != nil {
-		t.Fatalf("keyring.Set() error = %v", err)
+	if err := s.backend.Put(Key, data); err != nil {
+		t.Fatalf("backend Put() error = %v", err)
 	}
 }
 
-// storeCert writes raw certificate data to the keyring
-func storeCert(t *testing.T, s *Storage, data []byte) {
+// storeCert writes raw certificate data to the store's backend
+func storeCert(t *testing.T, s *Store, data []byte) {
 	t.Helper()
 
-	if err := keyring.Set(storeCertService, s.user, string(data)); err != nil {
-		t.Fatalf("keyring.Set() error = %v", err)
+	if err := s.backend.Put(Cert, data); err != nil {
+		t.Fatalf("backend Put() error = %v", err)
 	}
 }
 
@@ -123,7 +176,7 @@ func signCert(t *testing.T, ca ssh.Signer, pub ssh.PublicKey, validAfter, validB
 
 // validCert generates a key in the store and returns a currently valid
 // certificate for it signed by ca
-func validCert(t *testing.T, s *Storage, ca ssh.Signer) *ssh.Certificate {
+func validCert(t *testing.T, s *Store, ca ssh.Signer) *ssh.Certificate {
 	t.Helper()
 
 	generatePrivateKey(t, s)
@@ -147,15 +200,19 @@ func TestNew(t *testing.T) {
 	}
 
 	t.Run("defaults", func(t *testing.T) {
-		keyring.MockInit()
-
-		s, err := New(ca.PublicKey(), WithAgent(newAgent()))
+		s, err := New(ca.PublicKey(), NewMemoryBackend(), WithAgent(newAgent()))
 		if err != nil {
 			t.Fatalf("New() error = %v", err)
 		}
 
 		if s.curve != elliptic.P256() {
 			t.Errorf("curve = %v, want %v", s.curve.Params().Name, elliptic.P256().Params().Name)
+		}
+		if s.keyType != sshkey.KeyTypeECDSA {
+			t.Errorf("keyType = %v, want %v", s.keyType, sshkey.KeyTypeECDSA)
+		}
+		if !s.replaceKey {
+			t.Errorf("replaceKey = false, want true")
 		}
 		if s.user != u.Username {
 			t.Errorf("user = %q, want %q", s.user, u.Username)
@@ -167,7 +224,7 @@ func TestNew(t *testing.T) {
 
 	t.Run("with options", func(t *testing.T) {
 		a := newAgent()
-		s := newStorage(t, ca, WithCurve(elliptic.P384()), WithAgent(a))
+		s := newStorage(t, ca, WithCurve(elliptic.P384()), WithAgent(a), WithoutKeyReplacement())
 
 		if s.curve != elliptic.P384() {
 			t.Errorf("curve = %v, want %v", s.curve.Params().Name, elliptic.P384().Params().Name)
@@ -175,10 +232,24 @@ func TestNew(t *testing.T) {
 		if got, _, err := s.dial(); err != nil || got != a {
 			t.Errorf("agent was not set by WithAgent")
 		}
+		if s.replaceKey {
+			t.Errorf("replaceKey = true, want false")
+		}
+	})
+
+	t.Run("does not write to backend", func(t *testing.T) {
+		s := newStorage(t, ca)
+
+		if v := stored(t, s, Key); v != nil {
+			t.Errorf("key stored after New() = %q", v)
+		}
+		if v := stored(t, s, Cert); v != nil {
+			t.Errorf("certificate stored after New() = %q", v)
+		}
 	})
 }
 
-func TestStorage_GeneratePrivateKey(t *testing.T) {
+func TestStore_GeneratePrivateKey(t *testing.T) {
 	ca := newCA(t)
 
 	tests := []struct {
@@ -201,12 +272,12 @@ func TestStorage_GeneratePrivateKey(t *testing.T) {
 
 			generatePrivateKey(t, s)
 
-			k, err := keyring.Get(storeKeyService, s.user)
-			if err != nil {
-				t.Fatalf("key not stored in keyring: %v", err)
+			k := stored(t, s, Key)
+			if k == nil {
+				t.Fatalf("key not stored")
 			}
 
-			key, err := parseECDSAKey([]byte(k))
+			key, err := parseECDSAKey(k)
 			if err != nil {
 				t.Fatalf("stored key could not be parsed: %v", err)
 			}
@@ -221,20 +292,62 @@ func TestStorage_GeneratePrivateKey(t *testing.T) {
 		s := newStorage(t, ca)
 
 		generatePrivateKey(t, s)
-		first, err := s.PublicKeyBytes()
-		if err != nil {
-			t.Fatalf("PublicKeyBytes() error = %v", err)
-		}
+		first := stored(t, s, Key)
 
 		generatePrivateKey(t, s)
-		second, err := s.PublicKeyBytes()
-		if err != nil {
-			t.Fatalf("PublicKeyBytes() error = %v", err)
-		}
-
-		if bytes.Equal(first, second) {
+		if bytes.Equal(first, stored(t, s, Key)) {
 			t.Errorf("GeneratePrivateKey() did not replace existing key")
 		}
+	})
+
+	t.Run("without key replacement", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			existing []byte
+		}{
+			{"generated key", nil},
+			{"unparsable key", []byte("not a key")},
+		}
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				s := newStorage(t, ca, WithoutKeyReplacement())
+				if tt.existing == nil {
+					generatePrivateKey(t, s)
+				} else {
+					storeKey(t, s, tt.existing)
+				}
+				before := stored(t, s, Key)
+
+				if err := s.GeneratePrivateKey(); !errors.Is(err, ErrPrivateKeyExists) {
+					t.Errorf("GeneratePrivateKey() error = %v, want %v", err, ErrPrivateKeyExists)
+				}
+				if !bytes.Equal(before, stored(t, s, Key)) {
+					t.Errorf("GeneratePrivateKey() modified the existing key")
+				}
+			})
+		}
+
+		t.Run("no existing key", func(t *testing.T) {
+			s := newStorage(t, ca, WithoutKeyReplacement())
+
+			generatePrivateKey(t, s)
+			if !s.HasPrivateKey() {
+				t.Errorf("HasPrivateKey() = false, want true")
+			}
+		})
+
+		t.Run("existing key cannot be checked", func(t *testing.T) {
+			backendErr := errors.New("backend unavailable")
+			b := &failingBackend{MemoryBackend: NewMemoryBackend(), get: backendErr}
+			s := newStorageWith(t, ca, b, WithoutKeyReplacement())
+
+			if err := s.GeneratePrivateKey(); !errors.Is(err, backendErr) {
+				t.Errorf("GeneratePrivateKey() error = %v, want %v", err, backendErr)
+			}
+			if v, _ := b.MemoryBackend.Get(Key); v != nil {
+				t.Errorf("key stored despite error")
+			}
+		})
 	})
 
 	t.Run("removes existing certificate", func(t *testing.T) {
@@ -246,11 +359,11 @@ func TestStorage_GeneratePrivateKey(t *testing.T) {
 
 		generatePrivateKey(t, s)
 
-		if _, err := keyring.Get(storeCertService, s.user); !errors.Is(err, keyring.ErrNotFound) {
-			t.Errorf("certificate still in keyring after GeneratePrivateKey(), err = %v", err)
+		if v := stored(t, s, Cert); v != nil {
+			t.Errorf("certificate still stored after GeneratePrivateKey()")
 		}
-		if _, err := s.Certificate(); !errors.Is(err, ErrCertificateNotFound) {
-			t.Errorf("Certificate() error = %v, want %v", err, ErrCertificateNotFound)
+		if _, err := s.Certificate(); !errors.Is(err, cert.ErrCertificateNotFound) {
+			t.Errorf("Certificate() error = %v, want %v", err, cert.ErrCertificateNotFound)
 		}
 	})
 
@@ -262,50 +375,54 @@ func TestStorage_GeneratePrivateKey(t *testing.T) {
 			t.Errorf("GeneratePrivateKey() error = nil, want error")
 		}
 
-		if _, err := keyring.Get(storeKeyService, s.user); !errors.Is(err, keyring.ErrNotFound) {
-			t.Errorf("key was stored in keyring despite error, err = %v", err)
+		if v := stored(t, s, Key); v != nil {
+			t.Errorf("key stored despite error")
 		}
 	})
 
-	t.Run("keyring error", func(t *testing.T) {
-		s := newStorage(t, ca)
+	t.Run("key cannot be stored", func(t *testing.T) {
+		backendErr := errors.New("backend unavailable")
+		s := newStorageWith(t, ca, &failingBackend{MemoryBackend: NewMemoryBackend(), put: backendErr})
 
-		keyringErr := errors.New("keyring unavailable")
-		keyring.MockInitWithError(keyringErr)
+		if err := s.GeneratePrivateKey(); !errors.Is(err, backendErr) {
+			t.Errorf("GeneratePrivateKey() error = %v, want %v", err, backendErr)
+		}
+	})
 
-		if err := s.GeneratePrivateKey(); !errors.Is(err, keyringErr) {
-			t.Errorf("GeneratePrivateKey() error = %v, want %v", err, keyringErr)
+	t.Run("certificate cannot be removed", func(t *testing.T) {
+		backendErr := errors.New("backend unavailable")
+		s := newStorageWith(t, ca, &failingBackend{MemoryBackend: NewMemoryBackend(), del: backendErr})
+
+		if err := s.GeneratePrivateKey(); !errors.Is(err, backendErr) {
+			t.Errorf("GeneratePrivateKey() error = %v, want %v", err, backendErr)
 		}
 	})
 }
 
-func TestStorage_PublicKey(t *testing.T) {
+func TestStore_PublicKey(t *testing.T) {
 	ca := newCA(t)
 
 	t.Run("no key", func(t *testing.T) {
 		s := newStorage(t, ca)
 
-		if _, err := s.PublicKey(); !errors.Is(err, ErrKeyNotFound) {
-			t.Errorf("PublicKey() error = %v, want %v", err, ErrKeyNotFound)
+		if _, err := s.PublicKey(); !errors.Is(err, cert.ErrKeyNotFound) {
+			t.Errorf("PublicKey() error = %v, want %v", err, cert.ErrKeyNotFound)
 		}
-		if _, err := s.PublicKeyBytes(); !errors.Is(err, ErrKeyNotFound) {
-			t.Errorf("PublicKeyBytes() error = %v, want %v", err, ErrKeyNotFound)
+		if _, err := s.PublicKeyBytes(); !errors.Is(err, cert.ErrKeyNotFound) {
+			t.Errorf("PublicKeyBytes() error = %v, want %v", err, cert.ErrKeyNotFound)
 		}
 	})
 
-	t.Run("invalid key in keyring", func(t *testing.T) {
+	t.Run("invalid key file", func(t *testing.T) {
 		s := newStorage(t, ca)
+		storeKey(t, s, []byte("not a key"))
 
-		if err := keyring.Set(storeKeyService, s.user, "not a key"); err != nil {
-			t.Fatalf("keyring.Set() error = %v", err)
-		}
-
-		if _, err := s.PublicKey(); !errors.Is(err, ErrKeyNotFound) {
-			t.Errorf("PublicKey() error = %v, want %v", err, ErrKeyNotFound)
+		if _, err := s.PublicKey(); !errors.Is(err, cert.ErrKeyNotFound) {
+			t.Errorf("PublicKey() error = %v, want %v", err, cert.ErrKeyNotFound)
 		}
 	})
 
-	t.Run("undersized rsa key in keyring", func(t *testing.T) {
+	t.Run("undersized rsa key file", func(t *testing.T) {
 		s := newStorage(t, ca)
 
 		// RSA keys below the minimum size are not supported
@@ -317,12 +434,38 @@ func TestStorage_PublicKey(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not marshal key: %v", err)
 		}
-		if err := keyring.Set(storeKeyService, s.user, string(pemEncode(t, block))); err != nil {
-			t.Fatalf("keyring.Set() error = %v", err)
+		storeKey(t, s, pemEncode(t, block))
+
+		if _, err := s.PublicKey(); !errors.Is(err, cert.ErrKeyNotFound) {
+			t.Errorf("PublicKey() error = %v, want %v", err, cert.ErrKeyNotFound)
+		}
+	})
+
+	t.Run("existing key file", func(t *testing.T) {
+		s := newStorage(t, ca)
+
+		// a key generated outside the store (eg by ssh-keygen) is used
+		key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+		if err != nil {
+			t.Fatalf("could not generate key: %v", err)
+		}
+		block, err := ssh.MarshalPrivateKey(key, "")
+		if err != nil {
+			t.Fatalf("could not marshal key: %v", err)
+		}
+		storeKey(t, s, pemEncode(t, block))
+
+		want, err := ssh.NewPublicKey(&key.PublicKey)
+		if err != nil {
+			t.Fatalf("NewPublicKey() error = %v", err)
 		}
 
-		if _, err := s.PublicKey(); !errors.Is(err, ErrKeyNotFound) {
-			t.Errorf("PublicKey() error = %v, want %v", err, ErrKeyNotFound)
+		pub, err := s.PublicKey()
+		if err != nil {
+			t.Fatalf("PublicKey() error = %v", err)
+		}
+		if !bytes.Equal(pub.Marshal(), want.Marshal()) {
+			t.Errorf("PublicKey() does not match key file")
 		}
 	})
 
@@ -330,11 +473,7 @@ func TestStorage_PublicKey(t *testing.T) {
 		s := newStorage(t, ca)
 		generatePrivateKey(t, s)
 
-		k, err := keyring.Get(storeKeyService, s.user)
-		if err != nil {
-			t.Fatalf("keyring.Get() error = %v", err)
-		}
-		key, err := parseECDSAKey([]byte(k))
+		key, err := parseECDSAKey(stored(t, s, Key))
 		if err != nil {
 			t.Fatalf("ParseKey() error = %v", err)
 		}
@@ -372,7 +511,7 @@ func TestStorage_PublicKey(t *testing.T) {
 	})
 }
 
-func TestStorage_HasPrivateKey(t *testing.T) {
+func TestStore_HasPrivateKey(t *testing.T) {
 	ca := newCA(t)
 
 	t.Run("no key", func(t *testing.T) {
@@ -383,19 +522,16 @@ func TestStorage_HasPrivateKey(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid key in keyring", func(t *testing.T) {
+	t.Run("invalid key file", func(t *testing.T) {
 		s := newStorage(t, ca)
-
-		if err := keyring.Set(storeKeyService, s.user, "not a key"); err != nil {
-			t.Fatalf("keyring.Set() error = %v", err)
-		}
+		storeKey(t, s, []byte("not a key"))
 
 		if s.HasPrivateKey() {
 			t.Errorf("HasPrivateKey() = true, want false")
 		}
 	})
 
-	t.Run("undersized rsa key in keyring", func(t *testing.T) {
+	t.Run("undersized rsa key file", func(t *testing.T) {
 		s := newStorage(t, ca)
 
 		// RSA keys below the minimum size are not supported
@@ -407,20 +543,7 @@ func TestStorage_HasPrivateKey(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not marshal key: %v", err)
 		}
-		if err := keyring.Set(storeKeyService, s.user, string(pemEncode(t, block))); err != nil {
-			t.Fatalf("keyring.Set() error = %v", err)
-		}
-
-		if s.HasPrivateKey() {
-			t.Errorf("HasPrivateKey() = true, want false")
-		}
-	})
-
-	t.Run("keyring error", func(t *testing.T) {
-		s := newStorage(t, ca)
-		generatePrivateKey(t, s)
-
-		keyring.MockInitWithError(errors.New("keyring unavailable"))
+		storeKey(t, s, pemEncode(t, block))
 
 		if s.HasPrivateKey() {
 			t.Errorf("HasPrivateKey() = true, want false")
@@ -450,7 +573,7 @@ func TestStorage_HasPrivateKey(t *testing.T) {
 	})
 }
 
-func TestStorage_HasCertificate(t *testing.T) {
+func TestStore_HasCertificate(t *testing.T) {
 	ca := newCA(t)
 
 	t.Run("no certificate", func(t *testing.T) {
@@ -502,33 +625,20 @@ func TestStorage_HasCertificate(t *testing.T) {
 			t.Errorf("HasCertificate() = true, want false")
 		}
 	})
-
-	t.Run("keyring error", func(t *testing.T) {
-		s := newStorage(t, ca)
-		if err := s.SaveCertificate(validCert(t, s, ca)); err != nil {
-			t.Fatalf("SaveCertificate() error = %v", err)
-		}
-
-		keyring.MockInitWithError(errors.New("keyring unavailable"))
-
-		if s.HasCertificate() {
-			t.Errorf("HasCertificate() = true, want false")
-		}
-	})
 }
 
-func TestStorage_PrivateKey(t *testing.T) {
+func TestStore_PrivateKey(t *testing.T) {
 	ca := newCA(t)
 
 	// assertNoKey checks both PrivateKey and PrivateKeyBytes report no key
-	assertNoKey := func(t *testing.T, s *Storage) {
+	assertNoKey := func(t *testing.T, s *Store) {
 		t.Helper()
 
-		if _, err := s.PrivateKey(); !errors.Is(err, ErrKeyNotFound) {
-			t.Errorf("PrivateKey() error = %v, want %v", err, ErrKeyNotFound)
+		if _, err := s.PrivateKey(); !errors.Is(err, cert.ErrKeyNotFound) {
+			t.Errorf("PrivateKey() error = %v, want %v", err, cert.ErrKeyNotFound)
 		}
-		if _, err := s.PrivateKeyBytes(); !errors.Is(err, ErrKeyNotFound) {
-			t.Errorf("PrivateKeyBytes() error = %v, want %v", err, ErrKeyNotFound)
+		if _, err := s.PrivateKeyBytes(); !errors.Is(err, cert.ErrKeyNotFound) {
+			t.Errorf("PrivateKeyBytes() error = %v, want %v", err, cert.ErrKeyNotFound)
 		}
 	}
 
@@ -558,20 +668,6 @@ func TestStorage_PrivateKey(t *testing.T) {
 		storeKey(t, s, pemEncode(t, block))
 
 		assertNoKey(t, s)
-	})
-
-	t.Run("keyring error", func(t *testing.T) {
-		s := newStorage(t, ca)
-		generatePrivateKey(t, s)
-
-		keyring.MockInitWithError(errors.New("keyring unavailable"))
-
-		if _, err := s.PrivateKey(); !errors.Is(err, ErrKeyNotFound) {
-			t.Errorf("PrivateKey() error = %v, want %v", err, ErrKeyNotFound)
-		}
-		if _, err := s.PrivateKeyBytes(); !errors.Is(err, ErrKeyNotFound) {
-			t.Errorf("PrivateKeyBytes() error = %v, want %v", err, ErrKeyNotFound)
-		}
 	})
 
 	t.Run("existing key", func(t *testing.T) {
@@ -678,14 +774,14 @@ func TestStorage_PrivateKey(t *testing.T) {
 	}
 }
 
-func TestStorage_Signer(t *testing.T) {
+func TestStore_Signer(t *testing.T) {
 	ca := newCA(t)
 
 	t.Run("no key", func(t *testing.T) {
 		s := newStorage(t, ca)
 
-		if _, err := s.Signer(); !errors.Is(err, ErrKeyNotFound) {
-			t.Errorf("Signer() error = %v, want %v", err, ErrKeyNotFound)
+		if _, err := s.Signer(); !errors.Is(err, cert.ErrKeyNotFound) {
+			t.Errorf("Signer() error = %v, want %v", err, cert.ErrKeyNotFound)
 		}
 	})
 
@@ -717,7 +813,7 @@ func TestStorage_Signer(t *testing.T) {
 	})
 }
 
-func TestStorage_SaveCertificate(t *testing.T) {
+func TestStore_SaveCertificate(t *testing.T) {
 	ca := newCA(t)
 	otherCA := newCA(t)
 	now := time.Now()
@@ -734,18 +830,18 @@ func TestStorage_SaveCertificate(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		cert    func(t *testing.T, s *Storage) *ssh.Certificate
+		cert    func(t *testing.T, s *Store) *ssh.Certificate
 		wantErr error
 	}{
 		{
 			name: "valid",
-			cert: func(t *testing.T, s *Storage) *ssh.Certificate {
+			cert: func(t *testing.T, s *Store) *ssh.Certificate {
 				return validCert(t, s, ca)
 			},
 		},
 		{
 			name: "valid after within grace period",
-			cert: func(t *testing.T, s *Storage) *ssh.Certificate {
+			cert: func(t *testing.T, s *Store) *ssh.Certificate {
 				generatePrivateKey(t, s)
 				pub, _ := s.PublicKey()
 				return signCert(t, ca, pub, now.Add(3*time.Second), now.Add(time.Hour))
@@ -753,45 +849,45 @@ func TestStorage_SaveCertificate(t *testing.T) {
 		},
 		{
 			name: "no key",
-			cert: func(t *testing.T, s *Storage) *ssh.Certificate {
+			cert: func(t *testing.T, s *Store) *ssh.Certificate {
 				return signCert(t, ca, otherPub, now.Add(-time.Minute), now.Add(time.Hour))
 			},
-			wantErr: ErrKeyNotFound,
+			wantErr: cert.ErrKeyNotFound,
 		},
 		{
 			name: "expired",
-			cert: func(t *testing.T, s *Storage) *ssh.Certificate {
+			cert: func(t *testing.T, s *Store) *ssh.Certificate {
 				generatePrivateKey(t, s)
 				pub, _ := s.PublicKey()
 				return signCert(t, ca, pub, now.Add(-2*time.Hour), now.Add(-time.Hour))
 			},
-			wantErr: ErrCertificateNotValid,
+			wantErr: cert.ErrCertificateNotValid,
 		},
 		{
 			name: "not yet valid",
-			cert: func(t *testing.T, s *Storage) *ssh.Certificate {
+			cert: func(t *testing.T, s *Store) *ssh.Certificate {
 				generatePrivateKey(t, s)
 				pub, _ := s.PublicKey()
 				return signCert(t, ca, pub, now.Add(time.Minute), now.Add(time.Hour))
 			},
-			wantErr: ErrCertificateNotValid,
+			wantErr: cert.ErrCertificateNotValid,
 		},
 		{
 			name: "unexpected certificate authority",
-			cert: func(t *testing.T, s *Storage) *ssh.Certificate {
+			cert: func(t *testing.T, s *Store) *ssh.Certificate {
 				generatePrivateKey(t, s)
 				pub, _ := s.PublicKey()
 				return signCert(t, otherCA, pub, now.Add(-time.Minute), now.Add(time.Hour))
 			},
-			wantErr: ErrUnexpectedCertificateAuthority,
+			wantErr: cert.ErrUnexpectedCertificateAuthority,
 		},
 		{
 			name: "certificate for different key",
-			cert: func(t *testing.T, s *Storage) *ssh.Certificate {
+			cert: func(t *testing.T, s *Store) *ssh.Certificate {
 				generatePrivateKey(t, s)
 				return signCert(t, ca, otherPub, now.Add(-time.Minute), now.Add(time.Hour))
 			},
-			wantErr: ErrCertificateMismatch,
+			wantErr: cert.ErrCertificateMismatch,
 		},
 	}
 	for _, tt := range tests {
@@ -804,59 +900,87 @@ func TestStorage_SaveCertificate(t *testing.T) {
 				t.Fatalf("SaveCertificate() error = %v, want %v", err, tt.wantErr)
 			}
 
-			stored, getErr := keyring.Get(storeCertService, s.user)
+			got := stored(t, s, Cert)
 			if tt.wantErr != nil {
-				if !errors.Is(getErr, keyring.ErrNotFound) {
-					t.Errorf("certificate stored in keyring despite error, err = %v", getErr)
+				if got != nil {
+					t.Errorf("certificate stored despite error")
 				}
 				return
 			}
 
-			if getErr != nil {
-				t.Fatalf("certificate not stored in keyring: %v", getErr)
-			}
-			if stored != string(ssh.MarshalAuthorizedKey(c)) {
-				t.Errorf("stored certificate = %q, want %q", stored, ssh.MarshalAuthorizedKey(c))
+			if !bytes.Equal(got, ssh.MarshalAuthorizedKey(c)) {
+				t.Errorf("stored certificate = %q, want %q", got, ssh.MarshalAuthorizedKey(c))
 			}
 		})
 	}
+
+	t.Run("replaces existing certificate", func(t *testing.T) {
+		s := newStorage(t, ca)
+		generatePrivateKey(t, s)
+		pub, _ := s.PublicKey()
+
+		first := signCert(t, ca, pub, now.Add(-time.Minute), now.Add(time.Hour))
+		if err := s.SaveCertificate(first); err != nil {
+			t.Fatalf("SaveCertificate() error = %v", err)
+		}
+
+		second := signCert(t, ca, pub, now.Add(-time.Minute), now.Add(2*time.Hour))
+		if err := s.SaveCertificate(second); err != nil {
+			t.Fatalf("SaveCertificate() error = %v", err)
+		}
+
+		got, err := s.Certificate()
+		if err != nil {
+			t.Fatalf("Certificate() error = %v", err)
+		}
+		if !bytes.Equal(got.Marshal(), second.Marshal()) {
+			t.Errorf("Certificate() does not match most recently saved certificate")
+		}
+	})
+
+	t.Run("certificate cannot be written", func(t *testing.T) {
+		b := &failingBackend{MemoryBackend: NewMemoryBackend()}
+		s := newStorageWith(t, ca, b)
+		c := validCert(t, s, ca)
+
+		backendErr := errors.New("backend unavailable")
+		b.put = backendErr
+
+		if err := s.SaveCertificate(c); !errors.Is(err, backendErr) {
+			t.Errorf("SaveCertificate() error = %v, want %v", err, backendErr)
+		}
+	})
 }
 
-func TestStorage_Certificate(t *testing.T) {
+func TestStore_Certificate(t *testing.T) {
 	ca := newCA(t)
 
 	t.Run("no certificate", func(t *testing.T) {
 		s := newStorage(t, ca)
 
-		if _, err := s.Certificate(); !errors.Is(err, ErrCertificateNotFound) {
-			t.Errorf("Certificate() error = %v, want %v", err, ErrCertificateNotFound)
+		if _, err := s.Certificate(); !errors.Is(err, cert.ErrCertificateNotFound) {
+			t.Errorf("Certificate() error = %v, want %v", err, cert.ErrCertificateNotFound)
 		}
-		if _, err := s.CertificateBytes(); !errors.Is(err, ErrCertificateNotFound) {
-			t.Errorf("CertificateBytes() error = %v, want %v", err, ErrCertificateNotFound)
-		}
-	})
-
-	t.Run("invalid certificate in keyring", func(t *testing.T) {
-		s := newStorage(t, ca)
-
-		if err := keyring.Set(storeCertService, s.user, "not a certificate"); err != nil {
-			t.Fatalf("keyring.Set() error = %v", err)
-		}
-
-		if _, err := s.Certificate(); !errors.Is(err, ErrCertificateNotFound) {
-			t.Errorf("Certificate() error = %v, want %v", err, ErrCertificateNotFound)
+		if _, err := s.CertificateBytes(); !errors.Is(err, cert.ErrCertificateNotFound) {
+			t.Errorf("CertificateBytes() error = %v, want %v", err, cert.ErrCertificateNotFound)
 		}
 	})
 
-	t.Run("public key rather than certificate in keyring", func(t *testing.T) {
+	t.Run("invalid certificate file", func(t *testing.T) {
 		s := newStorage(t, ca)
+		storeCert(t, s, []byte("not a certificate"))
 
-		if err := keyring.Set(storeCertService, s.user, string(ssh.MarshalAuthorizedKey(ca.PublicKey()))); err != nil {
-			t.Fatalf("keyring.Set() error = %v", err)
+		if _, err := s.Certificate(); !errors.Is(err, cert.ErrCertificateNotFound) {
+			t.Errorf("Certificate() error = %v, want %v", err, cert.ErrCertificateNotFound)
 		}
+	})
 
-		if _, err := s.Certificate(); !errors.Is(err, ErrCertificateNotFound) {
-			t.Errorf("Certificate() error = %v, want %v", err, ErrCertificateNotFound)
+	t.Run("public key rather than certificate in file", func(t *testing.T) {
+		s := newStorage(t, ca)
+		storeCert(t, s, ssh.MarshalAuthorizedKey(ca.PublicKey()))
+
+		if _, err := s.Certificate(); !errors.Is(err, cert.ErrCertificateNotFound) {
+			t.Errorf("Certificate() error = %v, want %v", err, cert.ErrCertificateNotFound)
 		}
 	})
 
@@ -886,14 +1010,14 @@ func TestStorage_Certificate(t *testing.T) {
 	})
 }
 
-func TestStorage_AddToAgent(t *testing.T) {
+func TestStore_AddToAgent(t *testing.T) {
 	ca := newCA(t)
 
 	t.Run("no key", func(t *testing.T) {
 		s := newStorage(t, ca)
 
-		if err := s.AddToAgent(); !errors.Is(err, ErrKeyNotFound) {
-			t.Errorf("AddToAgent() error = %v, want %v", err, ErrKeyNotFound)
+		if err := s.AddToAgent(); !errors.Is(err, cert.ErrKeyNotFound) {
+			t.Errorf("AddToAgent() error = %v, want %v", err, cert.ErrKeyNotFound)
 		}
 	})
 
@@ -901,8 +1025,8 @@ func TestStorage_AddToAgent(t *testing.T) {
 		s := newStorage(t, ca)
 		generatePrivateKey(t, s)
 
-		if err := s.AddToAgent(); !errors.Is(err, ErrCertificateNotFound) {
-			t.Errorf("AddToAgent() error = %v, want %v", err, ErrCertificateNotFound)
+		if err := s.AddToAgent(); !errors.Is(err, cert.ErrCertificateNotFound) {
+			t.Errorf("AddToAgent() error = %v, want %v", err, cert.ErrCertificateNotFound)
 		}
 	})
 
@@ -934,8 +1058,8 @@ func TestStorage_AddToAgent(t *testing.T) {
 			t.Fatalf("SaveCertificate() error = %v", err)
 		}
 
-		if err := s.AddToAgent(); !errors.Is(err, ErrAddingToAgent) {
-			t.Errorf("AddToAgent() error = %v, want %v from locked agent", err, ErrAddingToAgent)
+		if err := s.AddToAgent(); !errors.Is(err, cert.ErrAddingToAgent) {
+			t.Errorf("AddToAgent() error = %v, want %v from locked agent", err, cert.ErrAddingToAgent)
 		}
 	})
 }
@@ -1001,7 +1125,7 @@ func newTypedKey(t *testing.T, keyType sshkey.KeyType, curve elliptic.Curve) cry
 	return key
 }
 
-func TestStorage_KeyTypes(t *testing.T) {
+func TestStore_KeyTypes(t *testing.T) {
 	ca := newCA(t)
 
 	p256 := newTypedKey(t, sshkey.KeyTypeECDSA, elliptic.P256())
@@ -1117,8 +1241,8 @@ func TestStorage_KeyTypes(t *testing.T) {
 		now := time.Now()
 		c := signCert(t, ca, pub, now.Add(-time.Minute), now.Add(time.Hour))
 
-		if err := s.SaveCertificate(c); !errors.Is(err, ErrCertificateMismatch) {
-			t.Errorf("SaveCertificate() error = %v, want %v", err, ErrCertificateMismatch)
+		if err := s.SaveCertificate(c); !errors.Is(err, cert.ErrCertificateMismatch) {
+			t.Errorf("SaveCertificate() error = %v, want %v", err, cert.ErrCertificateMismatch)
 		}
 	})
 
@@ -1135,13 +1259,13 @@ func TestStorage_KeyTypes(t *testing.T) {
 			t.Errorf("HasPrivateKey() = true, want false")
 		}
 		_, err = s.PrivateKey()
-		if !errors.Is(err, ErrKeyNotFound) || !errors.Is(err, sshkey.ErrEncryptedKey) {
-			t.Errorf("PrivateKey() error = %v, want %v and %v", err, ErrKeyNotFound, sshkey.ErrEncryptedKey)
+		if !errors.Is(err, cert.ErrKeyNotFound) || !errors.Is(err, sshkey.ErrEncryptedKey) {
+			t.Errorf("PrivateKey() error = %v, want %v and %v", err, cert.ErrKeyNotFound, sshkey.ErrEncryptedKey)
 		}
 	})
 }
 
-func TestStorage_GeneratePrivateKey_KeyType(t *testing.T) {
+func TestStore_GeneratePrivateKey_KeyType(t *testing.T) {
 	ca := newCA(t)
 
 	tests := []struct {
@@ -1230,39 +1354,7 @@ func parseECDSAKey(pemBytes []byte) (*ecdsa.PrivateKey, error) {
 	return k, nil
 }
 
-func TestStorage_LargeKey(t *testing.T) {
-	// a RSA-3072 key is larger than a single Windows Credential Manager entry
-	// so is stored in parts
-	ca := newCA(t)
-	s := newStorage(t, ca, WithKeyType(sshkey.KeyTypeRSA))
-	generatePrivateKey(t, s)
-
-	if _, err := keyring.Get(storeKeyService+" #1", s.user); err != nil {
-		t.Fatalf("key was not stored in parts: %v", err)
-	}
-
-	keyBytes, err := s.PrivateKeyBytes()
-	if err != nil {
-		t.Fatalf("PrivateKeyBytes() error = %v", err)
-	}
-	if len(keyBytes) <= keyringutil.ChunkSize {
-		t.Fatalf("key is %d bytes, want more than %d", len(keyBytes), keyringutil.ChunkSize)
-	}
-
-	if !s.HasPrivateKey() {
-		t.Errorf("HasPrivateKey() = false, want true")
-	}
-
-	// a certificate for a new (also RSA) key is stored alongside it
-	if err := s.SaveCertificate(validCert(t, s, ca)); err != nil {
-		t.Fatalf("SaveCertificate() error = %v", err)
-	}
-	if !s.HasCertificate() {
-		t.Errorf("HasCertificate() = false, want true")
-	}
-}
-
-func TestStorage_DeleteCertificate(t *testing.T) {
+func TestStore_DeleteCertificate(t *testing.T) {
 	ca := newCA(t)
 
 	tests := []struct {
@@ -1305,7 +1397,7 @@ func (listFailingAgent) List() ([]*agent.Key, error) {
 	return nil, errors.New("list failed")
 }
 
-func TestStorage_RemoveFromAgent(t *testing.T) {
+func TestStore_RemoveFromAgent(t *testing.T) {
 	ca := newCA(t)
 
 	t.Run("no certificate", func(t *testing.T) {
@@ -1368,8 +1460,65 @@ func TestStorage_RemoveFromAgent(t *testing.T) {
 			t.Fatalf("SaveCertificate() error = %v", err)
 		}
 
-		if err := s.RemoveFromAgent(); !errors.Is(err, ErrRemovingFromAgent) {
-			t.Errorf("RemoveFromAgent() error = %v, want %v", err, ErrRemovingFromAgent)
+		if err := s.RemoveFromAgent(); !errors.Is(err, cert.ErrRemovingFromAgent) {
+			t.Errorf("RemoveFromAgent() error = %v, want %v", err, cert.ErrRemovingFromAgent)
+		}
+	})
+}
+
+func TestStore_BackendErrors(t *testing.T) {
+	ca := newCA(t)
+	backendErr := errors.New("backend unavailable")
+
+	// newFailingStorage returns a store holding a valid key and certificate
+	// whose backend fails every subsequent read
+	newFailingStorage := func(t *testing.T) *Store {
+		t.Helper()
+
+		b := &failingBackend{MemoryBackend: NewMemoryBackend()}
+		s := newStorageWith(t, ca, b)
+		if err := s.SaveCertificate(validCert(t, s, ca)); err != nil {
+			t.Fatalf("SaveCertificate() error = %v", err)
+		}
+		b.get = backendErr
+
+		return s
+	}
+
+	t.Run("reads report not found", func(t *testing.T) {
+		s := newFailingStorage(t)
+
+		if s.HasPrivateKey() {
+			t.Errorf("HasPrivateKey() = true, want false")
+		}
+		if s.HasCertificate() {
+			t.Errorf("HasCertificate() = true, want false")
+		}
+		if _, err := s.PrivateKey(); !errors.Is(err, cert.ErrKeyNotFound) || !errors.Is(err, backendErr) {
+			t.Errorf("PrivateKey() error = %v, want %v and %v", err, cert.ErrKeyNotFound, backendErr)
+		}
+		if _, err := s.PrivateKeyBytes(); !errors.Is(err, cert.ErrKeyNotFound) {
+			t.Errorf("PrivateKeyBytes() error = %v, want %v", err, cert.ErrKeyNotFound)
+		}
+		if _, err := s.Certificate(); !errors.Is(err, cert.ErrCertificateNotFound) || !errors.Is(err, backendErr) {
+			t.Errorf("Certificate() error = %v, want %v and %v", err, cert.ErrCertificateNotFound, backendErr)
+		}
+	})
+
+	t.Run("remove from agent", func(t *testing.T) {
+		s := newFailingStorage(t)
+
+		// only a missing certificate is skipped
+		if err := s.RemoveFromAgent(); !errors.Is(err, cert.ErrRemovingFromAgent) || !errors.Is(err, backendErr) {
+			t.Errorf("RemoveFromAgent() error = %v, want %v and %v", err, cert.ErrRemovingFromAgent, backendErr)
+		}
+	})
+
+	t.Run("delete certificate", func(t *testing.T) {
+		s := newStorageWith(t, ca, &failingBackend{MemoryBackend: NewMemoryBackend(), del: backendErr})
+
+		if err := s.DeleteCertificate(); !errors.Is(err, backendErr) {
+			t.Errorf("DeleteCertificate() error = %v, want %v", err, backendErr)
 		}
 	})
 }

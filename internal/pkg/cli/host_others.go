@@ -15,7 +15,7 @@ import (
 	"github.com/andrewheberle/simplecommand"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/filestore"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
 	"github.com/bep/simplecobra"
 )
 
@@ -115,7 +115,7 @@ func (c *hostCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 
 	certs := make([]hostCert, 0)
 	for _, k := range c.keypath {
-		store, err := filestore.New(config.CertificateAuthorityPublicKey(), k)
+		store, err := store.NewFile(config.CertificateAuthorityPublicKey(), k)
 		if err != nil {
 			c.logger.Error("problem setting up store", "error", err)
 			continue

@@ -10,7 +10,7 @@ import (
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth/tokenstore"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
-	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/keyringstore"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
 	"github.com/bep/simplecobra"
 )
 
@@ -21,7 +21,7 @@ type loginCommand struct {
 	force     bool
 
 	cert  *cert.UserCertificate
-	store *keyringstore.Storage
+	store *store.Store
 
 	logger *slog.Logger
 
@@ -62,7 +62,7 @@ func (c *loginCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 		return err
 	}
 
-	store, err := keyringstore.New(config.CertificateAuthorityPublicKey())
+	store, err := store.NewKeyring(config.CertificateAuthorityPublicKey())
 	if err != nil {
 		return err
 	}
