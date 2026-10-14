@@ -3,7 +3,10 @@
 package e2e
 
 import (
+	"bytes"
 	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
@@ -73,29 +76,54 @@ func TestKRL_NotOlder(t *testing.T) {
 		t.Run(ct.name, func(t *testing.T) {
 			t.Parallel()
 
-			first := ca.krlResponse(t, ct.kind)
-			again := ca.krlResponse(t, ct.kind)
+			path := filepath.Join(t.TempDir(), "revocation_list")
 
-			if err := again.CheckNotOlder(first.Krl); err != nil {
-				t.Errorf("CheckNotOlder() of KRL fetched again error = %v, want nil", err)
-			}
+			first := ca.fetchKRL(t, ct.kind)
+			install(t, first, path)
 
 			store := ca.request(t, ct)
 			if err := ca.revoke(t, ct.kind, certificate(t, store).Serial, store); err != nil {
 				t.Fatalf("revoking certificate: %v", err)
 			}
 
-			revoked := ca.krlResponse(t, ct.kind)
-
-			if err := revoked.CheckNotOlder(first.Krl); err != nil {
-				t.Errorf("CheckNotOlder() of later KRL error = %v, want nil", err)
+			revoked := ca.fetchKRL(t, ct.kind)
+			if got := install(t, revoked, path); got != krl.Written {
+				t.Errorf("Install() of later KRL = %v, want %v", got, krl.Written)
 			}
 
-			if err := first.CheckNotOlder(revoked.Krl); !errors.Is(err, krl.ErrOlderKRL) {
-				t.Errorf("CheckNotOlder() of earlier KRL error = %v, want %v", err, krl.ErrOlderKRL)
+			// the KRL fetched again is the same, or regenerated with a later date
+			if got := install(t, ca.fetchKRL(t, ct.kind), path); got != krl.Unchanged && got != krl.Written {
+				t.Errorf("Install() of KRL fetched again = %v, want %v or %v", got, krl.Unchanged, krl.Written)
+			}
+			installed, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatalf("reading installed KRL: %v", err)
+			}
+
+			if _, err := first.Install(path); !errors.Is(err, krl.ErrOlderKRL) {
+				t.Errorf("Install() of earlier KRL error = %v, want %v", err, krl.ErrOlderKRL)
+			}
+			after, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatalf("reading installed KRL: %v", err)
+			}
+			if !bytes.Equal(after, installed) {
+				t.Error("installed KRL was changed by an earlier KRL")
 			}
 		})
 	}
+}
+
+// install installs verified at path and returns the outcome
+func install(t *testing.T, verified *krl.Verified, path string) krl.Outcome {
+	t.Helper()
+
+	outcome, err := verified.Install(path)
+	if err != nil {
+		t.Fatalf("installing KRL: %v", err)
+	}
+
+	return outcome
 }
 
 func TestRevocation(t *testing.T) {

@@ -580,29 +580,23 @@ func (ca *testCA) revoke(t *testing.T, certificateType krl.CertificateType, seri
 	return err
 }
 
-// krlResponse fetches and verifies the KRL for certificateType
-func (ca *testCA) krlResponse(t *testing.T, certificateType krl.CertificateType) *krl.Response {
+// fetchKRL fetches and verifies the KRL for certificateType
+func (ca *testCA) fetchKRL(t *testing.T, certificateType krl.CertificateType) *krl.Verified {
 	t.Helper()
 
-	res, err := krl.Get(context.Background(), ca.URL, certificateType, api.WithHTTPClient(httpClient()))
+	verified, err := krl.Fetch(context.Background(), ca.URL, certificateType, ca.PublicKey, api.WithHTTPClient(httpClient()))
 	if err != nil {
-		t.Fatalf("getting %s KRL: %v", certificateType, err)
+		t.Fatalf("fetching %s KRL: %v", certificateType, err)
 	}
 
-	if err := res.VerifyStrict(ca.PublicKey); err != nil {
-		t.Fatalf("verifying %s KRL: %v", certificateType, err)
-	}
-
-	return res
+	return verified
 }
 
 // krl fetches, verifies and parses the KRL for certificateType
 func (ca *testCA) krl(t *testing.T, certificateType krl.CertificateType) *sshkrl.KRL {
 	t.Helper()
 
-	res := ca.krlResponse(t, certificateType)
-
-	parsed, err := res.Parse()
+	parsed, err := sshkrl.ParseKRL(ca.fetchKRL(t, certificateType).Bytes())
 	if err != nil {
 		t.Fatalf("parsing %s KRL: %v", certificateType, err)
 	}
