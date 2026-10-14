@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.25.1](https://github.com/andrewheberle/ssh-ca-client/compare/v0.25.0...v0.25.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* **krl:** allow an installed KRL to be replaced on Windows ([#116](https://github.com/andrewheberle/ssh-ca-client/issues/116)) ([074386e](https://github.com/andrewheberle/ssh-ca-client/commit/074386e9b505e415e39bffd01a0bfead1ca66b8c))
+
 ## [0.25.0](https://github.com/andrewheberle/ssh-ca-client/compare/v0.24.0...v0.25.0) (2026-10-12)
 
 
