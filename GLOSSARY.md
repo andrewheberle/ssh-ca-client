@@ -15,3 +15,11 @@ _Avoid_: Storage, key store, keyring store, file store
 **Store backend**:
 Where a Certificate store physically keeps its private key and certificate, such as a key file on disk or the system keyring.
 _Avoid_: Storage, provider
+
+**KRL**:
+A key revocation list signed by the Trusted CA, listing the revoked certificates of one type (user or host).
+_Avoid_: Revocation list, CRL, blocklist
+
+**Rollback**:
+Installing a KRL older than the one already in place, which would un-revoke certificates; it is always refused.
+_Avoid_: Downgrade

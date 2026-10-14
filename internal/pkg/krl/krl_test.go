@@ -17,9 +17,9 @@ import (
 	"math/big"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/httpclient"
@@ -146,15 +146,56 @@ func response(status int, contentType, body string) func(req *http.Request) (*ht
 	}
 }
 
-func TestGet(t *testing.T) {
-	signer := newSigner(t)
-	b := marshal(t, certificateSection(signer.PublicKey()))
-	want := &krl.Response{Krl: b, Signature: sign(t, b, signer)}
+// serve returns a client that answers every request with b and its
+// signature, as the CA does
+func serve(t *testing.T, b []byte, signature string) *responseClient {
+	t.Helper()
 
-	body, err := json.Marshal(api.KeyRevocationListResponse(*want))
+	body, err := json.Marshal(api.KeyRevocationListResponse{Krl: b, Signature: signature})
 	if err != nil {
 		t.Fatalf("marshalling response: %v", err)
 	}
+
+	return &responseClient{fn: response(http.StatusOK, "application/json", string(body))}
+}
+
+// fetch returns b, signed by ca, after fetching and verifying it
+func fetch(t *testing.T, ca ssh.Signer, b []byte) *krl.Verified {
+	t.Helper()
+
+	v, err := krl.Fetch(t.Context(), "https://ssh.example.com/", krl.User, ca.PublicKey(), api.WithHTTPClient(serve(t, b, sign(t, b, ca))))
+	if err != nil {
+		t.Fatalf("Fetch() failed: %v", err)
+	}
+
+	return v
+}
+
+// generated returns a KRL revoking a certificate from ca with version and
+// generated date, as the CA sets version 1 and the generated date for every
+// KRL
+func generated(t *testing.T, ca ssh.Signer, version, date uint64) []byte {
+	t.Helper()
+
+	k := &sshkrl.KRL{
+		Version:       version,
+		GeneratedDate: date,
+		Sections:      []sshkrl.KRLSection{certificateSection(ca.PublicKey())},
+	}
+	b, err := k.Marshal(rand.Reader)
+	if err != nil {
+		t.Fatalf("marshalling krl: %v", err)
+	}
+
+	return b
+}
+
+func TestFetch(t *testing.T) {
+	ca := newSigner(t)
+
+	const date = 1_800_000_000
+	b := generated(t, ca, 3, date)
+	signature := sign(t, b, ca)
 
 	tests := []struct {
 		name            string
@@ -170,25 +211,44 @@ func TestGet(t *testing.T) {
 			var gotPath string
 			client := &responseClient{fn: func(req *http.Request) (*http.Response, error) {
 				gotPath = req.URL.Path
-				return response(http.StatusOK, "application/json", string(body))(req)
+				return serve(t, b, signature).Do(req)
 			}}
 
-			got, err := krl.Get(t.Context(), "https://ssh.example.com/", tt.certificateType, api.WithHTTPClient(client))
+			got, err := krl.Fetch(t.Context(), "https://ssh.example.com/", tt.certificateType, ca.PublicKey(), api.WithHTTPClient(client))
 			if err != nil {
-				t.Fatalf("Get() failed: %v", err)
+				t.Fatalf("Fetch() failed: %v", err)
 			}
 
 			if gotPath != tt.wantPath {
-				t.Errorf("Get() requested %q, want %q", gotPath, tt.wantPath)
+				t.Errorf("Fetch() requested %q, want %q", gotPath, tt.wantPath)
 			}
-			if !reflect.DeepEqual(got, want) {
-				t.Errorf("Get() = %v, want %v", got, want)
+			if !bytes.Equal(got.Bytes(), b) {
+				t.Errorf("Bytes() = %x, want %x", got.Bytes(), b)
+			}
+			if got.Version() != 3 {
+				t.Errorf("Version() = %d, want 3", got.Version())
+			}
+			if want := time.Unix(date, 0).UTC(); !got.Generated().Equal(want) {
+				t.Errorf("Generated() = %v, want %v", got.Generated(), want)
+			}
+			if got.Sections() != 1 {
+				t.Errorf("Sections() = %d, want 1", got.Sections())
 			}
 		})
 	}
+
+	t.Run("bytes cannot change the krl", func(t *testing.T) {
+		v := fetch(t, ca, b)
+
+		v.Bytes()[0]++
+		if !bytes.Equal(v.Bytes(), b) {
+			t.Errorf("Bytes() changed after modifying a returned slice")
+		}
+	})
 }
 
-func TestGetErrors(t *testing.T) {
+func TestFetchErrors(t *testing.T) {
+	ca := newSigner(t)
 	errTransport := errors.New("connection refused")
 
 	cancelled, cancel := context.WithCancel(t.Context())
@@ -213,50 +273,65 @@ func TestGetErrors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, gotErr := krl.Get(tt.ctx, "https://ssh.example.com/", krl.Host, api.WithHTTPClient(&responseClient{fn: tt.fn}))
+			_, gotErr := krl.Fetch(tt.ctx, "https://ssh.example.com/", krl.Host, ca.PublicKey(), api.WithHTTPClient(&responseClient{fn: tt.fn}))
 			if gotErr == nil {
-				t.Fatal("Get() succeeded unexpectedly")
+				t.Fatal("Fetch() succeeded unexpectedly")
 			}
 			if tt.wantErr != nil && !errors.Is(gotErr, tt.wantErr) {
-				t.Errorf("Get() error = %v, want %v", gotErr, tt.wantErr)
+				t.Errorf("Fetch() error = %v, want %v", gotErr, tt.wantErr)
 			}
 			if tt.wantMessage != "" && !strings.HasSuffix(gotErr.Error(), tt.wantMessage) {
-				t.Errorf("Get() error = %q, want suffix %q", gotErr, tt.wantMessage)
+				t.Errorf("Fetch() error = %q, want suffix %q", gotErr, tt.wantMessage)
 			}
 		})
 	}
 }
 
-func TestGetUnsupportedType(t *testing.T) {
+func TestFetchNoRequest(t *testing.T) {
+	ca := newSigner(t)
 	client := &responseClient{fn: func(req *http.Request) (*http.Response, error) {
-		t.Errorf("Get() made a request to %q", req.URL)
+		t.Errorf("Fetch() made a request to %q", req.URL)
 		return response(http.StatusOK, "application/json", `{"krl":"","signature":""}`)(req)
 	}}
 
 	tests := []struct {
 		name            string
 		certificateType krl.CertificateType
+		pub             ssh.PublicKey
+		wantErr         error
 	}{
-		{"empty", ""},
-		{"unknown", "other"},
+		{"empty type", "", ca.PublicKey(), nil},
+		{"unknown type", "other", ca.PublicKey(), nil},
+		{"no public key", krl.User, nil, krl.ErrNoPublicKey},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if _, err := krl.Get(t.Context(), "https://ssh.example.com/", tt.certificateType, api.WithHTTPClient(client)); err == nil {
-				t.Fatal("Get() succeeded unexpectedly")
+			_, err := krl.Fetch(t.Context(), "https://ssh.example.com/", tt.certificateType, tt.pub, api.WithHTTPClient(client))
+			if err == nil {
+				t.Fatal("Fetch() succeeded unexpectedly")
+			}
+			if tt.wantErr != nil && !errors.Is(err, tt.wantErr) {
+				t.Errorf("Fetch() error = %v, want %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestGetDefaultClient(t *testing.T) {
+func TestFetchDefaultClient(t *testing.T) {
+	ca := newSigner(t)
+	b := marshal(t, certificateSection(ca.PublicKey()))
+	body, err := json.Marshal(api.KeyRevocationListResponse{Krl: b, Signature: sign(t, b, ca)})
+	if err != nil {
+		t.Fatalf("marshalling response: %v", err)
+	}
+
 	var gotUserAgent, gotHeader string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotUserAgent = r.Header.Get("User-Agent")
 		gotHeader = r.Header.Get("X-Test")
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"krl":"","signature":""}`))
+		_, _ = w.Write(body)
 	}))
 	defer srv.Close()
 
@@ -275,8 +350,8 @@ func TestGetDefaultClient(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gotUserAgent, gotHeader = "", ""
 
-			if _, err := krl.Get(t.Context(), srv.URL, krl.Host, tt.opts...); err != nil {
-				t.Fatalf("Get() failed: %v", err)
+			if _, err := krl.Fetch(t.Context(), srv.URL, krl.Host, ca.PublicKey(), tt.opts...); err != nil {
+				t.Fatalf("Fetch() failed: %v", err)
 			}
 
 			if want := httpclient.GenerateUserAgent(httpclient.UserAgent); gotUserAgent != want {
@@ -289,7 +364,7 @@ func TestGetDefaultClient(t *testing.T) {
 	}
 }
 
-func TestVerifyStrict(t *testing.T) {
+func TestFetchVerification(t *testing.T) {
 	ca := newSigner(t)
 	other := newSigner(t)
 
@@ -313,57 +388,63 @@ func TestVerifyStrict(t *testing.T) {
 	fingerprintSHA1 := marshal(t, &sshkrl.KRLFingerprintSection{sha1.Sum(other.PublicKey().Marshal())})
 	fingerprintSHA256 := marshal(t, &sshkrl.KRLFingerprintSHA256Section{sha256.Sum256(other.PublicKey().Marshal())})
 	mixedSections := marshal(t, certificateSection(ca.PublicKey()), &sshkrl.KRLExplicitKeySection{other.PublicKey()})
+	otherCAThenExplicitKey := marshal(t, certificateSection(other.PublicKey()), &sshkrl.KRLExplicitKeySection{other.PublicKey()})
 
 	// change the last byte (the revoked serial) after signing
 	tampered := bytes.Clone(valid)
 	tampered[len(tampered)-1]++
 
 	tests := []struct {
-		name      string
-		krl       []byte
-		signature string
-		pub       ssh.PublicKey
-		wantErr   error
+		name         string
+		krl          []byte
+		signature    string
+		wantSections int
+		wantErr      error
 	}{
-		{"empty krl", empty, sign(t, empty, ca), ca.PublicKey(), nil},
-		{"serial list", valid, sign(t, valid, ca), ca.PublicKey(), nil},
-		{"all certificate subsections", allSubsections, sign(t, allSubsections, ca), ca.PublicKey(), nil},
-		{"multiple sections", multipleSections, sign(t, multipleSections, ca), ca.PublicKey(), nil},
+		{"empty krl", empty, sign(t, empty, ca), 0, nil},
+		{"serial list", valid, sign(t, valid, ca), 1, nil},
+		{"all certificate subsections", allSubsections, sign(t, allSubsections, ca), 1, nil},
+		{"multiple sections", multipleSections, sign(t, multipleSections, ca), 2, nil},
 
-		{"no public key", valid, sign(t, valid, ca), nil, krl.ErrNoPublicKey},
-		{"no signature", valid, "", ca.PublicKey(), krl.ErrInvalidSignature},
-		{"malformed signature", valid, "not a signature", ca.PublicKey(), krl.ErrInvalidSignature},
-		{"wrong signer", valid, sign(t, valid, other), ca.PublicKey(), krl.ErrInvalidSignature},
-		{"signature for other data", valid, sign(t, empty, ca), ca.PublicKey(), krl.ErrInvalidSignature},
-		{"krl changed after signing", tampered, sign(t, valid, ca), ca.PublicKey(), krl.ErrInvalidSignature},
-		{"wrong namespace", valid, signWith(t, valid, ca, sshsig.HashSHA512, "file"), ca.PublicKey(), krl.ErrInvalidSignature},
-		{"sha256 signature", valid, signWith(t, valid, ca, sshsig.HashSHA256, krl.Namespace), ca.PublicKey(), krl.ErrInvalidSignature},
+		{"no signature", valid, "", 0, krl.ErrInvalidSignature},
+		{"malformed signature", valid, "not a signature", 0, krl.ErrInvalidSignature},
+		{"wrong signer", valid, sign(t, valid, other), 0, krl.ErrInvalidSignature},
+		{"signature for other data", valid, sign(t, empty, ca), 0, krl.ErrInvalidSignature},
+		{"krl changed after signing", tampered, sign(t, valid, ca), 0, krl.ErrInvalidSignature},
+		{"wrong namespace", valid, signWith(t, valid, ca, sshsig.HashSHA512, "file"), 0, krl.ErrInvalidSignature},
+		{"sha256 signature", valid, signWith(t, valid, ca, sshsig.HashSHA256, krl.Namespace), 0, krl.ErrInvalidSignature},
 
-		{"malformed krl", malformed, sign(t, malformed, ca), ca.PublicKey(), errParse},
-		{"other ca", otherCA, sign(t, otherCA, ca), ca.PublicKey(), krl.ErrUnexpectedCA},
-		{"any ca", anyCA, sign(t, anyCA, ca), ca.PublicKey(), krl.ErrUnexpectedCA},
-		{"one section for other ca", oneOtherCA, sign(t, oneOtherCA, ca), ca.PublicKey(), krl.ErrUnexpectedCA},
-		{"explicit key section", explicitKey, sign(t, explicitKey, ca), ca.PublicKey(), krl.ErrUnexpectedSection},
-		{"sha1 fingerprint section", fingerprintSHA1, sign(t, fingerprintSHA1, ca), ca.PublicKey(), krl.ErrUnexpectedSection},
-		{"sha256 fingerprint section", fingerprintSHA256, sign(t, fingerprintSHA256, ca), ca.PublicKey(), krl.ErrUnexpectedSection},
-		{"certificate and explicit key sections", mixedSections, sign(t, mixedSections, ca), ca.PublicKey(), krl.ErrUnexpectedSection},
+		{"malformed krl", malformed, sign(t, malformed, ca), 0, errParse},
+		{"other ca", otherCA, sign(t, otherCA, ca), 0, krl.ErrUnexpectedCA},
+		{"any ca", anyCA, sign(t, anyCA, ca), 0, krl.ErrUnexpectedCA},
+		{"one section for other ca", oneOtherCA, sign(t, oneOtherCA, ca), 0, krl.ErrUnexpectedCA},
+		{"explicit key section", explicitKey, sign(t, explicitKey, ca), 0, krl.ErrUnexpectedSection},
+		{"sha1 fingerprint section", fingerprintSHA1, sign(t, fingerprintSHA1, ca), 0, krl.ErrUnexpectedSection},
+		{"sha256 fingerprint section", fingerprintSHA256, sign(t, fingerprintSHA256, ca), 0, krl.ErrUnexpectedSection},
+		{"certificate and explicit key sections", mixedSections, sign(t, mixedSections, ca), 0, krl.ErrUnexpectedSection},
 
-		// the public key and signature are checked before the krl is parsed
-		{"no public key with malformed krl", malformed, "", nil, krl.ErrNoPublicKey},
-		{"malformed signature with malformed krl", malformed, "not a signature", ca.PublicKey(), krl.ErrInvalidSignature},
-		{"wrong signer with malformed krl", malformed, sign(t, malformed, other), ca.PublicKey(), krl.ErrInvalidSignature},
-		{"wrong signer with explicit key section", explicitKey, sign(t, explicitKey, other), ca.PublicKey(), krl.ErrInvalidSignature},
+		// section types are checked before the CA of each section
+		{"other ca then explicit key section", otherCAThenExplicitKey, sign(t, otherCAThenExplicitKey, ca), 0, krl.ErrUnexpectedSection},
+
+		// the signature is checked before the krl is parsed
+		{"malformed signature with malformed krl", malformed, "not a signature", 0, krl.ErrInvalidSignature},
+		{"wrong signer with malformed krl", malformed, sign(t, malformed, other), 0, krl.ErrInvalidSignature},
+		{"wrong signer with explicit key section", explicitKey, sign(t, explicitKey, other), 0, krl.ErrInvalidSignature},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			res := &krl.Response{Krl: tt.krl, Signature: tt.signature}
-			checkErr(t, "VerifyStrict", res.VerifyStrict(tt.pub), tt.wantErr)
+			got, err := krl.Fetch(t.Context(), "https://ssh.example.com/", krl.User, ca.PublicKey(), api.WithHTTPClient(serve(t, tt.krl, tt.signature)))
+			checkErr(t, "Fetch", err, tt.wantErr)
+
+			if err == nil && got.Sections() != tt.wantSections {
+				t.Errorf("Sections() = %d, want %d", got.Sections(), tt.wantSections)
+			}
 		})
 	}
 }
 
-func TestVerifyStrictKeyTypes(t *testing.T) {
+func TestFetchKeyTypes(t *testing.T) {
 	ecdsaKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		t.Fatalf("generating ecdsa key: %v", err)
@@ -384,88 +465,7 @@ func TestVerifyStrictKeyTypes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			b := marshal(t, certificateSection(tt.signer.PublicKey()))
-			res := &krl.Response{Krl: b, Signature: sign(t, b, tt.signer)}
-			checkErr(t, "VerifyStrict", res.VerifyStrict(tt.signer.PublicKey()), nil)
-		})
-	}
-}
-
-func TestCheckNotOlder(t *testing.T) {
-	ca := newSigner(t)
-
-	// generated returns a KRL with version and generated date, as the CA sets
-	// version 1 and the generated date for every KRL
-	generated := func(version, date uint64) []byte {
-		t.Helper()
-
-		k := &sshkrl.KRL{
-			Version:       version,
-			GeneratedDate: date,
-			Sections:      []sshkrl.KRLSection{certificateSection(ca.PublicKey())},
-		}
-		b, err := k.Marshal(rand.Reader)
-		if err != nil {
-			t.Fatalf("marshalling krl: %v", err)
-		}
-
-		return b
-	}
-
-	const date = 1_800_000_000
-
-	tests := []struct {
-		name     string
-		krl      []byte
-		existing []byte
-		wantErr  error
-	}{
-		{"same krl", generated(1, date), generated(1, date), nil},
-		{"generated later", generated(1, date+1), generated(1, date), nil},
-		{"generated earlier", generated(1, date-1), generated(1, date), krl.ErrOlderKRL},
-		{"higher version generated earlier", generated(2, date-1), generated(1, date), nil},
-		{"lower version generated later", generated(1, date+1), generated(2, date), krl.ErrOlderKRL},
-		{"existing malformed", generated(1, date), []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}, errParse},
-		{"existing empty", generated(1, date), []byte{}, errParse},
-		{"krl malformed", []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}, generated(1, date), errParse},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			res := &krl.Response{Krl: tt.krl}
-			checkErr(t, "CheckNotOlder", res.CheckNotOlder(tt.existing), tt.wantErr)
-		})
-	}
-}
-
-func TestParse(t *testing.T) {
-	ca := newSigner(t)
-	other := newSigner(t)
-
-	valid := marshal(t, certificateSection(ca.PublicKey()), certificateSection(other.PublicKey()))
-	explicitKey := marshal(t, &sshkrl.KRLExplicitKeySection{other.PublicKey()})
-
-	tests := []struct {
-		name         string
-		krl          []byte
-		wantSections int
-		wantErr      error
-	}{
-		{"empty krl", marshal(t), 0, nil},
-		// the CA of each section is only checked by VerifyStrict
-		{"certificate sections", valid, 2, nil},
-		{"malformed krl", []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}, 0, errParse},
-		{"explicit key section", explicitKey, 0, krl.ErrUnexpectedSection},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := (&krl.Response{Krl: tt.krl}).Parse()
-			checkErr(t, "Parse", gotErr, tt.wantErr)
-
-			if gotErr == nil && len(got.Sections) != tt.wantSections {
-				t.Errorf("Parse() sections = %d, want %d", len(got.Sections), tt.wantSections)
-			}
+			fetch(t, tt.signer, marshal(t, certificateSection(tt.signer.PublicKey())))
 		})
 	}
 }
