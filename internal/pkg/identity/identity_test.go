@@ -7,11 +7,8 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -54,20 +51,17 @@ func newTestCA(t *testing.T) *testCA {
 	srv := httptest.NewServer(http.HandlerFunc(ca.handle))
 	t.Cleanup(srv.Close)
 
-	path := filepath.Join(t.TempDir(), "config.yml")
-	content := fmt.Sprintf(`issuer: http://127.0.0.1:1/
-client_id: test-client
-scopes: ["openid"]
-redirect_url: http://127.0.0.1:1/auth/callback
-ca_url: %s/
-trusted_ca: %s`, srv.URL, ssh.MarshalAuthorizedKey(signer.PublicKey()))
-	if err := os.WriteFile(path, []byte(content), 0600); err != nil {
-		t.Fatalf("writing config: %v", err)
-	}
-
-	ca.config, err = config.LoadClientConfig(path)
+	// built in code as LoadClientConfig reads the registry on Windows
+	ca.config, err = config.NewClientConfig(config.ClientConfig{
+		Issuer:                      "http://127.0.0.1:1/",
+		ClientID:                    "test-client",
+		Scopes:                      []string{"openid"},
+		RedirectURL:                 "http://127.0.0.1:1/auth/callback",
+		CertificateAuthorityURL:     srv.URL + "/",
+		TrustedCertificateAuthority: string(ssh.MarshalAuthorizedKey(signer.PublicKey())),
+	})
 	if err != nil {
-		t.Fatalf("loading config: %v", err)
+		t.Fatalf("creating config: %v", err)
 	}
 
 	return ca

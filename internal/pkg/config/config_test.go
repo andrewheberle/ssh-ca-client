@@ -347,6 +347,55 @@ func TestValidateConfig(t *testing.T) {
 	}
 }
 
+func TestNewClientConfig(t *testing.T) {
+	_, ca, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatalf("could not generate CA key: %v", err)
+	}
+	caPub, err := ssh.NewPublicKey(ca.Public())
+	if err != nil {
+		t.Fatalf("could not get CA public key: %v", err)
+	}
+
+	tests := []struct {
+		name    string
+		conf    ClientConfig
+		wantErr error
+	}{
+		{
+			name: "valid",
+			conf: ClientConfig{
+				CertificateAuthorityURL:     "https://ca.example.com",
+				ClientID:                    "client-id",
+				Issuer:                      "https://issuer.example.com",
+				RedirectURL:                 "http://localhost:3000/auth/callback",
+				Scopes:                      []string{"openid"},
+				TrustedCertificateAuthority: string(ssh.MarshalAuthorizedKey(caPub)),
+			},
+		},
+		{
+			// defaults are not applied
+			name:    "empty",
+			conf:    ClientConfig{},
+			wantErr: ErrMissingRedirectURL,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewClientConfig(tt.conf)
+			if !errors.Is(err, tt.wantErr) {
+				t.Fatalf("NewClientConfig() error = %v, want %v", err, tt.wantErr)
+			}
+			if tt.wantErr != nil {
+				return
+			}
+			if pub := got.CertificateAuthorityPublicKey(); pub == nil || !bytes.Equal(pub.Marshal(), caPub.Marshal()) {
+				t.Errorf("CertificateAuthorityPublicKey() = %v, want %v", pub, caPub)
+			}
+		})
+	}
+}
+
 // base64Key returns the base64 encoded key portion of pub in authorized_keys
 // format
 func base64Key(pub ssh.PublicKey) string {

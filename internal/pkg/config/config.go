@@ -55,6 +55,13 @@ func LoadClientConfig(configpath string) (*ClientConfig, error) {
 	return validateConfig(&conf)
 }
 
+// NewClientConfig validates conf and returns it ready to use, for callers
+// that build the config in code rather than loading it with
+// [LoadClientConfig]. No defaults are applied.
+func NewClientConfig(conf ClientConfig) (*ClientConfig, error) {
+	return validateConfig(&conf)
+}
+
 func (c *ClientConfig) CertificateAuthorityPublicKey() ssh.PublicKey {
 	return c.ca
 }
