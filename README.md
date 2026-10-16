@@ -1,6 +1,7 @@
 # ssh-ca-client
 
 [![codecov](https://codecov.io/gh/andrewheberle/ssh-ca-client/graph/badge.svg?token=dH7xSBu8eE)](https://codecov.io/gh/andrewheberle/ssh-ca-client)
+[![GitHub version](https://badge.fury.io/gh/andrewheberle%2Fssh-ca-client.svg?icon=si%3Agithub)](https://badge.fury.io/gh/andrewheberle%2Fssh-ca-client)
 
 This provides the client-side service to interact with the [Serverless
 Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
