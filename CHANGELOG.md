@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.25.2](https://github.com/andrewheberle/ssh-ca-client/compare/v0.25.1...v0.25.2) (2026-10-16)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/go-jose/go-jose/v4 to v4.1.6 ([#120](https://github.com/andrewheberle/ssh-ca-client/issues/120)) ([bab9bef](https://github.com/andrewheberle/ssh-ca-client/commit/bab9bef41d0ae06be2d6e74c883dfddbb6e71e22))
+
 ## [0.25.1](https://github.com/andrewheberle/ssh-ca-client/compare/v0.25.0...v0.25.1) (2026-10-14)
 
 
