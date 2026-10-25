@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.25.3](https://github.com/andrewheberle/ssh-ca-client/compare/v0.25.2...v0.25.3) (2026-10-25)
+
+
+### Bug Fixes
+
+* **auth:** log login server error received during shutdown ([#129](https://github.com/andrewheberle/ssh-ca-client/issues/129)) ([c206242](https://github.com/andrewheberle/ssh-ca-client/commit/c2062428fbb0f942f3f403c8f2fde21eebf0d343))
+* **deps:** update module github.com/gen2brain/beeep to v0.11.3 ([#125](https://github.com/andrewheberle/ssh-ca-client/issues/125)) ([ad81cf2](https://github.com/andrewheberle/ssh-ca-client/commit/ad81cf227e57876c39364dcad75e3c149722ffde))
+* **deps:** update module github.com/knadh/koanf/v2 to v2.4.1 ([#123](https://github.com/andrewheberle/ssh-ca-client/issues/123)) ([11aae0a](https://github.com/andrewheberle/ssh-ca-client/commit/11aae0a67d20d3945b833e5948b5b260222249b6))
+* **deps:** update module github.com/oapi-codegen/runtime to v1.8.0 ([#127](https://github.com/andrewheberle/ssh-ca-client/issues/127)) ([43183d6](https://github.com/andrewheberle/ssh-ca-client/commit/43183d6368d7ee43a65d5232ea06169478d25380))
+
 ## [0.25.2](https://github.com/andrewheberle/ssh-ca-client/compare/v0.25.1...v0.25.2) (2026-10-16)
 
 
