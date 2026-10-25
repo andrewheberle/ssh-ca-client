@@ -50,7 +50,7 @@ Run these before considering any change complete:
 
 ## Releases
 - Releases are prepared by release-please (`release-please-config.json`, `.release-please-manifest.json`), which keeps a `chore(release): vX.Y.Z` PR open with the version bump and `CHANGELOG.md` entry, derived from conventional commit messages on `main`.
-- Merging the release PR creates the `vX.Y.Z` tag and a draft GitHub release; the tag triggers the Release workflow, where GoReleaser adds the artifacts to the draft, the MSI is added, and then the release is published. Releases are immutable, so all assets must be added before publishing.
+- Merging the release PR creates the `vX.Y.Z` tag and a draft GitHub release; the tag triggers the Release workflow, where GoReleaser adds the artifacts to the draft, the MSI is added and `checksums.txt` is updated to include it and signed again, and then the release is published. Releases are immutable, so all assets must be added before publishing.
 - Don't edit `CHANGELOG.md` or `.release-please-manifest.json` by hand; release-please maintains them.
 - PRs are squash merged with the PR title as the commit message, so PR titles must be conventional commits (`feat:`, `fix(scope):`, `feat!:` for breaking changes); the PR title check enforces this. Only `feat`, `fix`, `perf`, `revert` and breaking changes trigger a release.
 - Never delete, move, or force-push an existing tag. The Go module proxy caches versions immutably, so a retagged version won't be picked up. Fix forward with a new patch version.
