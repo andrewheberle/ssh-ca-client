@@ -530,7 +530,12 @@ func (h *OidcHandler) interactiveLogin(ctx context.Context) (loginResult, error)
 		if err := srv.Shutdown(shutdownCtx); err != nil {
 			h.logger.Warn("could not cleanly shut down login server", "error", err)
 		}
-		<-serveErr
+
+		// wait for Serve to return, logging any error not already handled
+		// by the select below
+		if err := <-serveErr; err != nil {
+			h.logger.Warn("login server failed", "error", err)
+		}
 	}()
 
 	// the login URL uses the redirect URL host so the session cookie set by
