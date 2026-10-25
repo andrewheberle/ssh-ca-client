@@ -118,13 +118,14 @@ jobs:
 
   # GoReleaser leaves the release as a draft, as an immutable release can't
   # have assets added once published, so the MSI is added here before the
-  # release is published
+  # release is published. The release is only published once the snap and apt
+  # packages are also out
   publish:
     name: publish
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    needs: msi
+    needs: [msi, snapcraft, repo]
     steps:
       - name: Download MSI
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
