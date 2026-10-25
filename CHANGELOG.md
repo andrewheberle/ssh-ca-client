@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.25.4](https://github.com/andrewheberle/ssh-ca-client/compare/v0.25.3...v0.25.4) (2026-10-25)
+
+
+### Bug Fixes
+
+* **deps:** update module golang.org/x/crypto to v0.58.0 ([#35](https://github.com/andrewheberle/ssh-ca-client/issues/35)) ([98b775e](https://github.com/andrewheberle/ssh-ca-client/commit/98b775e3cff01cb6830f1c62c4ab3a4a060df6d9))
+* **msi:** resolve issue that prevented MSI build being added to last release ([62b507f](https://github.com/andrewheberle/ssh-ca-client/commit/62b507fd0e7bcc562225c475da3e1746a5785f36))
+
 ## [0.25.3](https://github.com/andrewheberle/ssh-ca-client/compare/v0.25.2...v0.25.3) (2026-10-25)
 
 
