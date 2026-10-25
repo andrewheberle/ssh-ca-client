@@ -46,6 +46,31 @@ sudo apt-get install ssh-ca-client
 On Windows there is an MSI build that includes both the GUI and CLI versions
 and is the recommended option for Windows users.
 
+### Verifying Releases
+
+Each GitHub release includes a `checksums.txt` file listing the SHA-256
+checksums of every release file, including the MSI, and a
+`checksums.txt.sigstore.json` bundle that signs it. With
+[cosign](https://docs.sigstore.dev/cosign/system_config/installation/)
+installed, download both files into the same directory as the release files
+you want to check, then verify the signature and the checksums:
+
+```sh
+cosign verify-blob checksums.txt \
+  --bundle checksums.txt.sigstore.json \
+  --certificate-identity-regexp '^https://github.com/andrewheberle/ssh-ca-client/.github/workflows/release.yml@refs/tags/v' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+sha256sum --check --ignore-missing checksums.txt
+```
+
+The release files also have GitHub build attestations, which can be checked
+with the [GitHub CLI](https://cli.github.com/), replacing `FILE` with the
+release file to check:
+
+```sh
+gh attestation verify FILE --repo andrewheberle/ssh-ca-client
+```
+
 ### Building From Source
 
 #### CLI
