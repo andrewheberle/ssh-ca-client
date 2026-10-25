@@ -95,7 +95,9 @@ archives:
         formats: [zip]
 
 # Release notes and CHANGELOG.md are written by release-please, which also
-# creates the GitHub release that GoReleaser adds the artifacts to
+# creates the draft GitHub release that GoReleaser adds the artifacts to. The
+# release is left as a draft so the Release workflow can add the MSI before
+# publishing it, as immutable releases can't be changed once published
 changelog:
   disable: true
 
@@ -104,8 +106,7 @@ checksum:
 
 release:
   mode: keep-existing
-  draft: false
-  make_latest: true
+  draft: true
   replace_existing_artifacts: true
   prerelease: auto
   use_existing_draft: true
