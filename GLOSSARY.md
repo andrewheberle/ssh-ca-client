@@ -8,6 +8,10 @@ The client side of the Serverless SSH Certificate Authority: it keeps SSH keys o
 The certificate authority whose public key the client is configured with; only certificates signed by it are accepted.
 _Avoid_: CA key, signing key
 
+**Policy**:
+Settings an administrator manages centrally for a Windows machine, applied over its local configuration.
+_Avoid_: GPO, override
+
 **Certificate store**:
 The place one private key and its certificate are kept together, which only ever holds a certificate issued by the Trusted CA for that key.
 _Avoid_: Storage, key store, keyring store, file store
