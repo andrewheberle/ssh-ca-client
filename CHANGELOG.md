@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.26.0](https://github.com/andrewheberle/ssh-ca-client/compare/v0.25.4...v0.26.0) (2026-10-27)
+
+
+### Bug Fixes
+
+* **windows:** load config when registry keys are absent and align GPO value names ([#137](https://github.com/andrewheberle/ssh-ca-client/issues/137)) ([57f28fe](https://github.com/andrewheberle/ssh-ca-client/commit/57f28fe078ec1d4187623cb9ad1c53fd0ac3df20))
+
+
+### Miscellaneous Chores
+
+* force release v0.26.0 ([#139](https://github.com/andrewheberle/ssh-ca-client/issues/139)) ([da48ef5](https://github.com/andrewheberle/ssh-ca-client/commit/da48ef50dc697f2dc9d5cdfdb68600333d18e91a))
+
 ## [0.25.4](https://github.com/andrewheberle/ssh-ca-client/compare/v0.25.3...v0.25.4) (2026-10-25)
 
 
