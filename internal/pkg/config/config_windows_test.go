@@ -1,7 +1,10 @@
 package config
 
 import (
+	"fmt"
+	"slices"
 	"testing"
+	"time"
 
 	"golang.org/x/sys/windows/registry"
 )
@@ -57,4 +60,96 @@ func Test_configRegistryKey(t *testing.T) {
 			t.Errorf("loadClientConfig() error = nil, want error")
 		}
 	})
+}
+
+// createTestKey creates path under HKCU with values, which may be a string
+// or []string, and removes it when the test ends
+func createTestKey(t *testing.T, path string, values map[string]any) {
+	t.Helper()
+
+	k, _, err := registry.CreateKey(registry.CURRENT_USER, path, registry.SET_VALUE)
+	if err != nil {
+		t.Fatalf("registry.CreateKey(%q) error = %v", path, err)
+	}
+	t.Cleanup(func() {
+		if err := registry.DeleteKey(registry.CURRENT_USER, path); err != nil {
+			t.Errorf("registry.DeleteKey(%q) error = %v", path, err)
+		}
+	})
+	defer func() { _ = k.Close() }()
+
+	for name, value := range values {
+		switch v := value.(type) {
+		case string:
+			err = k.SetStringValue(name, v)
+		case []string:
+			err = k.SetStringsValue(name, v)
+		default:
+			t.Fatalf("unsupported value type %T for %q", value, name)
+		}
+		if err != nil {
+			t.Fatalf("setting %q error = %v", name, err)
+		}
+	}
+}
+
+func Test_loadRegistryConfig(t *testing.T) {
+	tests := []struct {
+		name       string
+		config     map[string]any
+		policy     map[string]any
+		wantClient string
+		wantIssuer string
+		wantScopes []string
+	}{
+		{
+			name: "neither key exists",
+		},
+		{
+			name:       "config only",
+			config:     map[string]any{"client_id": "config", "scopes": []string{"openid", "email"}},
+			wantClient: "config",
+			wantScopes: []string{"openid", "email"},
+		},
+		{
+			name:       "policy only",
+			policy:     map[string]any{"client_id": "policy", "issuer": "https://idp.example.com/"},
+			wantClient: "policy",
+			wantIssuer: "https://idp.example.com/",
+		},
+		{
+			name:       "policy applied over config",
+			config:     map[string]any{"client_id": "config", "issuer": "https://config.example.com/"},
+			policy:     map[string]any{"client_id": "policy"},
+			wantClient: "policy",
+			wantIssuer: "https://config.example.com/",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			base := fmt.Sprintf(`SOFTWARE\ssh-ca-client-test-%d`, time.Now().UnixNano())
+			configPath := base + `-config`
+			policyPath := base + `-policy`
+			if tt.config != nil {
+				createTestKey(t, configPath, tt.config)
+			}
+			if tt.policy != nil {
+				createTestKey(t, policyPath, tt.policy)
+			}
+
+			k, err := loadRegistryConfig(registry.CURRENT_USER, configPath, registry.CURRENT_USER, policyPath)
+			if err != nil {
+				t.Fatalf("loadRegistryConfig() error = %v", err)
+			}
+			if got := k.String("client_id"); got != tt.wantClient {
+				t.Errorf("client_id = %q, want %q", got, tt.wantClient)
+			}
+			if got := k.String("issuer"); got != tt.wantIssuer {
+				t.Errorf("issuer = %q, want %q", got, tt.wantIssuer)
+			}
+			if got := k.Strings("scopes"); !slices.Equal(got, tt.wantScopes) {
+				t.Errorf("scopes = %q, want %q", got, tt.wantScopes)
+			}
+		})
+	}
 }

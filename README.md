@@ -190,6 +190,24 @@ under `SOFTWARE\Andrew Heberle\Serverless SSH CA Client`, with `--config`
 selecting the hive to use: `HKLM` (the default) or `HKCU`. Any configuration
 set via Group Policy is applied over this.
 
+The registry value names match the YAML keys above:
+
+| Value name     | Type           |
+|----------------|----------------|
+| `issuer`       | `REG_SZ`       |
+| `client_id`    | `REG_SZ`       |
+| `scopes`       | `REG_MULTI_SZ` |
+| `redirect_url` | `REG_SZ`       |
+| `ca_url`       | `REG_SZ`       |
+| `trusted_ca`   | `REG_SZ`       |
+
+Either the registry key or the Group Policy may be absent, as long as all
+required settings are set by one of them.
+
+**Note:** Previous versions of the ADMX/ADML files set values with different
+names (such as `ClientID`), which are no longer read. Import the current
+ADMX/ADML files and configure the policies again.
+
 **Note:** Previous versions of the GUI read a YAML configuration file on
 Windows. This file is no longer used, so its settings must be moved to the
 registry or Group Policy.

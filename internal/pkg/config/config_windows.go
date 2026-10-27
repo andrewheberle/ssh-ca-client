@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -13,6 +14,12 @@ import (
 const (
 	configHiveMachine = "HKLM"
 	configHiveUser    = "HKCU"
+)
+
+// Registry paths of the config and the policy applied over it
+const (
+	configRegistryPath = `SOFTWARE\Andrew Heberle\Serverless SSH CA Client`
+	policyRegistryPath = `SOFTWARE\Policies\Serverless SSH CA Client`
 )
 
 // configRegistryKey returns the registry hive for configpath, which must be
@@ -36,17 +43,40 @@ func loadClientConfig(configpath string) (*koanf.Koanf, error) {
 		return nil, err
 	}
 
+	return loadRegistryConfig(key, configRegistryPath, winreg.LOCAL_MACHINE, policyRegistryPath)
+}
+
+// loadRegistryConfig loads the config from path under key, then the policy
+// from policyPath under policyKey over it. Either key may be absent, which
+// leaves any required settings to be reported missing by validation.
+func loadRegistryConfig(key registry.Key, path string, policyKey registry.Key, policyPath string) (*koanf.Koanf, error) {
 	k := koanf.New(".")
-	if err := k.Load(winreg.Provider(winreg.Config{Key: key, Path: "SOFTWARE\\Andrew Heberle\\Serverless SSH CA Client", MaxDepth: 2}), nil); err != nil {
-		return nil, fmt.Errorf("could not load %s config: %w", strings.ToUpper(configpath), err)
+	if err := loadRegistryKey(k, key, path); err != nil {
+		return nil, fmt.Errorf("could not load config: %w", err)
 	}
 
 	// Load policy second
-	if err := k.Load(winreg.Provider(winreg.Config{Key: winreg.LOCAL_MACHINE, Path: "SOFTWARE\\Policies\\Serverless SSH CA Client", MaxDepth: 2}), nil); err != nil {
+	if err := loadRegistryKey(k, policyKey, policyPath); err != nil {
 		return nil, fmt.Errorf("could not load policy: %w", err)
 	}
 
 	return k, nil
+}
+
+// loadRegistryKey loads the values under path into k, skipping it if the key
+// does not exist. The provider does not wrap the error from opening the key,
+// so it is opened here first to tell a missing key apart from other errors.
+func loadRegistryKey(k *koanf.Koanf, key registry.Key, path string) error {
+	rk, err := registry.OpenKey(key, path, registry.READ)
+	if errors.Is(err, registry.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return fmt.Errorf("opening %s: %w", path, err)
+	}
+	_ = rk.Close()
+
+	return k.Load(winreg.Provider(winreg.Config{Key: key, Path: path, MaxDepth: 2}), nil)
 }
 
 // ConfigPath returns the default config location, which on Windows is the

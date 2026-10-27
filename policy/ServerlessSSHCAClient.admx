@@ -2,7 +2,7 @@
 
 <policyDefinitions revision="1.1" schemaVersion="1.0">
     <policyNamespaces>
-        <target prefix="sshcaclient" namespace="SSHCAClient_v0.23.0" />
+        <target prefix="sshcaclient" namespace="SSHCAClient_v0.26.0" />
     </policyNamespaces>
     <resources minRequiredRevision="1.1" />
     <supportedOn>
@@ -18,42 +18,42 @@
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <text id="ClientID_Element" valueName="ClientID" />
+                <text id="ClientID_Element" valueName="client_id" />
             </elements>
         </policy>
         <policy name="SSHCAClient_Issuer" class="Machine" displayName="$(string.Issuer)" explainText="$(string.Issuer_Explain)" presentation="$(presentation.Issuer)" key="Software\Policies\Serverless SSH CA Client">
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <text id="Issuer_Element" valueName="Issuer" />
+                <text id="Issuer_Element" valueName="issuer" />
             </elements>
         </policy>
         <policy name="SSHCAClient_Scopes" class="Machine" displayName="$(string.Scopes)" explainText="$(string.Scopes_Explain)" presentation="$(presentation.Scopes)" key="Software\Policies\Serverless SSH CA Client">
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <multiText id="Scopes_Element"  valueName="Scopes" />
+                <multiText id="Scopes_Element"  valueName="scopes" />
             </elements>
         </policy>
         <policy name="SSHCAClient_RedirectURL" class="Machine" displayName="$(string.RedirectURL)" explainText="$(string.RedirectURL_Explain)" presentation="$(presentation.RedirectURL)" key="Software\Policies\Serverless SSH CA Client">
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <text id="RedirectURL_Element" valueName="RedirectURL" />
+                <text id="RedirectURL_Element" valueName="redirect_url" />
             </elements>
         </policy>
         <policy name="SSHCAClient_CertificateAuthorityURL" class="Machine" displayName="$(string.CertificateAuthorityURL)" explainText="$(string.CertificateAuthorityURL_Explain)" presentation="$(presentation.CertificateAuthorityURL)" key="Software\Policies\Serverless SSH CA Client">
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <text id="CertificateAuthorityURL_Element" valueName="CertificateAuthorityURL" />
+                <text id="CertificateAuthorityURL_Element" valueName="ca_url" />
             </elements>
         </policy>
         <policy name="SSHCAClient_TrustedCertificateAuthority" class="Machine" displayName="$(string.TrustedCertificateAuthority)" explainText="$(string.TrustedCertificateAuthority_Explain)" presentation="$(presentation.TrustedCertificateAuthority)" key="Software\Policies\Serverless SSH CA Client">
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <text id="TrustedCertificateAuthority_Element" valueName="TrustedCertificateAuthority" />
+                <text id="TrustedCertificateAuthority_Element" valueName="trusted_ca" />
             </elements>
         </policy>
     </policies>
