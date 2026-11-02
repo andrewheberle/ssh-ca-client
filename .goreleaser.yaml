@@ -128,11 +128,13 @@ nfpms:
       - gui
     homepage: https://github.com/andrewheberle/ssh-ca-client
     maintainer: Andrew Heberle <andrew.heberle@gmail.com>
+    vendor: Andrew Heberle
     description: |-
       The graphical and CLI client-side component of a Serverless SSH CA
       that handles requesting and renewing user and/or host certificates for SSH
       authentication.
-    license: Apache 2.0
+    license: Apache-2.0
+    section: net
     formats:
       - deb
     contents:
