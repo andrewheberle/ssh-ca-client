@@ -43,6 +43,12 @@ sudo apt-get update
 sudo apt-get install ssh-ca-client
 ```
 
+Removing the package stops the `host-ssh-certificate-renewal` and
+`user-ssh-krl-refresh` timers, and purging it also disables them. If you
+enabled the `host-ssh-krl-refresh` user timer, disable it yourself with
+`systemctl --user disable --now host-ssh-krl-refresh.timer`, as it is not
+stopped when the package is removed.
+
 On Windows there is an MSI build that includes both the GUI and CLI versions
 and is the recommended option for Windows users.
 
