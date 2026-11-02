@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.27.1](https://github.com/andrewheberle/ssh-ca-client/compare/v0.27.0...v0.27.1) (2026-11-02)
+
+
+### Bug Fixes
+
+* **ci:** revert code generation change ([#146](https://github.com/andrewheberle/ssh-ca-client/issues/146)) ([02e53dc](https://github.com/andrewheberle/ssh-ca-client/commit/02e53dc4c09ae417f45d487c6933362b910e5674))
+
 ## [0.27.0](https://github.com/andrewheberle/ssh-ca-client/compare/v0.26.0...v0.27.0) (2026-11-02)
 
 
