@@ -150,6 +150,10 @@ nfpms:
         dst: /usr/share/icons/hicolor/128x128/apps/ssh-ca-client.png
       - src: cmd/ssh-ca-client/winres/icon256.png
         dst: /usr/share/icons/hicolor/256x256/apps/ssh-ca-client.png
+    scripts:
+      postinstall: deb/postinstall.sh
+      preremove: deb/preremove.sh
+      postremove: deb/postremove.sh
     mtime: "{{ .CommitDate }}"
 
 sboms:
