@@ -19,6 +19,12 @@ refresh is not possible, the certificate can be renewed from the tray menu,
 which opens a browser for an interactive login. During an interactive login a
 local web server is run on the host and port of the configured `redirect_url`.
 
+Each time a certificate is added to the SSH agent, any expired user certificates
+issued by the configured CA are removed from the agent, so on Windows the
+certificate for a replaced private key does not stay in the agent after it
+expires. Plain keys, host certificates, certificates from other CAs and
+certificates that have not expired are left in place.
+
 The users private key, certificate and refresh token are stored in the
 operating system keyring and are shared with the CLI
 ([ssh-ca-client-cli](ssh-ca-client-cli.md)).

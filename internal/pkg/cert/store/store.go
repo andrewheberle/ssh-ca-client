@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os/user"
 	"sync"
+	"time"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
 	"github.com/andrewheberle/ssh-ca-client/pkg/sshcert"
@@ -327,6 +328,29 @@ func (s *Store) RemoveFromAgent() error {
 	}
 
 	return nil
+}
+
+// RemoveStaleFromAgent removes every stale certificate from the SSH Agent:
+// user certificates signed by the trusted CA that have expired. This matters
+// on Windows, where certificates are added with no lifetime and the agent
+// keeps them across reboots, so the certificate for a replaced private key
+// would otherwise stay in the agent after it expires. Nothing is done if no
+// agent can be connected to. The removed certificates are returned, along
+// with any failures as [cert.ErrRemovingFromAgent].
+func (s *Store) RemoveStaleFromAgent() ([]*ssh.Certificate, error) {
+	// a certificate cannot be held by an agent that is not running
+	a, closeAgent, err := s.dial()
+	if err != nil {
+		return nil, nil
+	}
+	defer func() { _ = closeAgent() }()
+
+	removed, err := sshcert.RemoveStale(a, s.capubkey, time.Now())
+	if err != nil {
+		return removed, fmt.Errorf("%w: %w", cert.ErrRemovingFromAgent, err)
+	}
+
+	return removed, nil
 }
 
 // Saves the provided [ssh.Certificate]

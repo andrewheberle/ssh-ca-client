@@ -7,8 +7,10 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -312,6 +314,133 @@ func TestUser_AddToAgent(t *testing.T) {
 	}
 	if !agentHolds(t, sshAgent, c) {
 		t.Errorf("agent does not hold the certificate")
+	}
+}
+
+// addStale adds a certificate signed by ca for a new key that expired an hour
+// ago to a, as left behind in the agent when a private key is replaced
+func addStale(t *testing.T, ca *testCA, a agent.Agent) *ssh.Certificate {
+	t.Helper()
+
+	_, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatalf("generating key: %v", err)
+	}
+	pub, err := ssh.NewPublicKey(priv.Public())
+	if err != nil {
+		t.Fatalf("creating public key: %v", err)
+	}
+
+	now := time.Now()
+	c := &ssh.Certificate{
+		Key:             pub,
+		Serial:          42,
+		CertType:        ssh.UserCert,
+		KeyId:           "stale@example.com",
+		ValidPrincipals: []string{"test"},
+		ValidAfter:      uint64(now.Add(-2 * time.Hour).Unix()),
+		ValidBefore:     uint64(now.Add(-time.Hour).Unix()),
+	}
+	if err := c.SignCert(rand.Reader, ca.signer); err != nil {
+		t.Fatalf("signing certificate: %v", err)
+	}
+	if err := a.Add(agent.AddedKey{PrivateKey: priv, Certificate: c}); err != nil {
+		t.Fatalf("agent Add() error = %v", err)
+	}
+
+	return c
+}
+
+// listFailingAgent is an agent whose List always fails, so stale
+// certificates cannot be found, but certificates can still be added
+type listFailingAgent struct {
+	agent.ExtendedAgent
+}
+
+func (listFailingAgent) List() ([]*agent.Key, error) {
+	return nil, errors.New("list failed")
+}
+
+func TestUser_RemovesStaleCertificates(t *testing.T) {
+	// the ways a certificate is added to the agent
+	adds := []struct {
+		name string
+		add  func(t *testing.T, u *identity.User) error
+	}{
+		{"obtain", func(t *testing.T, u *identity.User) error {
+			return u.Obtain(t.Context())
+		}},
+		{"add to agent", func(t *testing.T, u *identity.User) error {
+			if err := u.Obtain(t.Context(), identity.WithoutAgent); err != nil {
+				t.Fatalf("Obtain() error = %v", err)
+			}
+			return u.AddToAgent()
+		}},
+	}
+
+	for _, add := range adds {
+		t.Run(add.name, func(t *testing.T) {
+			t.Run("stale certificate removed", func(t *testing.T) {
+				ca := newTestCA(t)
+				sshAgent := newAgent()
+				stale := addStale(t, ca, sshAgent)
+				var logs bytes.Buffer
+				u, _ := newUser(t, ca, &fakeAuth{}, sshAgent, identity.WithLogger(slog.New(slog.NewTextHandler(&logs, nil))))
+
+				if err := add.add(t, u); err != nil {
+					t.Fatalf("adding to agent error = %v", err)
+				}
+
+				c, err := u.Certificate()
+				if err != nil {
+					t.Fatalf("Certificate() error = %v", err)
+				}
+				if !agentHolds(t, sshAgent, c) {
+					t.Errorf("agent does not hold the current certificate")
+				}
+				if agentHolds(t, sshAgent, stale) {
+					t.Errorf("agent still holds the stale certificate")
+				}
+				if got := logs.String(); !strings.Contains(got, "level=INFO") || !strings.Contains(got, "serial=42") || !strings.Contains(got, "key_id=stale@example.com") {
+					t.Errorf("log = %q, want the removal logged at INFO with its serial and key ID", got)
+				}
+			})
+
+			t.Run("nothing stale logs nothing", func(t *testing.T) {
+				ca := newTestCA(t)
+				var logs bytes.Buffer
+				u, _ := newUser(t, ca, &fakeAuth{}, newAgent(), identity.WithLogger(slog.New(slog.NewTextHandler(&logs, nil))))
+
+				if err := add.add(t, u); err != nil {
+					t.Fatalf("adding to agent error = %v", err)
+				}
+				if logs.Len() != 0 {
+					t.Errorf("log = %q, want nothing logged", logs.String())
+				}
+			})
+
+			t.Run("cleanup failure does not fail the add", func(t *testing.T) {
+				ca := newTestCA(t)
+				sshAgent := newAgent()
+				var logs bytes.Buffer
+				u, _ := newUser(t, ca, &fakeAuth{}, listFailingAgent{sshAgent}, identity.WithLogger(slog.New(slog.NewTextHandler(&logs, nil))))
+
+				if err := add.add(t, u); err != nil {
+					t.Fatalf("adding to agent error = %v, want nil", err)
+				}
+
+				c, err := u.Certificate()
+				if err != nil {
+					t.Fatalf("Certificate() error = %v", err)
+				}
+				if !agentHolds(t, sshAgent, c) {
+					t.Errorf("agent does not hold the current certificate")
+				}
+				if got := logs.String(); !strings.Contains(got, "level=WARN") || !strings.Contains(got, "list failed") {
+					t.Errorf("log = %q, want the failure logged as a warning", got)
+				}
+			})
+		})
 	}
 }
 

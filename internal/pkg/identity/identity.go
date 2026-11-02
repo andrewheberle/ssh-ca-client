@@ -22,8 +22,9 @@ import (
 // kept in the system keyring and certificates are obtained after an OIDC
 // login, with the refresh token also kept in the system keyring.
 type User struct {
-	store cert.Storage
-	cert  *cert.UserCertificate
+	store  cert.Storage
+	cert   *cert.UserCertificate
+	logger *slog.Logger
 }
 
 type options struct {
@@ -44,7 +45,8 @@ func WithLifetime(d time.Duration) Option {
 	}
 }
 
-// WithLogger sets the logger used for the OIDC login
+// WithLogger sets the logger used for the OIDC login and for reporting stale
+// certificates removed from the SSH agent
 func WithLogger(logger *slog.Logger) Option {
 	return func(o *options) {
 		o.logger = logger
@@ -113,7 +115,7 @@ func NewUser(conf *config.ClientConfig, opts ...Option) (*User, error) {
 	c.AuthHandler = o.auth
 	c.Lifetime = o.lifetime
 
-	return &User{store: o.store, cert: c}, nil
+	return &User{store: o.store, cert: c, logger: o.logger}, nil
 }
 
 // ObtainOption changes how [User.Obtain] obtains a certificate
@@ -130,7 +132,7 @@ const (
 )
 
 // Obtain requests a new certificate from the CA, saves it and adds it to the
-// SSH agent. This blocks until any interactive login completes, times out or
+// SSH agent, then removes any stale certificates from the agent. This blocks until any interactive login completes, times out or
 // ctx is cancelled. If the certificate is saved but cannot be added to the
 // agent the returned error wraps [cert.ErrAddingToAgent].
 func (u *User) Obtain(ctx context.Context, opts ...ObtainOption) error {
@@ -149,14 +151,33 @@ func (u *User) Obtain(ctx context.Context, opts ...ObtainOption) error {
 	if err := u.store.AddToAgent(); err != nil {
 		return fmt.Errorf("certificate issued but %w", err)
 	}
+	u.removeStale()
 
 	return nil
 }
 
-// AddToAgent adds the current private key and certificate to the SSH agent.
-// Failures are returned as [cert.ErrAddingToAgent].
+// AddToAgent adds the current private key and certificate to the SSH agent,
+// then removes any stale certificates from the agent. Failures adding to the
+// agent are returned as [cert.ErrAddingToAgent].
 func (u *User) AddToAgent() error {
-	return u.store.AddToAgent()
+	if err := u.store.AddToAgent(); err != nil {
+		return err
+	}
+	u.removeStale()
+
+	return nil
+}
+
+// removeStale removes stale certificates from the SSH agent. Failures are
+// only logged, as the current certificate has already been added.
+func (u *User) removeStale() {
+	removed, err := u.store.RemoveStaleFromAgent()
+	for _, c := range removed {
+		u.logger.Info("removed stale certificate from ssh agent", "serial", c.Serial, "key_id", c.KeyId)
+	}
+	if err != nil {
+		u.logger.Warn("could not remove stale certificates from ssh agent", "error", err)
+	}
 }
 
 // Certificate returns the current certificate, or an error wrapping

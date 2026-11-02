@@ -256,3 +256,139 @@ func TestRemoveFromAgent(t *testing.T) {
 		})
 	}
 }
+
+// signCertValidity signs a certificate of certType for key using ca that is
+// valid between after and before
+func signCertValidity(t *testing.T, ca, key ssh.Signer, certType uint32, after, before uint64) *ssh.Certificate {
+	t.Helper()
+
+	cert := &ssh.Certificate{
+		Key:             key.PublicKey(),
+		CertType:        certType,
+		KeyId:           "test@example.com",
+		ValidPrincipals: []string{"test"},
+		ValidAfter:      after,
+		ValidBefore:     before,
+	}
+	if err := cert.SignCert(rand.Reader, ca); err != nil {
+		t.Fatalf("could not sign certificate: %v", err)
+	}
+
+	return cert
+}
+
+func TestRemoveStale(t *testing.T) {
+	now := time.Unix(1_800_000_000, 0)
+	past := uint64(now.Add(-time.Hour).Unix())
+	future := uint64(now.Add(time.Hour).Unix())
+	longAgo := uint64(now.Add(-48 * time.Hour).Unix())
+
+	_, ca := newSigner(t)
+	_, otherCA := newSigner(t)
+
+	// each identity uses its own key, as the Windows agent holds one
+	// certificate per key
+	type identity struct {
+		priv ed25519.PrivateKey
+		cert *ssh.Certificate // nil for a plain key
+	}
+	newIdentity := func(signer ssh.Signer, certType uint32, after, before uint64) identity {
+		priv, key := newSigner(t)
+		return identity{priv, signCertValidity(t, signer, key, certType, after, before)}
+	}
+	plainPriv, plainKey := newSigner(t)
+	plain := identity{priv: plainPriv}
+
+	expired := newIdentity(ca, ssh.UserCert, longAgo, past)
+	expiredAgain := newIdentity(ca, ssh.UserCert, longAgo, past)
+	expiresNow := newIdentity(ca, ssh.UserCert, longAgo, uint64(now.Unix()))
+	current := newIdentity(ca, ssh.UserCert, past, future)
+	notYetValid := newIdentity(ca, ssh.UserCert, future, future+3600)
+	neverExpires := newIdentity(ca, ssh.UserCert, past, ssh.CertTimeInfinity)
+	otherCAExpired := newIdentity(otherCA, ssh.UserCert, longAgo, past)
+	hostExpired := newIdentity(ca, ssh.HostCert, longAgo, past)
+
+	blob := func(id identity) []byte {
+		if id.cert == nil {
+			return plainKey.PublicKey().Marshal()
+		}
+		return id.cert.Marshal()
+	}
+
+	tests := []struct {
+		name        string
+		add         []identity
+		failing     *failingAgent
+		wantRemoved []identity
+		wantKept    []identity
+		wantErr     bool
+	}{
+		{name: "empty agent"},
+		{name: "removes expired certificate", add: []identity{expired}, wantRemoved: []identity{expired}},
+		{name: "removes certificate expiring now", add: []identity{expiresNow}, wantRemoved: []identity{expiresNow}},
+		{name: "keeps current certificate", add: []identity{current}, wantKept: []identity{current}},
+		{name: "keeps certificate not yet valid", add: []identity{notYetValid}, wantKept: []identity{notYetValid}},
+		{name: "keeps certificate that never expires", add: []identity{neverExpires}, wantKept: []identity{neverExpires}},
+		{name: "keeps certificate from another CA", add: []identity{otherCAExpired}, wantKept: []identity{otherCAExpired}},
+		{name: "keeps host certificate", add: []identity{hostExpired}, wantKept: []identity{hostExpired}},
+		{name: "keeps plain key", add: []identity{plain}, wantKept: []identity{plain}},
+		{
+			name:        "mixed",
+			add:         []identity{plain, expired, current, otherCAExpired, expiredAgain, hostExpired, neverExpires},
+			wantRemoved: []identity{expired, expiredAgain},
+			wantKept:    []identity{plain, current, otherCAExpired, hostExpired, neverExpires},
+		},
+		{name: "list error", add: []identity{expired}, failing: &failingAgent{listErr: errors.New("list failed")}, wantKept: []identity{expired}, wantErr: true},
+		{name: "remove error", add: []identity{expired, expiredAgain}, failing: &failingAgent{removeErr: errors.New("remove failed")}, wantKept: []identity{expired, expiredAgain}, wantErr: true},
+		{name: "remove not attempted when nothing is stale", add: []identity{current}, failing: &failingAgent{removeErr: errors.New("remove failed")}, wantKept: []identity{current}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := agent.NewKeyring()
+			for _, id := range tt.add {
+				if err := a.Add(agent.AddedKey{PrivateKey: id.priv, Certificate: id.cert}); err != nil {
+					t.Fatalf("agent Add() error = %v", err)
+				}
+			}
+			under := a
+			if tt.failing != nil {
+				tt.failing.Agent = a
+				under = tt.failing
+			}
+
+			removed, err := RemoveStale(under, ca.PublicKey(), now)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("RemoveStale() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if len(removed) != len(tt.wantRemoved) {
+				t.Fatalf("RemoveStale() removed %d certificates, want %d", len(removed), len(tt.wantRemoved))
+			}
+			for i, c := range removed {
+				if !bytes.Equal(c.Marshal(), tt.wantRemoved[i].cert.Marshal()) {
+					t.Errorf("RemoveStale() removed certificate %d is not the expected certificate", i)
+				}
+			}
+
+			keys, err := a.List()
+			if err != nil {
+				t.Fatalf("agent List() error = %v", err)
+			}
+			if len(keys) != len(tt.wantKept) {
+				t.Fatalf("agent holds %d keys, want %d", len(keys), len(tt.wantKept))
+			}
+			for _, want := range tt.wantKept {
+				found := false
+				for _, k := range keys {
+					if bytes.Equal(k.Marshal(), blob(want)) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Errorf("agent no longer holds key %x", blob(want))
+				}
+			}
+		})
+	}
+}
