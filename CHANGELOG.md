@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.27.0](https://github.com/andrewheberle/ssh-ca-client/compare/v0.26.0...v0.27.0) (2026-11-02)
+
+
+### Features
+
+* remove stale certificates from the SSH agent ([#144](https://github.com/andrewheberle/ssh-ca-client/issues/144)) ([5fcb9c0](https://github.com/andrewheberle/ssh-ca-client/commit/5fcb9c0d6ac1dc7fe2b7b540a086cb68efbccab7))
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/go-jose/go-jose/v4 to v4.1.7 ([#142](https://github.com/andrewheberle/ssh-ca-client/issues/142)) ([59fad1b](https://github.com/andrewheberle/ssh-ca-client/commit/59fad1b8da86a23964f972c93d81c30ecde635b8))
+
 ## [0.26.0](https://github.com/andrewheberle/ssh-ca-client/compare/v0.25.4...v0.26.0) (2026-10-27)
 
 
