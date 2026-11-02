@@ -190,6 +190,8 @@ jobs:
       AWS_RESPONSE_CHECKSUM_VALIDATION: WHEN_REQUIRED
       R2_ENDPOINT: https://${{ vars.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
       GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
+      # renovate: datasource=rubygems depName=deb-s3
+      DEB_S3_VERSION: 26.1.0
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -201,7 +203,7 @@ jobs:
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
       - name: Install deb-s3
-        run: sudo gem install deb-s3 --version 26.1.0 --no-document
+        run: sudo gem install deb-s3 --version "$DEB_S3_VERSION" --no-document
       # one upload for all packages, so the index is only rewritten and signed
       # once. Credentials are read by the AWS SDK from the environment
       - name: Upload .deb packages to repo
