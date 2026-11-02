@@ -24,6 +24,10 @@ _Avoid_: Storage, provider
 A user's SSH private key and current certificate, together with the means to obtain a new certificate for that key after logging in to the identity provider.
 _Avoid_: Session, user certificate, account
 
+**Stale certificate**:
+A certificate issued by the Trusted CA that has expired but is still held by the SSH agent.
+_Avoid_: Old identity, expired identity, leftover key
+
 **KRL**:
 A key revocation list signed by the Trusted CA, listing the revoked certificates of one type (user or host).
 _Avoid_: Revocation list, CRL, blocklist

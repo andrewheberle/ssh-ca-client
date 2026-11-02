@@ -1466,6 +1466,81 @@ func TestStore_RemoveFromAgent(t *testing.T) {
 	})
 }
 
+func TestStore_RemoveStaleFromAgent(t *testing.T) {
+	ca := newCA(t)
+
+	// addStale adds a certificate signed by ca for a new key that expired an
+	// hour ago to a, as left behind when a private key is replaced
+	addStale := func(t *testing.T, a agent.Agent) *ssh.Certificate {
+		t.Helper()
+
+		_, priv, err := ed25519.GenerateKey(rand.Reader)
+		if err != nil {
+			t.Fatalf("could not generate key: %v", err)
+		}
+		pub, err := ssh.NewPublicKey(priv.Public())
+		if err != nil {
+			t.Fatalf("could not create public key: %v", err)
+		}
+		now := time.Now()
+		c := signCert(t, ca, pub, now.Add(-2*time.Hour), now.Add(-time.Hour))
+		if err := a.Add(agent.AddedKey{PrivateKey: priv, Certificate: c}); err != nil {
+			t.Fatalf("agent Add() error = %v", err)
+		}
+
+		return c
+	}
+
+	t.Run("removes stale certificate and keeps current", func(t *testing.T) {
+		a := newAgent()
+		s := newStorage(t, ca, WithAgent(a))
+		c := validCert(t, s, ca)
+		if err := s.SaveCertificate(c); err != nil {
+			t.Fatalf("SaveCertificate() error = %v", err)
+		}
+		if err := s.AddToAgent(); err != nil {
+			t.Fatalf("AddToAgent() error = %v", err)
+		}
+		stale := addStale(t, a)
+
+		removed, err := s.RemoveStaleFromAgent()
+		if err != nil {
+			t.Fatalf("RemoveStaleFromAgent() error = %v", err)
+		}
+		if len(removed) != 1 || !bytes.Equal(removed[0].Marshal(), stale.Marshal()) {
+			t.Errorf("RemoveStaleFromAgent() removed %d certificates, want only the stale certificate", len(removed))
+		}
+
+		keys, err := a.List()
+		if err != nil {
+			t.Fatalf("agent List() error = %v", err)
+		}
+		if len(keys) != 1 || !bytes.Equal(keys[0].Marshal(), c.Marshal()) {
+			t.Errorf("agent holds %d keys, want only the current certificate", len(keys))
+		}
+	})
+
+	t.Run("no agent running", func(t *testing.T) {
+		s := newStorage(t, ca)
+		s.dial = func() (agent.ExtendedAgent, func() error, error) {
+			return nil, nil, errors.New("no agent")
+		}
+
+		removed, err := s.RemoveStaleFromAgent()
+		if err != nil || len(removed) != 0 {
+			t.Errorf("RemoveStaleFromAgent() = %v, %v, want nothing removed and no error", removed, err)
+		}
+	})
+
+	t.Run("agent error", func(t *testing.T) {
+		s := newStorage(t, ca, WithAgent(listFailingAgent{newAgent()}))
+
+		if _, err := s.RemoveStaleFromAgent(); !errors.Is(err, cert.ErrRemovingFromAgent) {
+			t.Errorf("RemoveStaleFromAgent() error = %v, want %v", err, cert.ErrRemovingFromAgent)
+		}
+	})
+}
+
 func TestStore_BackendErrors(t *testing.T) {
 	ca := newCA(t)
 	backendErr := errors.New("backend unavailable")

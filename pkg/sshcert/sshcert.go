@@ -4,7 +4,9 @@ package sshcert
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"time"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
@@ -55,4 +57,62 @@ func RemoveFromAgent(a agent.Agent, cert *ssh.Certificate) error {
 	}
 
 	return nil
+}
+
+// RemoveStale removes every stale certificate from the agent a: user
+// certificates signed by ca that expired at or before now. Plain keys,
+// host certificates, certificates from other CAs and certificates that have
+// not expired are left in place.
+//
+// The certificates that were removed are returned. A failure to remove one
+// certificate does not stop the others being removed and all failures are
+// returned together.
+func RemoveStale(a agent.Agent, ca ssh.PublicKey, now time.Time) ([]*ssh.Certificate, error) {
+	keys, err := a.List()
+	if err != nil {
+		return nil, fmt.Errorf("could not list agent keys: %w", err)
+	}
+
+	want := ca.Marshal()
+	var removed []*ssh.Certificate
+	var errs []error
+	for _, k := range keys {
+		pub, err := ssh.ParsePublicKey(k.Blob)
+		if err != nil {
+			// not a key this package can parse, so it cannot be one of ours
+			continue
+		}
+
+		c, ok := pub.(*ssh.Certificate)
+		if !ok || c.CertType != ssh.UserCert || !bytes.Equal(c.SignatureKey.Marshal(), want) {
+			continue
+		}
+
+		if !expired(c, now) {
+			continue
+		}
+
+		if err := a.Remove(c); err != nil {
+			errs = append(errs, fmt.Errorf("could not remove certificate with serial %d from agent: %w", c.Serial, err))
+			continue
+		}
+		removed = append(removed, c)
+	}
+
+	return removed, errors.Join(errs...)
+}
+
+// expired reports whether c has expired at now, matching the check made by
+// [ssh.CertChecker]. A certificate that never expires has not expired.
+func expired(c *ssh.Certificate, now time.Time) bool {
+	if c.ValidBefore == ssh.CertTimeInfinity {
+		return false
+	}
+
+	unix := now.Unix()
+	if unix < 0 {
+		return false
+	}
+
+	return uint64(unix) >= c.ValidBefore
 }

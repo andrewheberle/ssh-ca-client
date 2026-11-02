@@ -87,6 +87,7 @@ type Storage interface {
 	PublicKey() (ssh.PublicKey, error)
 	PublicKeyBytes() ([]byte, error)
 	RemoveFromAgent() error
+	RemoveStaleFromAgent() ([]*ssh.Certificate, error)
 	SaveCertificate(*ssh.Certificate) error
 	Signer() (ssh.Signer, error)
 }

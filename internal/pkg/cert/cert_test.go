@@ -326,6 +326,12 @@ func (s *fakeStore) RemoveFromAgent() error {
 	return nil
 }
 
+func (s *fakeStore) RemoveStaleFromAgent() ([]*ssh.Certificate, error) {
+	s.agentContacted = true
+
+	return nil, nil
+}
+
 func (s *fakeStore) Certificate() (*ssh.Certificate, error) {
 	return s.cert, s.certErr
 }

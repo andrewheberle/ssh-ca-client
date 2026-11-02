@@ -279,6 +279,13 @@ On Linux `ssh-agent` is often started as part of your normal login process and i
 addition the secure storage of sensitive material requires the users `login` keyring
 to be unlocked, which is usually the default in most desktop environments.
 
+Each time a certificate is added to the SSH agent, any expired user certificates
+issued by the configured CA are removed from the agent. This matters on Windows,
+where the agent keeps certificates across reboots with no lifetime, so the
+certificate for a replaced private key would otherwise stay in the agent after
+it expires. Plain keys, host certificates, certificates from other CAs and
+certificates that have not expired are left in place.
+
 ## Running via the CLI
 
 The client can be run in the following ways:
