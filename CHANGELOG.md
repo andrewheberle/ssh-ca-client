@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.27.2](https://github.com/andrewheberle/ssh-ca-client/compare/v0.27.1...v0.27.2) (2026-11-03)
+
+
+### Bug Fixes
+
+* **deb:** reload systemd and stop timers in package scripts ([#151](https://github.com/andrewheberle/ssh-ca-client/issues/151)) ([d32c545](https://github.com/andrewheberle/ssh-ca-client/commit/d32c545ccfe9bb21f69cab7f80109d383e5af472))
+
 ## [0.27.1](https://github.com/andrewheberle/ssh-ca-client/compare/v0.27.0...v0.27.1) (2026-11-02)
 
 
