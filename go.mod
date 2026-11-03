@@ -2,6 +2,8 @@ module github.com/andrewheberle/ssh-ca-client
 
 go 1.26.0
 
+toolchain go1.27.3
+
 require (
 	codeberg.org/sdassow/atomic v1.2.1
 	fyne.io/systray v1.12.2

@@ -9,6 +9,35 @@
 	],
 	"packageRules": [
 		{
+			"description": "Go toolchain updates ship as releases; see docs/adr/0001",
+			"matchManagers": [
+				"gomod"
+			],
+			"matchDepTypes": [
+				"toolchain"
+			],
+			"matchPackageNames": [
+				"go"
+			],
+			"semanticCommitType": "fix"
+		},
+		{
+			"description": "Go toolchain patch updates carry security fixes, so they automerge once the required checks pass; see docs/adr/0001",
+			"matchManagers": [
+				"gomod"
+			],
+			"matchDepTypes": [
+				"toolchain"
+			],
+			"matchPackageNames": [
+				"go"
+			],
+			"matchUpdateTypes": [
+				"patch"
+			],
+			"automerge": true
+		},
+		{
 			"matchPackageNames": [
 				"@andrewheberle/serverless-ssh-ca",
 				"@andrewheberle/serverless-ssh-ca-testing"

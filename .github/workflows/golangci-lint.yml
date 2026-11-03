@@ -11,10 +11,8 @@ jobs:
   golangci:
     strategy:
       matrix:
-        # run on stable and stable - 1 (oldstable) versions
-        go: ['oldstable', 'stable']
         os: [ubuntu-latest, windows-latest]
-    name: lint (${{ matrix.os }}, ${{ matrix.go }})
+    name: lint (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -22,7 +20,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: ${{ matrix.go }}
+          # the toolchain CI and releases build with; see docs/adr/0001
+          go-version-file: go.mod
           cache: false
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
