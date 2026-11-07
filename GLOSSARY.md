@@ -28,6 +28,10 @@ _Avoid_: Session, user certificate, account
 A certificate issued by the Trusted CA that has expired but is still held by the SSH agent.
 _Avoid_: Old identity, expired identity, leftover key
 
+**Renewal**:
+Obtaining a new host certificate for the same key and principals by proving possession of the key and a current certificate, which the CA revokes in exchange.
+_Avoid_: Refresh, re-issue
+
 **KRL**:
 A key revocation list signed by the Trusted CA, listing the revoked certificates of one type (user or host).
 _Avoid_: Revocation list, CRL, blocklist
