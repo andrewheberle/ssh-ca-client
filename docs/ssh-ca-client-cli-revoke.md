@@ -32,6 +32,11 @@ The certificates to be revoked are shown and confirmation is asked for unless
 A certificate is only rejected by ssh or sshd once they use a KRL that
 includes it, see the krl command.
 
+A revoked host certificate is deleted, but sshd keeps presenting it until it is
+reloaded (OpenSSH 9.8 and later). With --host, the --reload-command option sets
+a command, run with /bin/sh -c, that reloads sshd once any host certificate
+was deleted. A failing reload command makes this command fail.
+
 Revocation is only available from the command line, not from the system tray
 application.
 
@@ -51,6 +56,9 @@ ssh-ca-client-cli revoke --serial 12345678901234567890
 # Revoke the current host certificates without asking for confirmation
 ssh-ca-client-cli revoke --host --yes
 
+# Revoke the current host certificates and reload sshd
+ssh-ca-client-cli revoke --host --reload-command "systemctl try-reload-or-restart ssh.service"
+
 # Revoke a previous certificate for the Ed25519 host key
 ssh-ca-client-cli revoke --host --key /etc/ssh/ssh_host_ed25519_key --serial 12345678901234567890
 ```
@@ -58,11 +66,12 @@ ssh-ca-client-cli revoke --host --key /etc/ssh/ssh_host_ed25519_key --serial 123
 ### Options
 
 ```
-  -h, --help             help for revoke
-      --host             Revoke host certificates instead of the user certificate
-      --key strings      Path to host private key(s) whose certificates are revoked with --host (default [/etc/ssh/ssh_host_ed25519_key,/etc/ssh/ssh_host_ecdsa_key,/etc/ssh/ssh_host_rsa_key])
-      --serial strings   Revoke these certificate serial numbers instead of the current certificate
-  -y, --yes              Revoke without asking for confirmation
+  -h, --help                    help for revoke
+      --host                    Revoke host certificates instead of the user certificate
+      --key strings             Path to host private key(s) whose certificates are revoked with --host (default [/etc/ssh/ssh_host_ed25519_key,/etc/ssh/ssh_host_ecdsa_key,/etc/ssh/ssh_host_rsa_key])
+      --reload-command string   Command run with /bin/sh -c once host certificates have changed, such as to reload sshd (with --host)
+      --serial strings          Revoke these certificate serial numbers instead of the current certificate
+  -y, --yes                     Revoke without asking for confirmation
 ```
 
 ### Options inherited from parent commands

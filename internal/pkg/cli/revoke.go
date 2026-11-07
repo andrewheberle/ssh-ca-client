@@ -25,10 +25,11 @@ var (
 )
 
 type revokeCommand struct {
-	host    bool
-	keypath []string
-	serials []string
-	yes     bool
+	host      bool
+	keypath   []string
+	serials   []string
+	yes       bool
+	reloadCmd string
 
 	certs  []revocableCert
 	logger *slog.Logger
@@ -73,6 +74,10 @@ func (c *revokeCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 
 	if c.host && runtime.GOOS == "windows" {
 		return fmt.Errorf("revoking host certificates is not supported on %s", runtime.GOOS)
+	}
+
+	if !c.host && c.reloadCmd != "" {
+		return fmt.Errorf("--reload-command requires --host")
 	}
 
 	// a serial was issued for a single key
@@ -149,6 +154,17 @@ func (c *revokeCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, arg
 		}
 	}
 
+	// a revoked host certificate is deleted, so sshd is reloaded to stop
+	// presenting it
+	var reload *hostReload
+	if c.host {
+		stores := make(map[string]cert.Storage, len(c.certs))
+		for _, rc := range c.certs {
+			stores[rc.name] = rc.cert.Store()
+		}
+		reload = newHostReload(c.reloadCmd, stores)
+	}
+
 	// the serials that were confirmed are revoked, rather than whatever
 	// certificate is in the store by now
 	errs := make([]error, 0)
@@ -169,6 +185,12 @@ func (c *revokeCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, arg
 		default:
 			l.Error("could not revoke certificate", "error", err)
 			errs = append(errs, fmt.Errorf("%s: %w", t.name, err))
+		}
+	}
+
+	if reload != nil {
+		if err := reload.run(ctx, c.logger); err != nil {
+			errs = append(errs, err)
 		}
 	}
 

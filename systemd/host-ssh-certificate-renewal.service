@@ -5,4 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/ssh-ca-client-cli host --renew
+# sshd is reloaded only when a certificate was renewed, as OpenSSH 9.8 and
+# later keep presenting the previous (revoked) certificate until reloaded. On
+# RHEL and derivatives the unit is sshd.service rather than ssh.service.
+ExecStart=/usr/bin/ssh-ca-client-cli host --renew --reload-command "systemctl try-reload-or-restart ssh.service"

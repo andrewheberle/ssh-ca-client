@@ -26,6 +26,15 @@ As this command writes certificates issued for host SSH keys it needs write
 access to the directory holding the SSH host keys, which by default is /etc/ssh,
 so this command should be run as root.
 
+A renewal revokes the certificate it replaces. From OpenSSH 9.8 sshd only reads
+host certificates when it starts or is reloaded, so until then it keeps
+presenting the previous, revoked certificate. The --reload-command option sets
+a command, run with /bin/sh -c, that reloads sshd. It is run once, after all
+keys have been processed, if any host certificate was written, even if another
+key failed or the command was interrupted. A failing reload command makes this
+command fail, but the certificates that were written are kept. Without
+--reload-command a reminder to reload sshd is logged instead.
+
 This command is not available on Windows or when installed as a snap.
 
 The --addr option from previous versions has been removed as the listen address
@@ -49,19 +58,23 @@ ssh-ca-client-cli host --key /etc/ssh/ssh_host_ed25519_key --key /etc/ssh/ssh_ho
 
 # Renew existing certificates
 ssh-ca-client-cli host --renew
+
+# Renew existing certificates and reload sshd if any were renewed
+ssh-ca-client-cli host --renew --reload-command "systemctl try-reload-or-restart ssh.service"
 ```
 
 ### Options
 
 ```
-      --delay duration       Delay between requests/renewals (randomised between 50% and 150%, 0 disables) (default 250ms)
-      --force                Force renewal even if current certificate has more than 50.0% validity left
-  -h, --help                 help for host
-      --key strings          Path to private key(s) (default [/etc/ssh/ssh_host_ed25519_key,/etc/ssh/ssh_host_ecdsa_key,/etc/ssh/ssh_host_rsa_key])
-      --life duration        Lifetime of SSH certificate (default 720h0m0s)
-      --principals strings   Principals to add to the host certificate request (default [<hostname>])
-      --renew                Renew existing certificate
-      --renewat float        Renew once this fraction (0 to 1) of the certificate lifetime has passed (default 0.5)
+      --delay duration          Delay between requests/renewals (randomised between 50% and 150%, 0 disables) (default 250ms)
+      --force                   Force renewal even if current certificate has more than 50.0% validity left
+  -h, --help                    help for host
+      --key strings             Path to private key(s) (default [/etc/ssh/ssh_host_ed25519_key,/etc/ssh/ssh_host_ecdsa_key,/etc/ssh/ssh_host_rsa_key])
+      --life duration           Lifetime of SSH certificate (default 720h0m0s)
+      --principals strings      Principals to add to the host certificate request (default [<hostname>])
+      --reload-command string   Command run with /bin/sh -c once host certificates have changed, such as to reload sshd
+      --renew                   Renew existing certificate
+      --renewat float           Renew once this fraction (0 to 1) of the certificate lifetime has passed (default 0.5)
 ```
 
 ### Options inherited from parent commands
