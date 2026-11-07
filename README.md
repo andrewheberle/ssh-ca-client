@@ -399,6 +399,24 @@ The renewed certificate will be issued with identical principals and extensions
 as the current certificate with renewals being skipped unless the certificate
 has less than 50% of validity left (based on the default of 30-days validity).
 
+A renewal revokes the certificate it replaces. From OpenSSH 9.8, `sshd` only
+reads host certificates when it starts or is reloaded, so until it is reloaded
+it keeps presenting the previous, revoked certificate, and then an expired one.
+OpenSSH 9.7 and earlier read the certificate files for each connection, so they
+present a renewed certificate straight away.
+
+The `--reload-command` option sets a command, run with `/bin/sh -c`, that
+reloads `sshd`. It runs once, after all keys have been processed, if any host
+certificate was written, even if another key failed or the command was
+interrupted, and is not run when no certificate was due for renewal. If the
+reload command fails, the `host` command fails, but the certificates that were
+written are kept. Without `--reload-command` a reminder to reload `sshd` is
+logged instead.
+
+```sh
+ssh-ca-client-cli host --renew --reload-command "systemctl try-reload-or-restart ssh.service"
+```
+
 Example systemd unit files are located in the `systemd` directory and these are
 installed by the DEB package so renewals can be enabled as follows if you have
 installed via the package:
@@ -406,6 +424,10 @@ installed via the package:
 ```sh
 sudo systemctl enable --now host-ssh-certificate-renewal.timer
 ```
+
+The renewal unit reloads `ssh.service` when a certificate was renewed, which is
+the name of the OpenSSH server unit on Debian and Ubuntu. If you copy the unit
+to RHEL or a derivative, change it to `sshd.service`.
 
 #### Command Line Options
 
@@ -420,6 +442,7 @@ The `host` sub-command supports the following command-line options:
 | `--renew` | `bool` | false | Attempt to renew existing certificate(s) for the specified key(s) |
 | `--force` | `bool` | false | Force renewal of certificate(s) regardless of remaining validity |
 | `--renewat` | `float64` | 0.5 | Renew at this fraction of remaining validity for existing certificate(s) |
+| `--reload-command` | `string` | | Command run with `/bin/sh -c` once host certificates have changed, such as to reload `sshd` |
 
 The `--addr` option from previous versions has been removed as the listen
 address for the OIDC auth flow is now taken from the configured `redirect_url`.
@@ -436,8 +459,10 @@ ssh -L 3000:localhost:3000 admin@remotehost
 # Request the initial certificate(s) with three principals (hostname, FQDN and IP address)
 ssh-ca-client-cli host --principals remotehost --principals remotehost.example.com,192.168.1.10
 # Visit the URL displayed on the console using your local browser (eg http://localhost:3000/auth/login) and authenticate against the IdP
-# Some time later perform a renewal
-ssh-ca-client-cli host --renew
+# Reload sshd so it presents the new certificate(s), after adding HostCertificate to sshd_config
+sudo systemctl reload ssh
+# Some time later perform a renewal, reloading sshd if a certificate was renewed
+ssh-ca-client-cli host --renew --reload-command "systemctl try-reload-or-restart ssh.service"
 ```
 
 ### Key Revocation Lists
@@ -515,6 +540,10 @@ ssh-ca-client-cli revoke
 # revoke the current host certificates
 sudo ssh-ca-client-cli revoke --host
 ```
+
+As `sshd` keeps presenting a revoked host certificate until it is reloaded
+(OpenSSH 9.8 and later), `revoke --host` also accepts `--reload-command`, which
+is run once if any host certificate was deleted.
 
 The certificates to be revoked are shown and confirmation is asked for, which
 can be skipped with `--yes` (required when there is no terminal). Revocation

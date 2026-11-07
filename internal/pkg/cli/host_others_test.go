@@ -87,6 +87,16 @@ func (s *fakeHostStore) Certificate() (*ssh.Certificate, error) {
 	return s.cert, nil
 }
 
+func (s *fakeHostStore) CertificateBytes() ([]byte, error) {
+	if s.cert == nil {
+		return nil, cert.ErrCertificateNotFound
+	}
+
+	// the fake certificates are not signed, so their serial stands in for
+	// the certificate
+	return fmt.Appendf(nil, "%d", s.cert.Serial), nil
+}
+
 // fakeHostCert is a [cert.Renewable] that records each call as "request" or
 // "renew" in calls, which is shared between certificates to show the order.
 // If cancel is set it is called during the request or renewal.

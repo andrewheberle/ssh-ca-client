@@ -36,6 +36,7 @@ type hostCommand struct {
 	force      bool
 	principals []string
 	renewat    float64
+	reloadCmd  string
 
 	certs []hostCert
 
@@ -72,6 +73,7 @@ func (c *hostCommand) Init(cd *simplecobra.Commandeer) error {
 	cmd.Flags().BoolVar(&c.force, "force", false, fmt.Sprintf("Force renewal even if current certificate has more than %0.1f%% validity left", defaultHostRenewAt*100.0))
 	cmd.Flags().Float64Var(&c.renewat, "renewat", defaultHostRenewAt, "Renew once this fraction (0 to 1) of the certificate lifetime has passed")
 	cmd.MarkFlagsMutuallyExclusive("force", "renewat")
+	cmd.Flags().StringVar(&c.reloadCmd, "reload-command", "", reloadCommandUsage)
 
 	return nil
 }
@@ -142,6 +144,12 @@ func (c *hostCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 func (c *hostCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args []string) error {
 	errs := make([]error, 0)
 
+	stores := make(map[string]cert.Storage, len(c.certs))
+	for _, hc := range c.certs {
+		stores[hc.keypath] = hc.cert.Store()
+	}
+	reload := newHostReload(c.reloadCmd, stores)
+
 	// work out which certificates need a request to the CA
 	todo := c.certs
 	if c.renew {
@@ -192,6 +200,12 @@ func (c *hostCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args 
 			errs = append(errs, ctx.Err())
 			break
 		}
+	}
+
+	// sshd is reloaded for any certificate that was written, even if
+	// another key failed or the run was interrupted
+	if err := reload.run(ctx, c.logger); err != nil {
+		errs = append(errs, err)
 	}
 
 	return errors.Join(errs...)

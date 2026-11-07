@@ -69,6 +69,15 @@ As this command writes certificates issued for host SSH keys it needs write
 access to the directory holding the SSH host keys, which by default is /etc/ssh,
 so this command should be run as root.
 
+A renewal revokes the certificate it replaces. From OpenSSH 9.8 sshd only reads
+host certificates when it starts or is reloaded, so until then it keeps
+presenting the previous, revoked certificate. The --reload-command option sets
+a command, run with /bin/sh -c, that reloads sshd. It is run once, after all
+keys have been processed, if any host certificate was written, even if another
+key failed or the command was interrupted. A failing reload command makes this
+command fail, but the certificates that were written are kept. Without
+--reload-command a reminder to reload sshd is logged instead.
+
 This command is not available on Windows or when installed as a snap.
 
 The --addr option from previous versions has been removed as the listen address
@@ -84,7 +93,10 @@ ssh-ca-client-cli host --life 168h
 ssh-ca-client-cli host --key /etc/ssh/ssh_host_ed25519_key --key /etc/ssh/ssh_host_ecdsa_key
 
 # Renew existing certificates
-ssh-ca-client-cli host --renew`
+ssh-ca-client-cli host --renew
+
+# Renew existing certificates and reload sshd if any were renewed
+ssh-ca-client-cli host --renew --reload-command "systemctl try-reload-or-restart ssh.service"`
 
 	krlLong = `Download a key revocation list (KRL) in order to allow ssh or sshd to reject
 revoked host or user certificates respectively.
@@ -176,6 +188,11 @@ The certificates to be revoked are shown and confirmation is asked for unless
 A certificate is only rejected by ssh or sshd once they use a KRL that
 includes it, see the krl command.
 
+A revoked host certificate is deleted, but sshd keeps presenting it until it is
+reloaded (OpenSSH 9.8 and later). With --host, the --reload-command option sets
+a command, run with /bin/sh -c, that reloads sshd once any host certificate
+was deleted. A failing reload command makes this command fail.
+
 Revocation is only available from the command line, not from the system tray
 application.`
 
@@ -187,6 +204,9 @@ ssh-ca-client-cli revoke --serial 12345678901234567890
 
 # Revoke the current host certificates without asking for confirmation
 ssh-ca-client-cli revoke --host --yes
+
+# Revoke the current host certificates and reload sshd
+ssh-ca-client-cli revoke --host --reload-command "systemctl try-reload-or-restart ssh.service"
 
 # Revoke a previous certificate for the Ed25519 host key
 ssh-ca-client-cli revoke --host --key /etc/ssh/ssh_host_ed25519_key --serial 12345678901234567890`

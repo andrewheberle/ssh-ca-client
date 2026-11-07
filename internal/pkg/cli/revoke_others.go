@@ -15,6 +15,7 @@ func (c *revokeCommand) Init(cd *simplecobra.Commandeer) error {
 	c.initCommonFlags(cmd)
 	cmd.Flags().BoolVar(&c.host, "host", false, "Revoke host certificates instead of the user certificate")
 	cmd.Flags().StringSliceVar(&c.keypath, "key", defaultHostKeys, "Path to host private key(s) whose certificates are revoked with --host")
+	cmd.Flags().StringVar(&c.reloadCmd, "reload-command", "", reloadCommandUsage+" (with --host)")
 
 	return nil
 }
