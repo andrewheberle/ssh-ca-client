@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.27.3](https://github.com/andrewheberle/ssh-ca-client/compare/v0.27.2...v0.27.3) (2026-11-07)
+
+
+### Bug Fixes
+
+* **cli:** reload sshd with --reload-command when host certificates change ([#164](https://github.com/andrewheberle/ssh-ca-client/issues/164)) ([4727dc3](https://github.com/andrewheberle/ssh-ca-client/commit/4727dc3ba4051bf5d4f1193c7e9e447f5c851692))
+* **deps:** update module github.com/go-jose/go-jose/v4 to v4.1.8 ([#149](https://github.com/andrewheberle/ssh-ca-client/issues/149)) ([b3e2a52](https://github.com/andrewheberle/ssh-ca-client/commit/b3e2a52cfc6d6c995e8b57ab55fcd37c7147f92d))
+* **deps:** update module github.com/go-jose/go-jose/v4 to v4.1.9 ([#160](https://github.com/andrewheberle/ssh-ca-client/issues/160)) ([35265c8](https://github.com/andrewheberle/ssh-ca-client/commit/35265c8dd78767cb6aff17d4ba26255c51025f2e))
+* **deps:** update serverless ssh ca to v0.29.0 ([#161](https://github.com/andrewheberle/ssh-ca-client/issues/161)) ([5d2a18d](https://github.com/andrewheberle/ssh-ca-client/commit/5d2a18d3b6fbe4977577a5327f7feeda76fb852c))
+
 ## [0.27.2](https://github.com/andrewheberle/ssh-ca-client/compare/v0.27.1...v0.27.2) (2026-11-03)
 
 
