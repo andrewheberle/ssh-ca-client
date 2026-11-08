@@ -46,7 +46,10 @@ This policy covers:
 - the GUI, `ssh-ca-client`
 - the deb, snap and MSI packages, including the systemd units and Windows
   Group Policy templates they install
-- the importable Go packages under `pkg/`
+
+The Go packages in this module are internal to the client and are not a
+supported API. Vulnerabilities in their code are still in scope, because it
+is built into the CLI and the GUI.
 
 Vulnerabilities in the CA, serverless-ssh-ca, are reported to that project
 instead, as described in its
