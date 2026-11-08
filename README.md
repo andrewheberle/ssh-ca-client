@@ -10,7 +10,7 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 ## Installing
 
 There are two versions of the client, one CLI based and the other GUI based both of which
-are tested on Windows and Linux.
+are tested on Windows and Linux (see [Supported Platforms](#supported-platforms)).
 
 [<img src="https://snapcraft.io/en/dark/install.svg" alt="Get it from the Snap Store" width="200"/>](https://snapcraft.io/ssh-ca-client)
 
@@ -273,6 +273,32 @@ not migrated, so after upgrading generate a new private key (via the GUI
 "Generate" menu item or `ssh-ca-client-cli generate`) and request a new
 certificate.
 
+
+## Supported Platforms
+
+| Platform | Architectures | Installed with |
+| -------- | ------------- | -------------- |
+| Linux    | amd64, arm64  | The deb (APT) package or the snap; a release archive (`.tar.gz`) |
+| Windows  | x64           | The MSI, with Group Policy settings from `policy/`; a release archive (`.zip`) |
+| Windows  | arm64         | A release archive (`.zip`) only |
+
+The deb, snap and MSI are the recommended ways to install the client. The
+release archives are supported on the same platforms, but do not include the
+systemd units or the Group Policy templates.
+
+macOS and BSD: the CLI can be built from source but is untested, and the GUI
+is not available. Bug reports are welcome, but no support is promised.
+
+Both hosts (`sshd`) and user machines (`ssh` and `ssh-agent`) need OpenSSH 8.0
+or later. On Windows this is the built-in OpenSSH Client and OpenSSH Agent. From
+OpenSSH 9.8, `sshd` must be reloaded to present a renewed host certificate, see
+[Host Certificates](#host-certificates) and
+[ADR 0002](docs/adr/0002-host-commands-run-a-reload-command-only-when-certificates-change.md).
+
+Releases are built with the Go toolchain pinned by the `toolchain` line in
+`go.mod`, see
+[ADR 0001](docs/adr/0001-go-toolchain-pinned-with-a-release-per-update.md) and
+[Building From Source](#building-from-source).
 
 ## Requirements
 

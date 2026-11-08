@@ -38,7 +38,7 @@ Add current key and certificate (if valid) to SSH agent on start (default true)
 Location of the configuration that defines global/system config such as the CA
 URL, OIDC IdP configuration and CA trust.
 
-On Linux/BSD/Darwin this is the path to a YAML configuration file and the
+On Linux this is the path to a YAML configuration file and the
 default is `/etc/serverless-ssh-ca/config.yml`.
 
 On Windows this is the registry hive to load the configuration from, either
@@ -68,7 +68,7 @@ Log directory, which contains `tray.log` (when logging to a file) and
 The default is `log` inside the state directory, which is
 `%LOCALAPPDATA%\Serverless SSH CA Client` (Windows),
 `$XDG_STATE_HOME/serverless-ssh-ca` or `$HOME/.local/state/serverless-ssh-ca`
-(Linux/BSD/Darwin) or `$SNAP_USER_COMMON` (snap). The lock file that prevents
+(Linux) or `$SNAP_USER_COMMON` (snap). The lock file that prevents
 more than one instance running is also kept in the state directory.
 
 `--log.file`
