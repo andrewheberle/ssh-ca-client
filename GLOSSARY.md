@@ -29,8 +29,12 @@ A certificate issued by the Trusted CA that has expired but is still held by the
 _Avoid_: Old identity, expired identity, leftover key
 
 **Renewal**:
-Obtaining a new host certificate for the same key and principals by proving possession of the key and a current certificate, which the CA revokes in exchange.
+Obtaining a new host certificate for the same key and principals with a **proof of possession** of the key and a current certificate, which the CA revokes in exchange.
 _Avoid_: Refresh, re-issue
+
+**Proof of possession**:
+A signature made with a key over a timestamp, the key's fingerprint and the request it is sent with, which shows the CA that the client holds that key. It is only valid for that one request, and only briefly (see the CA's [ADR 0006](https://github.com/andrewheberle/serverless-ssh-ca/blob/main/docs/adr/0006-proofs-of-possession-are-bound-to-the-request.md)).
+_Avoid_: PoP, proof, signature
 
 **KRL**:
 A key revocation list signed by the Trusted CA, listing the revoked certificates of one type (user or host).
