@@ -1,3 +1,10 @@
+// Package proof generates and parses the proofs of possession the client
+// sends to the CA, which show that the client holds a private key.
+//
+// A proof is bound to the request it is sent with: it signs the current
+// timestamp, the key's fingerprint and the request's method and path, so it
+// cannot be replayed against another endpoint or with other path parameters.
+// See the CA's ADR 0006 for the format.
 package proof
 
 import (
@@ -13,38 +20,20 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// Proof is a proof of possession made by [GenerateForRequest] or read by
+// [Parse].
 type Proof struct {
 	timestamp   int64
 	fingerprint string
 	signature   *sshsig.Signature
-	data        []byte
 }
 
-// The namespace used for signing the proof
-const Namespace = "proof-of-possession@com.github.serverless-ssh-ca.andrewheberle"
-
-// The namespace used for signing a proof that is bound to a request, which is
-// kept separate from [Namespace] so a proof made for one form can never be
-// accepted as the other
+// RequestNamespace is the SSHSIG namespace a proof is signed in.
 const RequestNamespace = "request-proof-of-possession@com.github.serverless-ssh-ca.andrewheberle"
 
 // getTimestamp is a variable so it can be overridden in tests
 var getTimestamp = func() int64 {
 	return time.Now().UnixMilli()
-}
-
-// Generate creates a proof by signing the current timestamp using SSHSIG
-// and the public key fingerprint with the provided signer.
-//
-// The proof is returned as a string in the format:
-// <timestamp>.<fingerprint>.<base64 armored_signature>
-//
-// This form of proof is used by the v3 API of the CA. See [GenerateForRequest]
-// for the form used by the v4 API.
-func Generate(signer ssh.Signer) (*Proof, error) {
-	return generate(signer, Namespace, func(timestamp int64, fingerprint string) []byte {
-		return data(timestamp, fingerprint)
-	})
 }
 
 // GenerateForRequest creates a proof that is bound to a request, so it cannot
@@ -58,27 +47,22 @@ func Generate(signer ssh.Signer) (*Proof, error) {
 // "/api/v4/user/certificates/12345678901234567890".
 //
 // The signed data is "<timestamp>.<fingerprint>.<METHOD> <path>" and the proof
-// is returned in the same format as [Generate].
+// is returned as a string in the format:
+// <timestamp>.<fingerprint>.<base64 armored_signature>
 func GenerateForRequest(signer ssh.Signer, method, path string) (*Proof, error) {
-	return generate(signer, RequestNamespace, func(timestamp int64, fingerprint string) []byte {
-		return requestData(timestamp, fingerprint, method, path)
-	})
-}
-
-func generate(signer ssh.Signer, namespace string, signed func(timestamp int64, fingerprint string) []byte) (*Proof, error) {
 	// generate data to sign
 	timestamp := getTimestamp()
 	fingerprint := ssh.FingerprintSHA256(signer.PublicKey())
-	data := signed(timestamp, fingerprint)
+	data := requestData(timestamp, fingerprint, method, path)
 
 	// generate signature of data
-	sig, err := sshsig.Sign(bytes.NewReader(data), signer, sshsig.HashSHA512, namespace)
+	sig, err := sshsig.Sign(bytes.NewReader(data), signer, sshsig.HashSHA512, RequestNamespace)
 	if err != nil {
 		return nil, err
 	}
 
 	// return encoded data
-	return &Proof{timestamp: timestamp, fingerprint: fingerprint, signature: sig, data: data}, nil
+	return &Proof{timestamp: timestamp, fingerprint: fingerprint, signature: sig}, nil
 }
 
 // Parse takes a proof string and validates it is in the expected format, returning a Proof struct if valid.
@@ -88,15 +72,11 @@ func Parse(proof string) (Proof, error) {
 		return Proof{}, fmt.Errorf("invalid proof format: %v", err)
 	}
 
-	return Proof{timestamp: timestamp, fingerprint: fingerprint, signature: signature, data: data(timestamp, fingerprint)}, nil
-}
-
-func data(timestamp int64, fingerprint string) []byte {
-	return fmt.Appendf(nil, "%d.%s", timestamp, fingerprint)
+	return Proof{timestamp: timestamp, fingerprint: fingerprint, signature: signature}, nil
 }
 
 func requestData(timestamp int64, fingerprint, method, path string) []byte {
-	return fmt.Appendf(data(timestamp, fingerprint), ".%s %s", strings.ToUpper(method), path)
+	return fmt.Appendf(nil, "%d.%s.%s %s", timestamp, fingerprint, strings.ToUpper(method), path)
 }
 
 func parse(proof string) (timestamp int64, fingerprint string, signature *sshsig.Signature, err error) {
@@ -129,24 +109,12 @@ func parse(proof string) (timestamp int64, fingerprint string, signature *sshsig
 	return timestamp, fingerprint, signature, nil
 }
 
-// Verify checks the proof is valid by verifying the signature and that the timestamp is within the allowed range.
-//
-// This verifies a proof made by [Generate]. See [Proof.VerifyRequest] to
-// verify a proof made by [GenerateForRequest].
-func (p Proof) Verify(pub ssh.PublicKey, allowedrange time.Duration) error {
-	return p.verify(pub, allowedrange, data(p.timestamp, p.fingerprint), Namespace)
-}
-
 // VerifyRequest checks the proof is valid for the request with the provided
 // method and path by verifying the signature and that the timestamp is within
 // the allowed range.
 //
 // This verifies a proof made by [GenerateForRequest].
 func (p Proof) VerifyRequest(pub ssh.PublicKey, method, path string, allowedrange time.Duration) error {
-	return p.verify(pub, allowedrange, requestData(p.timestamp, p.fingerprint, method, path), RequestNamespace)
-}
-
-func (p Proof) verify(pub ssh.PublicKey, allowedrange time.Duration, data []byte, namespace string) error {
 	// verify timestamp is within allowed range (this is to prevent replay attacks, but allows for some clock skew between client and server)
 	proofTime := time.UnixMilli(p.timestamp)
 	now := getTimestamp()
@@ -161,7 +129,8 @@ func (p Proof) verify(pub ssh.PublicKey, allowedrange time.Duration, data []byte
 	}
 
 	// verify signature
-	if err := sshsig.Verify(bytes.NewReader(data), p.signature, pub, sshsig.HashSHA512, namespace); err != nil {
+	data := requestData(p.timestamp, p.fingerprint, method, path)
+	if err := sshsig.Verify(bytes.NewReader(data), p.signature, pub, sshsig.HashSHA512, RequestNamespace); err != nil {
 		return fmt.Errorf("signature did not verify: %v", err)
 	}
 

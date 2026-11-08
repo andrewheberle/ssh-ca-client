@@ -13,7 +13,7 @@ import (
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/httpclient"
-	"github.com/andrewheberle/ssh-ca-client/pkg/proof"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/proof"
 	"golang.org/x/crypto/ssh"
 )
 

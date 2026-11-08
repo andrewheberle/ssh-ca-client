@@ -13,7 +13,7 @@ Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 - `internal/pkg/api/` - generated OpenAPI primitives to interact with the server implementation. Do not edit `api.gen.go` or `openapi.json`; `openapi.json` is copied from the CA package pinned in `internal/e2e/testdata/ca/package.json` and CI checks it matches, so update both with `npm run sync-schema --prefix internal/e2e/testdata/ca`.
 - `internal/pkg/cli/` - primary package used by the CLI
 - `internal/pkg/gui/` - primary package used by the GUI
-- `pkg/` - application packages; importable by others
+- There is no `pkg/`: all packages live under `internal/`, so the module has no importable Go API. A public package becomes part of the semver promise, so add one only when the maintainer explicitly asks
 - `policy/` - Group Policy Object's for Windows to manage GUI on Windows; included in MSI build
 - `snap/` - Snap specific scripts and files
 - `systemd/` - Systemd units for host key renewals and the user KRL; included in APT package
@@ -32,7 +32,7 @@ Run these before considering any change complete:
 
 ## Code conventions
 - Go version: [1.26], per `go.mod`. Don't bump it unless asked.
-- Go toolchain: the `toolchain` line in `go.mod` pins the Go used by CI and releases (see `docs/adr/0001`). Renovate updates it; don't change it by hand unless asked. Moving the `go` line changes `GODEBUG` defaults and the minimum Go for modules importing `pkg/`, so it only moves when asked, after reviewing that Go version's `GODEBUG` changes.
+- Go toolchain: the `toolchain` line in `go.mod` pins the Go used by CI and releases (see `docs/adr/0001`). Renovate updates it; don't change it by hand unless asked. Moving the `go` line changes `GODEBUG` defaults, so it only moves when asked, after reviewing that Go version's `GODEBUG` changes.
 - Logging: use `log/slog` with structured key/value attributes. No `fmt.Println` or `log.Printf` in service code.
 - Errors: wrap with `fmt.Errorf("doing x: %w", err)`. Return errors rather than logging and continuing, unless at the top level or the parent contains a `*slog.Logger`.
 - Context: pass `context.Context` as the first parameter for anything doing I/O; respect cancellation.

@@ -31,7 +31,7 @@ import (
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/httpclient"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/krl"
-	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/sshkey"
 	sshkrl "github.com/forfuncsake/krl"
 	"github.com/go-jose/go-jose/v4"
 	"github.com/go-jose/go-jose/v4/jwt"
