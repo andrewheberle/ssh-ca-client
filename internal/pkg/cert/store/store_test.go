@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
-	"github.com/andrewheberle/ssh-ca-client/pkg/sshkey"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/sshkey"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
 )

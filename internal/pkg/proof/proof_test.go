@@ -20,7 +20,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func TestGenerate(t *testing.T) {
+func TestGenerateForRequest_KeyTypes(t *testing.T) {
 	rsaKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		panic(err)
@@ -50,6 +50,16 @@ func TestGenerate(t *testing.T) {
 
 	// set known timestamp for testing by overriding getTimestamp function
 	now := time.Now()
+	t.Cleanup(func() {
+		getTimestamp = func() int64 {
+			return time.Now().UnixMilli()
+		}
+	})
+
+	const (
+		method = "POST"
+		path   = "/api/v4/user/certificates"
+	)
 
 	tests := []struct {
 		name    string
@@ -67,71 +77,71 @@ func TestGenerate(t *testing.T) {
 		}
 
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := Generate(tt.signer)
+			got, gotErr := GenerateForRequest(tt.signer, method, path)
 			if gotErr != nil {
 				if !tt.wantErr {
-					t.Errorf("Generate() failed: %v", gotErr)
+					t.Errorf("GenerateForRequest() failed: %v", gotErr)
 				}
 				return
 			}
 			if tt.wantErr {
-				t.Fatal("Generate() succeeded unexpectedly")
+				t.Fatal("GenerateForRequest() succeeded unexpectedly")
 			}
 
 			// no verification, just make sure it looks right
 			parts := strings.Split(got.String(), ".")
 			if len(parts) != 3 {
-				t.Fatalf("Generate() generated wrong number of parts: %v", len(parts))
+				t.Fatalf("GenerateForRequest() generated wrong number of parts: %v", len(parts))
 			}
 
 			// check timestamp seems ok
 			ms, err := strconv.ParseInt(parts[0], 10, 64)
 			if err != nil {
-				t.Fatalf("Generate() timestamp was not an integer: %v", err)
+				t.Fatalf("GenerateForRequest() timestamp was not an integer: %v", err)
 			}
 			ts := time.Unix(ms/1000, (ms%1000)*1000000)
 			if ts.UnixMilli() != now.UnixMilli() {
-				t.Fatalf("Generate() timestamp did not match expected: %v", ts)
+				t.Fatalf("GenerateForRequest() timestamp did not match expected: %v", ts)
 			}
 
 			// check signature format is expected and can be parsed back manually
 			signature, err := base64.StdEncoding.DecodeString(parts[2])
 			if err != nil {
-				t.Fatalf("Generate() signature was not base64: %v", err)
+				t.Fatalf("GenerateForRequest() signature was not base64: %v", err)
 			}
 			sig, err := sshsig.Unarmor(signature)
 			if err != nil {
-				t.Fatalf("Generate() could not dearmor signature: %v", err)
+				t.Fatalf("GenerateForRequest() could not dearmor signature: %v", err)
 			}
 			if err := sshsig.Verify(
-				bytes.NewReader(fmt.Appendf(nil, "%d.%s", ms, parts[1])),
+				bytes.NewReader(fmt.Appendf(nil, "%d.%s.%s %s", ms, parts[1], method, path)),
 				sig,
 				tt.signer.PublicKey(),
 				sshsig.HashSHA512,
-				Namespace,
+				RequestNamespace,
 			); err != nil {
-				t.Fatalf("Generate() signature did not verify: %v", err)
+				t.Fatalf("GenerateForRequest() signature did not verify: %v", err)
 			}
 
 			// check it can be verfied
-			if err := got.Verify(tt.signer.PublicKey(), 5*time.Minute); err != nil {
-				t.Fatalf("Proof.Verify() failed: %v", err)
+			if err := got.VerifyRequest(tt.signer.PublicKey(), method, path, 5*time.Minute); err != nil {
+				t.Fatalf("Proof.VerifyRequest() failed: %v", err)
 			}
 
 			// check it fails if we change getTimestamp to be far in the past
 			getTimestamp = func() int64 {
 				return now.Add(-10 * time.Minute).UnixMilli()
 			}
-			if err := got.Verify(tt.signer.PublicKey(), 5*time.Minute); err == nil {
-				t.Fatal("Proof.Verify() succeeded unexpectedly with old timestamp")
+			if err := got.VerifyRequest(tt.signer.PublicKey(), method, path, 5*time.Minute); err == nil {
+				t.Fatal("Proof.VerifyRequest() succeeded unexpectedly with old timestamp")
 			}
 
 			// check it fails if we change getTimestamp to be far in the future
 			getTimestamp = func() int64 {
 				return now.Add(10 * time.Minute).UnixMilli()
 			}
-			if err := got.Verify(tt.signer.PublicKey(), 5*time.Minute); err == nil {
-				t.Fatal("Proof.Verify() succeeded unexpectedly with future timestamp")
+			if err := got.VerifyRequest(tt.signer.PublicKey(), method, path, 5*time.Minute); err == nil {
+				t.Fatal("Proof.VerifyRequest() succeeded unexpectedly with future timestamp")
 			}
 		})
 	}
@@ -217,19 +227,18 @@ func TestGenerateForRequest(t *testing.T) {
 		})
 	}
 
-	// the two forms of proof must not be accepted as each other
-	t.Run("not a plain proof", func(t *testing.T) {
-		if err := got.Verify(signer.PublicKey(), 5*time.Minute); err == nil {
-			t.Fatal("Proof.Verify() succeeded unexpectedly for a request proof")
-		}
-	})
-	t.Run("plain proof is not a request proof", func(t *testing.T) {
-		plain, err := Generate(signer)
+	// a proof in the removed v3 form, which signed only the timestamp and
+	// fingerprint in another namespace, must never be accepted
+	t.Run("v3 proof is not a request proof", func(t *testing.T) {
+		const v3Namespace = "proof-of-possession@com.github.serverless-ssh-ca.andrewheberle"
+		fingerprint := ssh.FingerprintSHA256(signer.PublicKey())
+		v3Sig, err := sshsig.Sign(bytes.NewReader(fmt.Appendf(nil, "%d.%s", now.UnixMilli(), fingerprint)), signer, sshsig.HashSHA512, v3Namespace)
 		if err != nil {
-			t.Fatalf("Generate() failed: %v", err)
+			t.Fatalf("sshsig.Sign() failed: %v", err)
 		}
-		if err := plain.VerifyRequest(signer.PublicKey(), method, path, 5*time.Minute); err == nil {
-			t.Fatal("Proof.VerifyRequest() succeeded unexpectedly for a plain proof")
+		v3 := Proof{timestamp: now.UnixMilli(), fingerprint: fingerprint, signature: v3Sig}
+		if err := v3.VerifyRequest(signer.PublicKey(), method, path, 5*time.Minute); err == nil {
+			t.Fatal("Proof.VerifyRequest() succeeded unexpectedly for a v3 proof")
 		}
 	})
 
@@ -290,7 +299,7 @@ func TestProof_String(t *testing.T) {
 		return 12345
 	}
 
-	proof, err := Generate(ecdsaSigner)
+	proof, err := GenerateForRequest(ecdsaSigner, "GET", "/api/v4/user/certificates")
 	if err != nil {
 		panic(err)
 	}
@@ -338,7 +347,7 @@ func TestProof_MarshalJSON(t *testing.T) {
 		return 12345
 	}
 
-	proof, err := Generate(ecdsaSigner)
+	proof, err := GenerateForRequest(ecdsaSigner, "GET", "/api/v4/user/certificates")
 	if err != nil {
 		panic(err)
 	}

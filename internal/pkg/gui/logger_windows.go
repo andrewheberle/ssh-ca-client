@@ -4,7 +4,7 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/andrewheberle/ssh-ca-client/pkg/winevent"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/winevent"
 )
 
 // Sets up a new [slog.Handler] using either [winevent.NewHandler],
