@@ -133,11 +133,18 @@ func (idp *testIDP) claims(email string, groups ...string) map[string]any {
 	return claims
 }
 
-// sign returns a JWT for claims
+// sign returns a JWT for claims. Each JWT has its own random jti, unless
+// claims sets one, so no two tokens are the same string, as with a real IdP:
+// the CA refuses an identity token sent as the access token.
 func (idp *testIDP) sign(t *testing.T, claims map[string]any) string {
 	t.Helper()
 
-	token, err := jwt.Signed(idp.signer).Claims(claims).Serialize()
+	withID := maps.Clone(claims)
+	if _, ok := withID["jti"]; !ok {
+		withID["jti"] = rand.Text()
+	}
+
+	token, err := jwt.Signed(idp.signer).Claims(withID).Serialize()
 	if err != nil {
 		t.Fatalf("signing token: %v", err)
 	}
@@ -145,13 +152,14 @@ func (idp *testIDP) sign(t *testing.T, claims map[string]any) string {
 	return token
 }
 
-// tokens returns valid access and identity tokens for email
+// tokens returns valid access and identity tokens for email, which are
+// separate tokens with the same claims
 func (idp *testIDP) tokens(t *testing.T, email string, groups ...string) *auth.Tokens {
 	t.Helper()
 
-	token := idp.sign(t, idp.claims(email, groups...))
+	claims := idp.claims(email, groups...)
 
-	return &auth.Tokens{Access: token, Identity: token}
+	return &auth.Tokens{Access: idp.sign(t, claims), Identity: idp.sign(t, claims)}
 }
 
 // staticAuth is an [auth.Handler] that returns fixed tokens
