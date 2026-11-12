@@ -301,8 +301,7 @@ func TestUserCertificate_Rejected(t *testing.T) {
 			tokens: func(t *testing.T, idp *testIDP) *auth.Tokens {
 				claims := idp.claims("alice@example.com")
 				claims["exp"] = time.Now().Add(-time.Minute).Unix()
-				token := idp.sign(t, claims)
-				return &auth.Tokens{Access: token, Identity: token}
+				return &auth.Tokens{Access: idp.sign(t, claims), Identity: idp.sign(t, claims)}
 			},
 			wantCode:   http.StatusBadRequest,
 			wantReason: "the access token has expired",
@@ -312,8 +311,7 @@ func TestUserCertificate_Rejected(t *testing.T) {
 			tokens: func(t *testing.T, idp *testIDP) *auth.Tokens {
 				claims := idp.claims("alice@example.com")
 				claims["iss"] = "https://idp.example.com"
-				token := idp.sign(t, claims)
-				return &auth.Tokens{Access: token, Identity: token}
+				return &auth.Tokens{Access: idp.sign(t, claims), Identity: idp.sign(t, claims)}
 			},
 			wantCode:   http.StatusBadRequest,
 			wantReason: "claim validation of the JWT failed",
@@ -336,8 +334,7 @@ func TestUserCertificate_Rejected(t *testing.T) {
 			tokens: func(t *testing.T, idp *testIDP) *auth.Tokens {
 				claims := idp.claims("alice@example.com")
 				delete(claims, "email")
-				token := idp.sign(t, claims)
-				return &auth.Tokens{Access: token, Identity: token}
+				return &auth.Tokens{Access: idp.sign(t, claims), Identity: idp.sign(t, claims)}
 			},
 			wantCode:   http.StatusBadRequest,
 			wantReason: "missing required email claim",
@@ -345,8 +342,8 @@ func TestUserCertificate_Rejected(t *testing.T) {
 		{
 			name: "signed by untrusted key",
 			tokens: func(t *testing.T, idp *testIDP) *auth.Tokens {
-				token := other.sign(t, idp.claims("alice@example.com"))
-				return &auth.Tokens{Access: token, Identity: token}
+				claims := idp.claims("alice@example.com")
+				return &auth.Tokens{Access: other.sign(t, claims), Identity: other.sign(t, claims)}
 			},
 			wantCode:   http.StatusBadRequest,
 			wantReason: "the access token signature verification failed",
