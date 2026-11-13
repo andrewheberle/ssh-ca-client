@@ -474,6 +474,25 @@ The renewal unit reloads `ssh.service` when a certificate was renewed, which is
 the name of the OpenSSH server unit on Debian and Ubuntu. If you copy the unit
 to RHEL or a derivative, change it to `sshd.service`.
 
+The units run sandboxed. The two system units can only write to `/etc/ssh`,
+where host certificates and the user KRL are written. If a drop-in renews keys
+or writes a KRL elsewhere, or the reload command writes outside `/etc/ssh`,
+add the directory to the drop-in, for example:
+
+```sh
+sudo systemctl edit host-ssh-certificate-renewal.service
+```
+
+```ini
+[Service]
+ReadWritePaths=/srv/ssh
+```
+
+The reload command runs inside the renewal unit's sandbox, which still allows
+it to use `sudo`, capabilities and runtimes that compile code at run time. The
+user unit only restricts system calls and address families, as other
+sandboxing needs unprivileged user namespaces, which some systems disable.
+
 #### Command Line Options
 
 The `host` sub-command supports the following command-line options:

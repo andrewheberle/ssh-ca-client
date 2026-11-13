@@ -4,3 +4,18 @@ Description=Refresh SSH Host Certificate Revocation List
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/ssh-ca-client-cli krl --host --out %h/.ssh/revocation_list
+
+# Sandboxing. Only options a user manager applies without user namespaces are
+# set. ProtectSystem=, PrivateTmp= and the like need them, and where
+# unprivileged user namespaces are disabled (for example by AppArmor on Ubuntu
+# 24.04) the unit would fail to start.
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
