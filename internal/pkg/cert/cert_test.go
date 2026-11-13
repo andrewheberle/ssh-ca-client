@@ -95,6 +95,62 @@ func signCert(t *testing.T, ca ssh.Signer, key crypto.Signer, validAfter, validB
 	return c
 }
 
+// claimSigner sets the signer that c names to ca, without signing c again
+func claimSigner(c *ssh.Certificate, ca ssh.PublicKey) *ssh.Certificate {
+	c.SignatureKey = ca
+
+	return c
+}
+
+// extendValidity sets the end of c's validity period to validBefore, without
+// signing c again
+func extendValidity(c *ssh.Certificate, validBefore uint64) *ssh.Certificate {
+	c.ValidBefore = validBefore
+
+	return c
+}
+
+func TestCheckIssued(t *testing.T) {
+	ca := newCA(t)
+	key := newKey(t, elliptic.P256())
+	now := uint64(time.Now().Unix())
+
+	host := func(principals ...string) *ssh.Certificate {
+		c := signCert(t, ca, key, now-60, now+3600)
+		c.CertType = ssh.HostCert
+		c.ValidPrincipals = principals
+		return c
+	}
+
+	tests := []struct {
+		name       string
+		cert       *ssh.Certificate
+		certType   uint32
+		principals []string
+		wantErr    error
+	}{
+		{"user certificate", signCert(t, ca, key, now-60, now+3600), ssh.UserCert, nil, nil},
+		{"host certificate", host("a", "b"), ssh.HostCert, []string{"a", "b"}, nil},
+		{"principals in another order", host("b", "a"), ssh.HostCert, []string{"a", "b"}, nil},
+		{"duplicate requested principal", host("a", "b"), ssh.HostCert, []string{"a", "b", "a"}, nil},
+		{"principals not checked", host("other"), ssh.HostCert, nil, nil},
+		{"host certificate when user wanted", host("a"), ssh.UserCert, nil, ErrUnexpectedCertificateType},
+		{"user certificate when host wanted", signCert(t, ca, key, now-60, now+3600), ssh.HostCert, []string{"test"}, ErrUnexpectedCertificateType},
+		{"missing principal", host("a"), ssh.HostCert, []string{"a", "b"}, ErrUnexpectedPrincipals},
+		{"extra principal", host("a", "b", "*"), ssh.HostCert, []string{"a", "b"}, ErrUnexpectedPrincipals},
+		{"different principal", host("other"), ssh.HostCert, []string{"a"}, ErrUnexpectedPrincipals},
+		{"no principals", host(), ssh.HostCert, []string{"a"}, ErrUnexpectedPrincipals},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := checkIssued(tt.cert, tt.certType, tt.principals)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("checkIssued() error = %v, want %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestCertificateValid(t *testing.T) {
 	ca := newCA(t)
 	otherCA := newCA(t)
@@ -103,6 +159,10 @@ func TestCertificateValid(t *testing.T) {
 	p384Key := newKey(t, elliptic.P384())
 	edKey := newTypedKey(t, sshkey.KeyTypeEd25519)
 	rsaKey := newTypedKey(t, sshkey.KeyTypeRSA)
+	rsaCA, err := ssh.NewSignerFromSigner(newTypedKey(t, sshkey.KeyTypeRSA))
+	if err != nil {
+		t.Fatalf("could not create RSA CA signer: %v", err)
+	}
 
 	// offsets from now are kept a few seconds away from the boundaries so
 	// the tests are not affected by the clock ticking over during the test
@@ -248,6 +308,35 @@ func TestCertificateValid(t *testing.T) {
 			key:     key,
 			cert:    signCert(t, otherCA, otherKey, at(-time.Minute), at(time.Hour)),
 			wantErr: ErrUnexpectedCertificateAuthority,
+		},
+		{
+			name: "valid with rsa certificate authority",
+			ca:   rsaCA.PublicKey(),
+			key:  key,
+			cert: signCert(t, rsaCA, key, at(-time.Minute), at(time.Hour)),
+		},
+		{
+			// the certificate names the CA as its signer, but another key
+			// signed it
+			name:    "signed by another key claiming to be the certificate authority",
+			ca:      ca.PublicKey(),
+			key:     key,
+			cert:    claimSigner(signCert(t, otherCA, key, at(-time.Minute), at(time.Hour)), ca.PublicKey()),
+			wantErr: ErrCertificateSignature,
+		},
+		{
+			name:    "changed after signing",
+			ca:      ca.PublicKey(),
+			key:     key,
+			cert:    extendValidity(signCert(t, ca, key, at(-time.Minute), at(time.Hour)), ssh.CertTimeInfinity),
+			wantErr: ErrCertificateSignature,
+		},
+		{
+			name:    "signature checked before key",
+			ca:      ca.PublicKey(),
+			key:     key,
+			cert:    claimSigner(signCert(t, otherCA, otherKey, at(-time.Minute), at(time.Hour)), ca.PublicKey()),
+			wantErr: ErrCertificateSignature,
 		},
 	}
 	for _, tt := range tests {
