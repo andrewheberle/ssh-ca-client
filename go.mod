@@ -16,6 +16,7 @@ require (
 	github.com/forfuncsake/krl v0.1.0
 	github.com/gen2brain/beeep v0.11.3
 	github.com/go-jose/go-jose/v4 v4.1.9
+	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/gorilla/securecookie v1.1.2
 	github.com/gorilla/sessions v1.4.0
 	github.com/hiddeco/sshsig v0.2.0
@@ -48,7 +49,6 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-openapi/jsonpointer v0.23.1 // indirect
 	github.com/go-openapi/swag/jsonname v0.26.0 // indirect
-	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/gohugoio/gift v0.2.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect

@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/knadh/koanf/v2"
@@ -76,8 +77,37 @@ func loadRegistryKey(k *koanf.Koanf, key registry.Key, path string) error {
 	}
 	_ = rk.Close()
 
-	return k.Load(winreg.Provider(winreg.Config{Key: key, Path: path, MaxDepth: 2}), nil)
+	raw := koanf.New(".")
+	if err := raw.Load(winreg.Provider(winreg.Config{Key: key, Path: path, MaxDepth: 2}), nil); err != nil {
+		return err
+	}
+
+	// registry names are case insensitive, so they are lower-cased to match
+	// the configuration keys, and a policy value replaces the config value
+	// however either is written
+	values := koanf.New(".")
+	for name, value := range raw.All() {
+		name = strings.ToLower(name)
+
+		// the MSI writes values to the config key that are not
+		// configuration, and existing installs keep them, so they are
+		// ignored
+		if slices.Contains(ignoredRegistryValues, name) {
+			continue
+		}
+
+		if err := values.Set(name, value); err != nil {
+			return fmt.Errorf("reading %s: %w", name, err)
+		}
+	}
+
+	return k.Merge(values)
 }
+
+// ignoredRegistryValues are values in the config key that are not
+// configuration. installed0 is the per-user marker for the Start menu
+// shortcut that the MSI writes under HKCU (templates/product.wxs).
+var ignoredRegistryValues = []string{"installed0"}
 
 // ConfigPath returns the default config location, which on Windows is the
 // HKLM registry hive.

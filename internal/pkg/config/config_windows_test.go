@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"testing"
@@ -11,6 +12,7 @@ import (
 
 // errAny is used in tests where an error is expected but its specific value
 // is not checked
+var errAny = errors.New("any error")
 
 func TestConfigPath(t *testing.T) {
 	if got := ConfigPath(); got != "HKLM" {
@@ -84,6 +86,8 @@ func createTestKey(t *testing.T, path string, values map[string]any) {
 			err = k.SetStringValue(name, v)
 		case []string:
 			err = k.SetStringsValue(name, v)
+		case uint32:
+			err = k.SetDWordValue(name, v)
 		default:
 			t.Fatalf("unsupported value type %T for %q", value, name)
 		}
@@ -118,6 +122,25 @@ func Test_loadRegistryConfig(t *testing.T) {
 			wantIssuer: "https://idp.example.com/",
 		},
 		{
+			// registry names are case insensitive
+			name:       "names in another case",
+			config:     map[string]any{"Client_ID": "config", "ISSUER": "https://config.example.com/"},
+			policy:     map[string]any{"CLIENT_ID": "policy"},
+			wantClient: "policy",
+			wantIssuer: "https://config.example.com/",
+		},
+		{
+			name:       "installer value in another case ignored",
+			config:     map[string]any{"client_id": "config", "Installed0": uint32(1)},
+			wantClient: "config",
+		},
+		{
+			// the MSI writes installed0 under the HKCU config key
+			name:       "installer value ignored",
+			config:     map[string]any{"client_id": "config", "installed0": uint32(1)},
+			wantClient: "config",
+		},
+		{
 			name:       "policy applied over config",
 			config:     map[string]any{"client_id": "config", "issuer": "https://config.example.com/"},
 			policy:     map[string]any{"client_id": "policy"},
@@ -149,6 +172,9 @@ func Test_loadRegistryConfig(t *testing.T) {
 			}
 			if got := k.Strings("scopes"); !slices.Equal(got, tt.wantScopes) {
 				t.Errorf("scopes = %q, want %q", got, tt.wantScopes)
+			}
+			if err := checkKeys(k.Keys()); err != nil {
+				t.Errorf("checkKeys() error = %v, want nil", err)
 			}
 		})
 	}
