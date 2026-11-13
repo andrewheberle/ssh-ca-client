@@ -27,9 +27,10 @@ The following configuration options must be set:
     # The SSH public key of the CA, used to validate issued certificates are from the expected CA
     trusted_ca: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMgJTsYW+tHl0lz/rnO8djbwq0B3uZ5sGugXU6Ha5S2rTdzMDgit2DO+hoivdT4I07rMrRtmFI179wUY06gIf00=
 
-Keys must be spelt exactly as shown, and an unknown key is an error. ca_url and
-issuer must use https unless the host is localhost or a loopback address, and
-trusted_ca holds exactly one key.
+Keys must be spelt exactly as shown (registry value names on Windows are case
+insensitive), and an unknown key is an error. ca_url and issuer must use https
+unless the host is localhost or a loopback address, and trusted_ca holds
+exactly one key.
 
 The users SSH private key, certificate and OIDC refresh token (if available)
 are stored in the operating system keyring (Windows Credential Manager, macOS

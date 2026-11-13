@@ -120,6 +120,19 @@ func Test_loadRegistryConfig(t *testing.T) {
 			wantIssuer: "https://idp.example.com/",
 		},
 		{
+			// registry names are case insensitive
+			name:       "names in another case",
+			config:     map[string]any{"Client_ID": "config", "ISSUER": "https://config.example.com/"},
+			policy:     map[string]any{"CLIENT_ID": "policy"},
+			wantClient: "policy",
+			wantIssuer: "https://config.example.com/",
+		},
+		{
+			name:       "installer value in another case ignored",
+			config:     map[string]any{"client_id": "config", "Installed0": uint32(1)},
+			wantClient: "config",
+		},
+		{
 			// the MSI writes installed0 under the HKCU config key
 			name:       "installer value ignored",
 			config:     map[string]any{"client_id": "config", "installed0": uint32(1)},

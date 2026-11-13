@@ -192,9 +192,9 @@ On Linux/BSD/Darwin this is a YAML file, by default
 `/etc/serverless-ssh-ca/config.yml`, however this may also be overidden using
 the `--config` command line flag.
 
-Keys must be spelt exactly as shown, in lower case. An unknown key is an error
-rather than being ignored, so a misspelt key cannot silently leave a setting at
-its default. Values must have the type shown: `scopes` is a list, and a
+Keys must be spelt exactly as shown, in lower case (registry value names on
+Windows are case insensitive). An unknown key is an error rather than being
+ignored, so a misspelt key cannot silently leave a setting at its default. Values must have the type shown: `scopes` is a list, and a
 `client_id` that YAML would read as a number must be quoted. `ca_url` and
 `issuer` must use `https` unless the host is `localhost` or a loopback address,
 and `trusted_ca` holds exactly one key.
