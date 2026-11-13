@@ -23,15 +23,15 @@ ssh-ca-client-cli version --json
 ### Options
 
 ```
-  -h, --help   help for version
-      --json   Output as JSON
+  -h, --help[=true|false]   help for version
+      --json[=true|false]   Output as JSON
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
-      --debug           Enable debug logging
+      --config string        Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug[=true|false]   Enable debug logging
 ```
 
 ### SEE ALSO

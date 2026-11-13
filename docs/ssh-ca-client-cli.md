@@ -41,10 +41,10 @@ ssh-ca-client-cli [command] [flags]
 ### Options
 
 ```
-      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
-      --debug           Enable debug logging
-  -h, --help            help for ssh-ca-client-cli
-      --json            Enable JSON logging
+      --config string        Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug[=true|false]   Enable debug logging
+  -h, --help[=true|false]    help for ssh-ca-client-cli
+      --json[=true|false]    Enable JSON logging
 ```
 
 ### SEE ALSO

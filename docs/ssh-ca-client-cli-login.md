@@ -41,19 +41,19 @@ ssh-ca-client-cli login --life 1h
 ### Options
 
 ```
-      --add             Add existing certificate to SSH agent
-      --force           Force renewal even if current certificate has more than 50% validity left
-  -h, --help            help for login
-      --life duration   Lifetime of SSH certificate (default 24h0m0s)
-      --skip-agent      Skip adding SSH key and certificate to ssh-agent
+      --add[=true|false]          Add existing certificate to SSH agent
+      --force[=true|false]        Force renewal even if current certificate has more than 50% validity left
+  -h, --help[=true|false]         help for login
+      --life duration             Lifetime of SSH certificate (default 24h0m0s)
+      --skip-agent[=true|false]   Skip adding SSH key and certificate to ssh-agent
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
-      --debug           Enable debug logging
-      --json            Enable JSON logging
+      --config string        Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug[=true|false]   Enable debug logging
+      --json[=true|false]    Enable JSON logging
 ```
 
 ### SEE ALSO

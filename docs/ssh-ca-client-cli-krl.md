@@ -51,17 +51,17 @@ ssh-ca-client-cli krl --host --out /home/example/.ssh/revocation_list
 ### Options
 
 ```
-  -h, --help         help for krl
-      --host         Retrieve host KRL instead of user KRL
-  -f, --out string   Output file for KRL
+  -h, --help[=true|false]   help for krl
+      --host[=true|false]   Retrieve host KRL instead of user KRL
+  -f, --out string          Output file for KRL
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
-      --debug           Enable debug logging
-      --json            Enable JSON logging
+      --config string        Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug[=true|false]   Enable debug logging
+      --json[=true|false]    Enable JSON logging
 ```
 
 ### SEE ALSO

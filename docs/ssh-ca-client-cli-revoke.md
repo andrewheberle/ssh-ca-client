@@ -66,20 +66,20 @@ ssh-ca-client-cli revoke --host --key /etc/ssh/ssh_host_ed25519_key --serial 123
 ### Options
 
 ```
-  -h, --help                    help for revoke
-      --host                    Revoke host certificates instead of the user certificate
+  -h, --help[=true|false]       help for revoke
+      --host[=true|false]       Revoke host certificates instead of the user certificate
       --key strings             Path to host private key(s) whose certificates are revoked with --host (default [/etc/ssh/ssh_host_ed25519_key,/etc/ssh/ssh_host_ecdsa_key,/etc/ssh/ssh_host_rsa_key])
       --reload-command string   Command run with /bin/sh -c once host certificates have changed, such as to reload sshd (with --host)
       --serial strings          Revoke these certificate serial numbers instead of the current certificate
-  -y, --yes                     Revoke without asking for confirmation
+  -y, --yes[=true|false]        Revoke without asking for confirmation
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
-      --debug           Enable debug logging
-      --json            Enable JSON logging
+      --config string        Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug[=true|false]   Enable debug logging
+      --json[=true|false]    Enable JSON logging
 ```
 
 ### SEE ALSO
