@@ -117,6 +117,19 @@ func TestDecodeConfig_Registry(t *testing.T) {
 			want:   want(nil),
 		},
 		{
+			// an enabled Policy left empty does not replace the setting
+			name:   "empty policy values",
+			config: required(map[string]any{"scopes": []string{"openid"}}),
+			policy: map[string]any{"client_id": "", "issuer": "  ", "scopes": []string{}},
+			want:   want(func(c *ClientConfig) { c.Scopes = []string{"openid"} }),
+		},
+		{
+			// an empty value does not replace a default either
+			name:   "empty redirect url",
+			config: required(map[string]any{"redirect_url": ""}),
+			want:   want(nil),
+		},
+		{
 			name:    "unknown value",
 			config:  required(map[string]any{"foo_bar": "1"}),
 			wantErr: ErrUnknownKey,

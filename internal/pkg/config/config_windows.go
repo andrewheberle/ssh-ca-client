@@ -96,6 +96,12 @@ func loadRegistryKey(k *koanf.Koanf, key registry.Key, path string) error {
 			continue
 		}
 
+		// an empty value, such as a Policy enabled but left empty, is
+		// treated as not set
+		if emptyValue(value) {
+			continue
+		}
+
 		if err := values.Set(name, value); err != nil {
 			return fmt.Errorf("reading %s: %w", name, err)
 		}

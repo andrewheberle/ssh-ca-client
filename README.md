@@ -238,6 +238,18 @@ ADMX/ADML files in the `policy` sub-directory of this repository. These files
 are also installed by the MSI into a `policy` sub-directory of the install
 location (by default `C:\Program Files\Serverless SSH CA Client\policy`).
 
+Each setting must have a value when its policy is enabled. An empty registry
+value, in either the configuration or the Group Policy key, is treated as not
+set.
+
+The ADMX namespace includes the version of the release that last changed the
+templates, currently `SSHCAClient_v1.0.0` (see
+[ADR 0003](docs/adr/0003-admx-namespace-carries-the-version-of-the-last-template-change.md)).
+Intune can't import a changed template under a namespace it already has, so
+after a release that changes the templates, import them as a new template in
+Intune. The registry value names don't change, so settings already applied
+keep working.
+
 The GUI and CLI store persistent user data such as the users private key,
 refresh token (if available) and certificate in the operating system keyring
 (Windows Credential Manager, macOS Keychain or a Secret Service provider such
