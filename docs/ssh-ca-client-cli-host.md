@@ -74,7 +74,7 @@ ssh-ca-client-cli host --renew --reload-command "systemctl try-reload-or-restart
       --principals strings      Principals to add to the host certificate request (default [<hostname>])
       --reload-command string   Command run with /bin/sh -c once host certificates have changed, such as to reload sshd
       --renew[=true|false]      Renew existing certificate
-      --renewat float           Renew once this fraction (0 to 1) of the certificate lifetime has passed (default 0.5)
+      --renew-at float          Renew once this fraction (0 to 1) of the certificate lifetime has passed (default 0.5)
 ```
 
 ### Options inherited from parent commands

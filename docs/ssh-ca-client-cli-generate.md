@@ -19,15 +19,15 @@ ssh-ca-client-cli generate [flags] [args]
 ssh-ca-client-cli generate --force
 
 # Show any changes that would be made
-ssh-ca-client-cli generate --force --dryrun
+ssh-ca-client-cli generate --force --dry-run
 ```
 
 ### Options
 
 ```
-  -n, --dryrun[=true|false]   Show what would be done
-      --force[=true|false]    Force replacing an existing private key
-  -h, --help[=true|false]     help for generate
+  -n, --dry-run[=true|false]   Show what would be done
+      --force[=true|false]     Force replacing an existing private key
+  -h, --help[=true|false]      help for generate
 ```
 
 ### Options inherited from parent commands

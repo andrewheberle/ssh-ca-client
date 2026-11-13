@@ -45,7 +45,7 @@ existing certificate, as it is not valid for the new key.`
 ssh-ca-client-cli generate --force
 
 # Show any changes that would be made
-ssh-ca-client-cli generate --force --dryrun`
+ssh-ca-client-cli generate --force --dry-run`
 
 	hostLong = `Issues or renews one or more host SSH certificates with the initial request
 requiring an OIDC authentication process against the configured IdP and
@@ -103,8 +103,7 @@ revoked host or user certificates respectively.
 
 The downloaded KRL is verified against its SSHSIG signature using the trusted_ca
 public key from the configuration, and must only revoke certificates issued by
-that CA. A KRL that fails verification is not written. The --force flag is
-deprecated and has no effect.
+that CA. A KRL that fails verification is not written.
 
 When --out is an existing KRL, the downloaded KRL is only written if it is not
 older than the existing one, comparing the KRL version and then the time it was
@@ -134,13 +133,15 @@ ssh-ca-client-cli krl --out /etc/ssh/revocation_list
 # Write the host KRL to a file for use by ssh
 ssh-ca-client-cli krl --host --out /home/example/.ssh/revocation_list`
 
-	loginLong = `Issues or renews a users SSH certificate using an interactive OIDC
-authentication flow, with the principals added to the certificate based on the
-claims returned from the OIDC IdP.
+	loginLong = `Issues a users SSH certificate using an interactive OIDC authentication
+flow, with the principals added to the certificate based on the claims returned
+from the OIDC IdP.
 
-Renewals may use a refresh token from the OIDC IdP if the configuration of the
-IdP allows this. Any issued certificate is added to the local SSH Agent unless
---skip-agent is set.
+A new certificate is only requested once half of the current certificate's
+lifetime has passed, unless --force is set. If the IdP issued a refresh token
+at an earlier login, the new certificate is obtained with that token and no
+interactive login is needed (a refresh). Any issued certificate is added to the
+local SSH Agent unless --skip-agent is set.
 
 When an interactive login is required, a local web server is started on the
 host and port of the redirect_url from the configuration for the duration of
@@ -151,10 +152,10 @@ minutes and may be cancelled with CTRL-C.
 The --addr option from previous versions has been removed as the listen address
 is now taken from the redirect_url, which must use http.`
 
-	loginExample = `# Request or renew a certificate
+	loginExample = `# Request a certificate, or a new one if the current one is due
 ssh-ca-client-cli login
 
-# Force renewal of an existing certificate
+# Request a new certificate even if the current one is not yet due
 ssh-ca-client-cli login --force
 
 # Request a certificate with a shorter than default validity period

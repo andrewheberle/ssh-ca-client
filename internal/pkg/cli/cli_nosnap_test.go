@@ -8,8 +8,9 @@ import "testing"
 // when building as a snap
 func TestExecute_NoSnapFlags(t *testing.T) {
 	runFlagTests(t, []flagTest{
-		{"krl", []string{"krl", "--host", "--out", "krl.bin", "--force"}},
-		{"krl short flags", []string{"krl", "-f", "krl.bin"}},
+		{"krl", []string{"krl", "--host", "--out", "krl.bin"}},
+		{"krl short flags", []string{"krl", "-o", "krl.bin"}},
+		{"krl deprecated short flag", []string{"krl", "-f", "krl.bin"}},
 		{"revoke", []string{"revoke", "--host", "--key", "a", "--key", "b,c"}},
 		{"host", []string{"host"}},
 	})

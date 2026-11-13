@@ -43,7 +43,7 @@ func (c *loginCommand) Init(cd *simplecobra.Commandeer) error {
 	cmd.Flags().BoolVar(&c.skipAgent, "skip-agent", false, "Skip adding SSH key and certificate to ssh-agent")
 	cmd.Flags().DurationVar(&c.lifetime, "life", time.Hour*24, "Lifetime of SSH certificate")
 	cmd.Flags().BoolVar(&c.add, "add", false, "Add existing certificate to SSH agent")
-	cmd.Flags().BoolVar(&c.force, "force", false, "Force renewal even if current certificate has more than 50% validity left")
+	cmd.Flags().BoolVar(&c.force, "force", false, "Get a new certificate even if the current one has more than 50% of its lifetime left")
 
 	return nil
 }
@@ -59,6 +59,15 @@ func (c *loginCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 		return fmt.Errorf("could not set up logger: %w", err)
 	}
 	c.logger = logger
+
+	// --add only adds the existing certificate, so these would be ignored
+	if c.add {
+		for _, name := range []string{"force", "life", "skip-agent"} {
+			if this.CobraCommand.Flags().Changed(name) {
+				return fmt.Errorf("%w: --add cannot be used with --%s", ErrInvalidFlags, name)
+			}
+		}
+	}
 
 	c.logger.Debug("attempting load config", "command", this.CobraCommand.Name())
 

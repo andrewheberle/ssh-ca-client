@@ -54,7 +54,8 @@ func TestExecute_Flags(t *testing.T) {
 	runFlagTests(t, []flagTest{
 		{"global flags", []string{"--config", "location", "--debug", "--json"}},
 		{"global flags after sub-command", []string{"login", "--config", "location", "--debug", "--json"}},
-		{"generate", []string{"generate", "--force", "--dryrun"}},
+		{"generate", []string{"generate", "--force", "--dry-run"}},
+		{"generate deprecated dryrun", []string{"generate", "--dryrun"}},
 		{"generate short flags", []string{"generate", "-n"}},
 		{"login", []string{"login", "--add", "--force", "--life", "1h", "--skip-agent"}},
 		{"revoke", []string{"revoke", "--serial", "1", "--serial", "2,3", "--yes"}},
@@ -79,6 +80,7 @@ func TestExecute_InvalidFlags(t *testing.T) {
 		{"removed --keyfile", []string{"--keyfile", "keyfile", "login"}},
 		{"removed login --addr", []string{"login", "--addr", "localhost:3000"}},
 		{"removed show --status", []string{"show", "--status"}},
+		{"removed krl --force", []string{"krl", "--force"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -98,7 +100,8 @@ func TestExecute(t *testing.T) {
 		{"no args", []string{}, false},
 		{"version", []string{"version"}, false},
 		{"version as json", []string{"version", "--json"}, false},
-		{"generate with missing config", []string{"--config", missingConfig, "generate", "--dryrun"}, true},
+		{"version with an argument", []string{"version", "extra"}, true},
+		{"generate with missing config", []string{"--config", missingConfig, "generate", "--dry-run"}, true},
 		{"login with missing config", []string{"--config", missingConfig, "login"}, true},
 		{"show with missing config", []string{"--config", missingConfig, "show"}, true},
 		{"revoke with missing config", []string{"--config", missingConfig, "revoke", "--yes"}, true},

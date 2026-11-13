@@ -29,7 +29,11 @@ func (c *generateCommand) Init(cd *simplecobra.Commandeer) error {
 
 	cmd := cd.CobraCommand
 	cmd.Flags().BoolVar(&c.force, "force", false, "Force replacing an existing private key")
-	cmd.Flags().BoolVarP(&c.dryrun, "dryrun", "n", false, "Show what would be done")
+	cmd.Flags().BoolVarP(&c.dryrun, "dry-run", "n", false, "Show what would be done")
+	cmd.Flags().BoolVar(&c.dryrun, "dryrun", false, "Show what would be done")
+	if err := deprecateRenamed(cmd.Flags(), "dryrun", "dry-run"); err != nil {
+		return err
+	}
 
 	return nil
 }

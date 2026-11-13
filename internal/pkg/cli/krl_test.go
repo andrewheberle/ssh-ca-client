@@ -139,9 +139,7 @@ func TestExecute_KRL(t *testing.T) {
 		{"write host", ca, nil, []string{"--host"}, false, false, true},
 		{"no output file", ca, nil, nil, true, false, false},
 		{"wrong signer", other, nil, nil, false, true, false},
-		{"wrong signer with force", other, nil, []string{"--force"}, false, true, false},
 		{"keep newer", ca, existing(t, generated+1), nil, false, true, false},
-		{"keep newer with force", ca, existing(t, generated+1), []string{"--force"}, false, true, false},
 	}
 
 	for _, tt := range tests {

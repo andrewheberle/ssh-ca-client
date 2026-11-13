@@ -467,7 +467,7 @@ The `host` sub-command supports the following command-line options:
 | `--principals` | `[]string` | `hostname` | Principal(s) to request on certificate (may be specified multiple times or as a comma seperated string) |
 | `--renew` | `bool` | false | Attempt to renew existing certificate(s) for the specified key(s) |
 | `--force` | `bool` | false | Force renewal of certificate(s) regardless of remaining validity |
-| `--renewat` | `float64` | 0.5 | Renew at this fraction of remaining validity for existing certificate(s) |
+| `--renew-at` | `float64` | 0.5 | Renew at this fraction of remaining validity for existing certificate(s) |
 | `--reload-command` | `string` | | Command run with `/bin/sh -c` once host certificates have changed, such as to reload `sshd` |
 
 The `--addr` option from previous versions has been removed as the listen
@@ -614,10 +614,10 @@ The GUI supports the following command line flags:
 | Flag              | Type            | Description                                                                 |
 |-------------------|-----------------|-----------------------------------------------------------------------------|
 | `--life`          | `time.Duration` | Lifetime of SSH certificate                                                 |
-| `--renew`         | `time.Duration` | Renew once remaining time gets below this value                             |
+| `--refresh-before` | `time.Duration` | Refresh the certificate once less than this remains of its lifetime        |
 | `--config`        | `string`        | Configuration file (Linux) or registry hive, `HKLM` or `HKCU` (Windows)     |
 | `--log`           | `string`        | Log directory, which contains `tray.log` and `crash.log`                    |
-| `--log.file`      | `bool`          | Log to a file instead of the Windows Event Log (Windows only)               |
+| `--log-file`      | `bool`          | Log to a file instead of the Windows Event Log (Windows only)               |
 | `--json`          | `bool`          | Enable JSON logging                                                         |
 | `--debug`         | `bool`          | Enable debug logging                                                        |
 | `--disable-proxy` | `bool`          | Disable proxying of PuTTY Agent (pageant) requests (Windows only)           |
@@ -629,10 +629,10 @@ The defaults are as follows:
 | Flag              | Default (Windows)                          | Default (Linux)                        |
 |-------------------|--------------------------------------------|----------------------------------------|
 | `--life`          | `24h`                                      | `24h`                                  |
-| `--renew`         | `1h`                                       | `1h`                                   |
+| `--refresh-before` | `1h`                                      | `1h`                                   |
 | `--config`        | `HKLM`                                     | `/etc/serverless-ssh-ca/config.yml`    |
 | `--log`           | `%LOCALAPPDATA%\Serverless SSH CA Client\log` | `~/.local/state/serverless-ssh-ca/log` |
-| `--log.file`      | `false`                                    | n/a (always logs to a file)            |
+| `--log-file`      | `false`                                    | n/a (always logs to a file)            |
 | `--disable-proxy` | `false`                                    | n/a (always disabled)                  |
 | `--add-on-start`  | `true`                                     | `true`                                 |
 

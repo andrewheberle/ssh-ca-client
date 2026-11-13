@@ -71,8 +71,14 @@ func (c *hostCommand) Init(cd *simplecobra.Commandeer) error {
 	cmd.Flags().BoolVar(&c.renew, "renew", false, "Renew existing certificate")
 	cmd.MarkFlagsMutuallyExclusive("renew", "principals")
 	cmd.Flags().BoolVar(&c.force, "force", false, fmt.Sprintf("Force renewal even if current certificate has more than %0.1f%% validity left", defaultHostRenewAt*100.0))
+	cmd.Flags().Float64Var(&c.renewat, "renew-at", defaultHostRenewAt, "Renew once this fraction (0 to 1) of the certificate lifetime has passed")
 	cmd.Flags().Float64Var(&c.renewat, "renewat", defaultHostRenewAt, "Renew once this fraction (0 to 1) of the certificate lifetime has passed")
+	if err := deprecateRenamed(cmd.Flags(), "renewat", "renew-at"); err != nil {
+		return err
+	}
+	cmd.MarkFlagsMutuallyExclusive("force", "renew-at")
 	cmd.MarkFlagsMutuallyExclusive("force", "renewat")
+	cmd.MarkFlagsMutuallyExclusive("renew-at", "renewat")
 	cmd.Flags().StringVar(&c.reloadCmd, "reload-command", "", reloadCommandUsage)
 
 	return nil
@@ -91,7 +97,16 @@ func (c *hostCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 	c.logger = logger
 
 	if c.renewat < 0 || c.renewat > 1 {
-		return fmt.Errorf("renewat must be between 0 and 1")
+		return fmt.Errorf("--renew-at must be between 0 and 1")
+	}
+
+	// these only apply to a renewal, so would otherwise be ignored
+	if !c.renew {
+		for _, name := range []string{"force", "renew-at", "renewat"} {
+			if this.CobraCommand.Flags().Changed(name) {
+				return fmt.Errorf("%w: --%s requires --renew", ErrInvalidFlags, name)
+			}
+		}
 	}
 
 	if os.Geteuid() != 0 {

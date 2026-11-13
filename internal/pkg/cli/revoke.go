@@ -77,7 +77,13 @@ func (c *revokeCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 	}
 
 	if !c.host && c.reloadCmd != "" {
-		return fmt.Errorf("--reload-command requires --host")
+		return fmt.Errorf("%w: --reload-command requires --host", ErrInvalidFlags)
+	}
+
+	// without --host the user certificate would be revoked instead of the
+	// host certificates of the keys given
+	if !c.host && this.CobraCommand.Flags().Changed("key") {
+		return fmt.Errorf("%w: --key requires --host", ErrInvalidFlags)
 	}
 
 	// a serial was issued for a single key
