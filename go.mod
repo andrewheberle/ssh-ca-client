@@ -16,7 +16,7 @@ require (
 	github.com/forfuncsake/krl v0.1.0
 	github.com/gen2brain/beeep v0.11.3
 	github.com/go-jose/go-jose/v4 v4.1.9
-	github.com/go-viper/mapstructure/v2 v2.4.0
+	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/gorilla/securecookie v1.1.2
 	github.com/gorilla/sessions v1.4.0
 	github.com/hiddeco/sshsig v0.2.0
