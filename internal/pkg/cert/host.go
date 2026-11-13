@@ -128,6 +128,11 @@ func (h *HostCertificate) RenewContext(ctx context.Context) error {
 		return fmt.Errorf("host certificate renewal: could not parse certificate: %w", err)
 	}
 
+	// a renewal keeps the principals of the existing certificate
+	if err := checkIssued(cert, ssh.HostCert, existing.ValidPrincipals); err != nil {
+		return fmt.Errorf("host certificate renewal: %w", err)
+	}
+
 	// save certificate
 	if err := h.store.SaveCertificate(cert); err != nil {
 		return fmt.Errorf("host certificate renewal: could not save certificate: %w", err)
@@ -209,6 +214,10 @@ func (h *HostCertificate) RequestContext(ctx context.Context) error {
 	cert, err := sshcert.ParseCert(res.JSON200.Certificate)
 	if err != nil {
 		return fmt.Errorf("host certificate request: could not parse certificate: %w", err)
+	}
+
+	if err := checkIssued(cert, ssh.HostCert, h.Principals); err != nil {
+		return fmt.Errorf("host certificate request: %w", err)
 	}
 
 	// save certificate

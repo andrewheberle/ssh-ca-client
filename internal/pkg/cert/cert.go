@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"sync"
 	"time"
@@ -23,6 +24,7 @@ var (
 	ErrCertificateMismatch            = errors.New("certificate did not match private key")
 	ErrCertificateNotFound            = errors.New("no certificate found")
 	ErrCertificateNotValid            = errors.New("certificate validity not ok")
+	ErrCertificateSignature           = errors.New("certificate signature did not verify")
 	ErrDeletingCertificate            = errors.New("could not delete certificate")
 	ErrKeyNotFound                    = errors.New("no key private key found")
 	ErrNoAuthHandlerAvailable         = errors.New("no auth handler was available")
@@ -30,6 +32,8 @@ var (
 	ErrRemovingFromAgent              = errors.New("could not remove from agent")
 	ErrSignerNotFound                 = errors.New("no signer found")
 	ErrUnexpectedCertificateAuthority = errors.New("certificate was not issued by the CA")
+	ErrUnexpectedCertificateType      = errors.New("certificate was not of the expected type")
+	ErrUnexpectedPrincipals           = errors.New("certificate principals did not match the request")
 	ErrUnexpectedResponse             = errors.New("unexpected response from CA")
 	ErrUnknownCertificate             = errors.New("certificate not found at CA for this key")
 )
@@ -93,7 +97,7 @@ type Storage interface {
 }
 
 // Helper function to validate a certificate. This checks that the certificate
-// is not expired, was issued by the expected CA and that the certificate is for
+// is not expired, was signed by the expected CA and that the certificate is for
 // the public key of the private key it will be used with.
 func CertificateValid(ca ssh.PublicKey, pub ssh.PublicKey, cert *ssh.Certificate) error {
 	// Check its not expired (with 5-seconds grace time on ValidAfter as
@@ -109,12 +113,61 @@ func CertificateValid(ca ssh.PublicKey, pub ssh.PublicKey, cert *ssh.Certificate
 		return ErrUnexpectedCertificateAuthority
 	}
 
+	// SignatureKey is only a claim made by the certificate, so check that the
+	// CA really signed it
+	if err := ca.Verify(signedBytes(cert), cert.Signature); err != nil {
+		return fmt.Errorf("%w: %w", ErrCertificateSignature, err)
+	}
+
 	// Check that certificate is for our private key
 	if !bytes.Equal(cert.Key.Marshal(), pub.Marshal()) {
 		return ErrCertificateMismatch
 	}
 
 	return nil
+}
+
+// signedBytes returns the part of a certificate that its signature covers:
+// its encoding without the signature, which is the last field (see
+// PROTOCOL.certkeys in OpenSSH). This is the data [ssh.CertChecker] verifies,
+// which x/crypto does not export on its own.
+func signedBytes(cert *ssh.Certificate) []byte {
+	unsigned := *cert
+	unsigned.Signature = nil
+	out := unsigned.Marshal()
+
+	// drop the length of the empty signature
+	return out[:len(out)-4]
+}
+
+// checkIssued checks that a certificate issued by the CA is of the requested
+// type (ssh.UserCert or ssh.HostCert) and, when principals is not nil, is for
+// exactly those principals, ignoring order and duplicates.
+func checkIssued(cert *ssh.Certificate, certType uint32, principals []string) error {
+	if cert.CertType != certType {
+		return fmt.Errorf("%w: got type %d, want %d", ErrUnexpectedCertificateType, cert.CertType, certType)
+	}
+
+	if principals == nil {
+		return nil
+	}
+
+	if !samePrincipals(cert.ValidPrincipals, principals) {
+		return fmt.Errorf("%w: got %q, want %q", ErrUnexpectedPrincipals, cert.ValidPrincipals, principals)
+	}
+
+	return nil
+}
+
+// samePrincipals reports whether a and b hold the same set of principals.
+func samePrincipals(a, b []string) bool {
+	set := func(s []string) []string {
+		s = slices.Clone(s)
+		slices.Sort(s)
+		return slices.Compact(s)
+	}
+
+	return slices.Equal(set(a), set(b))
 }
 
 // RenewalDue reports whether the fraction at (between 0 and 1) of the

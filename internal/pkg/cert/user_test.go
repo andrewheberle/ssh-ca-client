@@ -81,10 +81,12 @@ type fakeCA struct {
 	ca ssh.Signer
 
 	// behaviour overrides
-	status      int    // non-zero to respond with this status
-	contentType string // overrides the response content type
-	body        string // overrides the response body, including for status
-	hang        bool   // do not respond until the test finishes
+	status      int      // non-zero to respond with this status
+	contentType string   // overrides the response content type
+	body        string   // overrides the response body, including for status
+	hang        bool     // do not respond until the test finishes
+	certType    uint32   // non-zero to issue certificates of this type
+	principals  []string // non-nil to issue certificates for these principals
 
 	release chan struct{} // closed when the test finishes
 
@@ -222,6 +224,12 @@ func (ca *fakeCA) handle(w http.ResponseWriter, r *http.Request) {
 		c.CertType = ssh.HostCert
 		c.KeyId = "host"
 		c.ValidPrincipals = existing.ValidPrincipals
+	}
+	if ca.certType != 0 {
+		c.CertType = ca.certType
+	}
+	if ca.principals != nil {
+		c.ValidPrincipals = ca.principals
 	}
 	if err := c.SignCert(rand.Reader, ca.ca); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -498,6 +506,12 @@ func TestUserCertificate_Request_Errors(t *testing.T) {
 			name:         "save failed",
 			setup:        func(ca *fakeCA, u *UserCertificate, store *fakeStore) { store.saveErr = saveErr },
 			wantErr:      saveErr,
+			wantRequests: 1,
+		},
+		{
+			name:         "host certificate in response",
+			setup:        func(ca *fakeCA, u *UserCertificate, store *fakeStore) { ca.certType = ssh.HostCert },
+			wantErr:      ErrUnexpectedCertificateType,
 			wantRequests: 1,
 		},
 	}

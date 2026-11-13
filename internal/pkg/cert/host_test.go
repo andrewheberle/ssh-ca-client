@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -512,6 +513,26 @@ func TestHostCertificate_ResponseErrors(t *testing.T) {
 			name:         "save failed",
 			setup:        func(ca *fakeCA, store *fakeStore) { store.saveErr = saveErr },
 			wantErr:      saveErr,
+			wantRequests: 1,
+		},
+		{
+			name:         "user certificate in response",
+			setup:        func(ca *fakeCA, store *fakeStore) { ca.certType = ssh.UserCert },
+			wantErr:      ErrUnexpectedCertificateType,
+			wantRequests: 1,
+		},
+		{
+			name:         "other principals in response",
+			setup:        func(ca *fakeCA, store *fakeStore) { ca.principals = []string{"other.example.com"} },
+			wantErr:      ErrUnexpectedPrincipals,
+			wantRequests: 1,
+		},
+		{
+			name: "extra principal in response",
+			setup: func(ca *fakeCA, store *fakeStore) {
+				ca.principals = append(slices.Clone(testPrincipals), "*")
+			},
+			wantErr:      ErrUnexpectedPrincipals,
 			wantRequests: 1,
 		},
 	}

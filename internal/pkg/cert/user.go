@@ -116,6 +116,12 @@ func (u *UserCertificate) RequestContext(ctx context.Context) error {
 		return fmt.Errorf("user certificate request: could not parse certificate: %w", err)
 	}
 
+	// the principals of a user certificate come from the identity provider,
+	// so only its type can be checked here
+	if err := checkIssued(cert, ssh.UserCert, nil); err != nil {
+		return fmt.Errorf("user certificate request: %w", err)
+	}
+
 	// save certificate
 	if err := u.store.SaveCertificate(cert); err != nil {
 		return fmt.Errorf("user certificate request: could not save certificate: %w", err)
