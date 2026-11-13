@@ -73,6 +73,7 @@ Run these before considering any change complete:
 - Don't commit secrets, tokens, or real config values.
 - Don't modify generated files; regenerate them with `go generate ./...`.
 - Keep changes scoped to the task. No drive-by refactors or renames.
+- Changing how or where state is stored (keyring entries, the token store, state and cache files) needs a migration step in the client, so every 1.x release keeps working with what 0.27.x and earlier 1.x releases stored, and no one has to log in again or re-issue certificates.
 
 ## Agent skills
 
