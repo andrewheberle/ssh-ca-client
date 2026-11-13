@@ -89,6 +89,11 @@ type Application struct {
 	refreshBackOff int
 	refreshFailure int
 
+	// renewing is set by the event loop while a renewal started from the
+	// menu is running. It is only used by the event loop, which is the only
+	// caller of setState once it has started.
+	renewing bool
+
 	logger *slog.Logger
 }
 
@@ -252,10 +257,12 @@ func (app *Application) setState() {
 			// have a private key
 			app.state = stateKeyOK
 
-			// if we have a certificate but it's expired on start, try to refresh
+			// if we have a certificate but it's expired on start, try to
+			// refresh. A failure counts towards the backoff, so the expired
+			// state below does not try again straight away.
 			if app.hasCertificate() {
 				if !app.certificateValid() {
-					if err := app.refresh(); err == nil {
+					if err := app.refreshWithBackoff(); err == nil {
 						app.state = stateCertificateOK
 						app.logger.Info("refresh of certificate succeeded")
 						app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
@@ -322,6 +329,27 @@ func (app *Application) setState() {
 			app.setState()
 			// finish now
 			break
+		}
+
+		// keep trying to refresh, with the backoff, as an earlier attempt may
+		// have failed only because the network was not up yet, such as after
+		// a resume or at logon. Not while a renewal from the menu is running,
+		// as both would need the lock and the menu renewal would fail.
+		if !app.renewing {
+			err := app.refreshWithBackoff()
+			if err == nil {
+				app.logger.Info("refresh of expired certificate succeeded")
+				app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
+				app.state = stateCertificateOK
+				// re-run to handle change
+				app.setState()
+				// finish now
+				break
+			}
+
+			if !errors.Is(err, ErrRenewSkipped) && !errors.Is(err, ErrRenewRunning) {
+				app.logger.Warn("could not refresh expired certificate", "error", err, "failures", app.refreshFailure, "backoff", app.refreshBackOff)
+			}
 		}
 
 		app.mRenew.SetTitle("Renew")
@@ -444,11 +472,13 @@ func (app *Application) eventloop() {
 			app.mRenew.Disable()
 
 			renewDone = make(chan error, 1)
+			app.renewing = true
 			go func(done chan<- error) {
 				done <- app.refreshOrRenew()
 			}(renewDone)
 		case err := <-renewDone:
 			renewDone = nil
+			app.renewing = false
 
 			switch {
 			case err == nil:

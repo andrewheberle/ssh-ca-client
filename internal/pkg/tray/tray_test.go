@@ -642,3 +642,97 @@ func TestApplication_setState_backoff(t *testing.T) {
 		}
 	}
 }
+
+// TestApplication_setState_expiredRetry checks that an expired certificate is
+// refreshed once a refresh works again, such as when the network comes up
+// after a resume or at logon, rather than staying expired until the user
+// renews it from the menu (#223)
+func TestApplication_setState_expiredRetry(t *testing.T) {
+	for _, start := range []appState{stateInit, stateCertificateOK} {
+		t.Run(string(start), func(t *testing.T) {
+			app, c, tray := newTestApp(t)
+			app.state = start
+			c.cert = expiresIn(-time.Minute)
+			c.refreshErr = errors.New("dial tcp: network is unreachable")
+
+			app.setState()
+			if app.state != stateCertificateExpired {
+				t.Fatalf("state after failed refresh = %s, want %s", app.state, stateCertificateExpired)
+			}
+
+			// the network comes back and the refresh token still works
+			c.refreshErr = nil
+			for range 10 {
+				app.setState()
+			}
+
+			if app.state != stateCertificateOK {
+				t.Fatalf("state = %s, want %s", app.state, stateCertificateOK)
+			}
+			for _, nonInteractive := range c.requestKinds() {
+				if !nonInteractive {
+					t.Errorf("requests = %v, want only refreshes, which need no login", c.requestKinds())
+					break
+				}
+			}
+			// the user is told it expired once, and then that it was refreshed
+			want := []string{"Certificate Expired", "Certificate Refreshed"}
+			if !slices.Equal(tray.notifications, want) {
+				t.Errorf("notifications = %q, want %q", tray.notifications, want)
+			}
+		})
+	}
+}
+
+// TestApplication_setState_expiredBackoff checks that refreshes of an expired
+// certificate that keep failing are backed off, counting the failure at
+// start-up, and that the user is only told once that it expired
+func TestApplication_setState_expiredBackoff(t *testing.T) {
+	app, c, tray := newTestApp(t)
+	c.cert = expiresIn(-time.Minute)
+	c.refreshErr = errors.New("refresh failed")
+
+	// each failure backs off for twice the number of failures so far
+	wantRequests := []int{1, 1, 2, 2, 2, 2, 2, 3}
+	for i, want := range wantRequests {
+		app.setState()
+
+		if got := len(c.requestKinds()); got != want {
+			t.Fatalf("tick %d: %d requests made, want %d", i+1, got, want)
+		}
+		if app.state != stateCertificateExpired {
+			t.Fatalf("tick %d: state = %s, want %s", i+1, app.state, stateCertificateExpired)
+		}
+	}
+
+	if want := []string{"Certificate Expired"}; !slices.Equal(tray.notifications, want) {
+		t.Errorf("notifications = %q, want %q", tray.notifications, want)
+	}
+}
+
+// TestApplication_setState_expiredWhileRenewing checks that an expired
+// certificate is not refreshed while a renewal from the menu is running, as
+// both need the lock and the renewal from the menu would fail (#224)
+func TestApplication_setState_expiredWhileRenewing(t *testing.T) {
+	app, c, _ := newTestApp(t)
+	app.state = stateCertificateExpired
+	c.cert = expiresIn(-time.Minute)
+	app.renewing = true
+
+	app.setState()
+
+	if got := c.requestKinds(); len(got) != 0 {
+		t.Errorf("requests = %v, want none while a renewal from the menu is running", got)
+	}
+	if app.state != stateCertificateExpired {
+		t.Errorf("state = %s, want %s", app.state, stateCertificateExpired)
+	}
+
+	// once it has finished, the refresh is tried again
+	app.renewing = false
+	app.setState()
+
+	if got := len(c.requestKinds()); got != 1 {
+		t.Errorf("%d requests after the renewal finished, want 1", got)
+	}
+}
