@@ -54,6 +54,17 @@ Run these before considering any change complete:
 - Merging the release PR creates the `vX.Y.Z` tag and a draft GitHub release; the tag triggers the Release workflow, where GoReleaser adds the artifacts to the draft, the MSI is added and `checksums.txt` is updated to include it and signed again, and then the release is published. Releases are immutable, so all assets must be added before publishing.
 - Don't edit `CHANGELOG.md` or `.release-please-manifest.json` by hand; release-please maintains them.
 - PRs are squash merged with the PR title as the commit message, so PR titles must be conventional commits (`feat:`, `fix(scope):`, `feat!:` for breaking changes); the PR title check enforces this. Only `feat`, `fix`, `perf`, `revert` and breaking changes trigger a release.
+- The commit has no body: the PR description does not reach it. Write the description as plain prose explaining what changed and why. A `!` in the PR title marks a change as breaking. A PR that also needs a footer, such as a `BREAKING CHANGE:` note for the changelog or `Release-As:`, ends its description with a block that release-please reads from the merged PR. The block holds the full conventional commit message, and the footer must be its last paragraph, with nothing after it:
+
+  ```
+  BEGIN_COMMIT_OVERRIDE
+  feat!: remove the old config file format
+
+  What changed and why.
+
+  BREAKING CHANGE: what users must do.
+  END_COMMIT_OVERRIDE
+  ```
 - Never delete, move, or force-push an existing tag. The Go module proxy caches versions immutably, so a retagged version won't be picked up. Fix forward with a new patch version.
 - Don't edit `.goreleaser.yaml` or CI config unless the task is specifically about them.
 - Do not create or push a tag unless specifically directed to as this triggers the release workflow.
