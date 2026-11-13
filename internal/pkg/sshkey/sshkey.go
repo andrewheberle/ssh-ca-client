@@ -9,6 +9,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
+	"encoding/pem"
 	"errors"
 	"fmt"
 
@@ -22,6 +23,14 @@ const minRSAKeyBits = 2048
 // defaultRSAKeyBits is the size of RSA keys created by [GeneratePrivateKey],
 // matching the ssh-keygen default.
 const defaultRSAKeyBits = 3072
+
+// supportedPEMTypes are the PEM block types that [ParsePrivateKey] can parse.
+var supportedPEMTypes = map[string]bool{
+	"OPENSSH PRIVATE KEY": true, // OpenSSH
+	"RSA PRIVATE KEY":     true, // PKCS#1
+	"EC PRIVATE KEY":      true, // SEC1
+	"PRIVATE KEY":         true, // PKCS#8
+}
 
 var (
 	ErrEncryptedKey       = errors.New("private key is passphrase protected")
@@ -66,6 +75,13 @@ func ParsePrivateKey(pemBytes []byte) (crypto.Signer, error) {
 		var missing *ssh.PassphraseMissingError
 		if errors.As(err, &missing) {
 			return nil, ErrEncryptedKey
+		}
+
+		// x/crypto reports a PEM block of a type it can't parse, such as
+		// "DSA PRIVATE KEY", with an untyped error, so classify it here
+		// rather than by matching its text.
+		if block, _ := pem.Decode(pemBytes); block != nil && !supportedPEMTypes[block.Type] {
+			return nil, fmt.Errorf("%w: PEM block type %q", ErrUnsupportedKeyType, block.Type)
 		}
 
 		return nil, fmt.Errorf("could not parse private key: %w", err)
