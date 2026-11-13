@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.0.0](https://github.com/andrewheberle/ssh-ca-client/compare/v0.27.4...v1.0.0) (2026-11-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* **systemd:** the system units can only write to /etc/ssh. A drop-in that renews keys, or writes a KRL, outside /etc/ssh, or a reload command that writes elsewhere, needs ReadWritePaths= for that directory.
+* **config:** configuration that loaded before can now be refused. Unknown keys, YAML keys in a different case, values of the wrong type (such as a string for scopes or an unquoted numeric client_id), more than one trusted_ca key, and an http ca_url or issuer for a host other than localhost or a loopback address are now errors.
+* positional arguments are now rejected by every command; `revoke --key` requires `--host`; `host --force` and `--renewat` require `--renew`; `login --add` can't be combined with `--force`, `--life` or `--skip-agent`; and `krl --force` is removed.
+
+### Features
+
+* **config:** reject unknown keys and loose types, and require https for the CA and issuer ([f01fd1d](https://github.com/andrewheberle/ssh-ca-client/commit/f01fd1d6fc73558951e956b23c94411522aca8f6))
+* **systemd:** sandbox the packaged units ([8466bb6](https://github.com/andrewheberle/ssh-ca-client/commit/8466bb65a73c1a1937d23c0e44d00a26bea0545f))
+* use hyphenated flag names, and call a user certificate refresh a refresh ([a21e5d6](https://github.com/andrewheberle/ssh-ca-client/commit/a21e5d641264a69096001e43d7920ee6c4ba24c4))
+
+
+### Bug Fixes
+
+* **auth:** listen on every address the redirect host resolves to ([#244](https://github.com/andrewheberle/ssh-ca-client/issues/244)) ([4d458b9](https://github.com/andrewheberle/ssh-ca-client/commit/4d458b96616d71ddcb90cf15f4b7f8411b54564a))
+* **cert:** verify the signature, type and principals of issued certificates ([#240](https://github.com/andrewheberle/ssh-ca-client/issues/240)) ([16a80d9](https://github.com/andrewheberle/ssh-ca-client/commit/16a80d9e82275179148e6b74eb9ff1976f88441f))
+* **deps:** update for the v1 ca release ([#204](https://github.com/andrewheberle/ssh-ca-client/issues/204)) ([b10915e](https://github.com/andrewheberle/ssh-ca-client/commit/b10915eb613da2fc52476ac0f89d07d6bae66806))
+* **deps:** update module github.com/go-viper/mapstructure/v2 to v2.5.0 ([#243](https://github.com/andrewheberle/ssh-ca-client/issues/243)) ([6809a23](https://github.com/andrewheberle/ssh-ca-client/commit/6809a2315d97381322b744a6305196d5cc126853))
+* **deps:** update module github.com/spf13/pflag to v1.1.0 ([#208](https://github.com/andrewheberle/ssh-ca-client/issues/208)) ([0e7a0cb](https://github.com/andrewheberle/ssh-ca-client/commit/0e7a0cb73e82b491ccca3b3fc2890caf4b6fb450))
+* **deps:** update module golang.org/x/crypto to v0.59.0 ([#195](https://github.com/andrewheberle/ssh-ca-client/issues/195)) ([ad5e177](https://github.com/andrewheberle/ssh-ca-client/commit/ad5e17753ca90ea2d7d34892a8ee711c9553d336))
+* **policy:** require a value for each enabled policy and ignore empty values ([#245](https://github.com/andrewheberle/ssh-ca-client/issues/245)) ([f65355a](https://github.com/andrewheberle/ssh-ca-client/commit/f65355adf004f9e42d9737c52d335b892dcf7642))
+* **sshkey:** report unsupported PEM key types as ErrUnsupportedKeyType ([#207](https://github.com/andrewheberle/ssh-ca-client/issues/207)) ([795600f](https://github.com/andrewheberle/ssh-ca-client/commit/795600f5b1b6be61541b2d28249240f264d0aa83))
+
+
+### Documentation
+
+* add upgrading to 1.0 notes ([9af629a](https://github.com/andrewheberle/ssh-ca-client/commit/9af629a786fc3c9d0bd0b77efe9304eba34a5b23))
+
 ## [0.27.4](https://github.com/andrewheberle/ssh-ca-client/compare/v0.27.3...v0.27.4) (2026-11-13)
 
 
