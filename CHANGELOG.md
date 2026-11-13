@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.27.4](https://github.com/andrewheberle/ssh-ca-client/compare/v0.27.3...v0.27.4) (2026-11-13)
+
+
+### Bug Fixes
+
+* **deps:** update go toolchain directive to v1.27.4 ([#193](https://github.com/andrewheberle/ssh-ca-client/issues/193)) ([6c95b75](https://github.com/andrewheberle/ssh-ca-client/commit/6c95b7532787d04f0132ac44b345b75a89fd65c1))
+* **deps:** update module github.com/oapi-codegen/runtime to v1.9.0 ([#194](https://github.com/andrewheberle/ssh-ca-client/issues/194)) ([4f588c8](https://github.com/andrewheberle/ssh-ca-client/commit/4f588c8452e02e84db160e0c8ca52287e58bcb12))
+* **deps:** update module golang.org/x/oauth2 to v0.38.0 ([#191](https://github.com/andrewheberle/ssh-ca-client/issues/191)) ([bde3b0f](https://github.com/andrewheberle/ssh-ca-client/commit/bde3b0fa19e05774d79b091e4acb0b21f836d671))
+* **deps:** update module golang.org/x/sys to v0.50.0 ([#192](https://github.com/andrewheberle/ssh-ca-client/issues/192)) ([91eb0a4](https://github.com/andrewheberle/ssh-ca-client/commit/91eb0a4bce6c68c1c92b1340ae37bea6a732f58b))
+* **deps:** update serverless ssh ca to v0.30.0 ([#166](https://github.com/andrewheberle/ssh-ca-client/issues/166)) ([a4cf633](https://github.com/andrewheberle/ssh-ca-client/commit/a4cf633c2a067b51f75c073164ef593e9be5fd26))
+* **deps:** update serverless ssh ca to v0.31.0 ([#168](https://github.com/andrewheberle/ssh-ca-client/issues/168)) ([e3d85e0](https://github.com/andrewheberle/ssh-ca-client/commit/e3d85e04fac6cb67593aa3fa09b56e59a250be69))
+
 ## [0.27.3](https://github.com/andrewheberle/ssh-ca-client/compare/v0.27.2...v0.27.3) (2026-11-07)
 
 
