@@ -22,7 +22,7 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.1
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.4.1
-	github.com/ndbeals/winssh-pageant v0.0.0-20230609194536-9f88b630ebec
+	github.com/ndbeals/winssh-pageant/v2 v2.4.0
 	github.com/oapi-codegen/runtime v1.9.0
 	github.com/pda0/koanf-winreg/v2 v2.0.0
 	github.com/spf13/cobra v1.10.2
