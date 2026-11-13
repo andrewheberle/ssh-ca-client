@@ -5,6 +5,7 @@ package cli
 import (
 	"github.com/andrewheberle/simplecommand"
 	"github.com/bep/simplecobra"
+	"github.com/spf13/cobra"
 )
 
 // when building as a snap the "host" sub-command is not included
@@ -14,30 +15,35 @@ func commands() []simplecobra.Commander {
 			Command: simplecommand.New("generate", "Generate a SSH private key",
 				simplecommand.WithLong(generateLong),
 				simplecommand.WithExample(generateExample),
+				simplecommand.WithArgs(cobra.NoArgs),
 			),
 		},
 		&loginCommand{
 			Command: simplecommand.New("login", "Login via OIDC and request a certificate from CA",
 				simplecommand.WithLong(loginLong),
 				simplecommand.WithExample(loginExample),
+				simplecommand.WithArgs(cobra.NoArgs),
 			),
 		},
 		&showCommand{
 			Command: simplecommand.New("show", "Show existing private/public key",
 				simplecommand.WithLong(showLong),
 				simplecommand.WithExample(showExample),
+				simplecommand.WithArgs(cobra.NoArgs),
 			),
 		},
 		&versionCommand{
 			Command: simplecommand.New("version", "Show the current version of the ssh-ca-client-cli",
 				simplecommand.WithLong(versionLong),
 				simplecommand.WithExample(versionExample),
+				simplecommand.WithArgs(cobra.NoArgs),
 			),
 		},
 		&revokeCommand{
 			Command: simplecommand.New("revoke", "Revoke a certificate",
 				simplecommand.WithLong(revokeLong),
 				simplecommand.WithExample(revokeExample),
+				simplecommand.WithArgs(cobra.NoArgs),
 			),
 		},
 	}

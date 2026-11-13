@@ -16,9 +16,6 @@ type krlCommand struct {
 	host bool
 	out  string
 
-	// force is deprecated and has no effect, as the KRL is always verified
-	force bool
-
 	config          *config.ClientConfig
 	logger          *slog.Logger
 	certificatetype krl.CertificateType
@@ -34,10 +31,6 @@ func (c *krlCommand) Init(cd *simplecobra.Commandeer) error {
 	cmd := cd.CobraCommand
 	cmd.Flags().BoolVar(&c.host, "host", false, "Retrieve host KRL instead of user KRL")
 	cmd.Flags().StringVarP(&c.out, "out", "f", "", "Output file for KRL")
-	cmd.Flags().BoolVar(&c.force, "force", false, "Force writing to output even if signature was not verified")
-	if err := cmd.Flags().MarkDeprecated("force", "the krl is always verified as trusted_ca is required"); err != nil {
-		return err
-	}
 
 	return nil
 }

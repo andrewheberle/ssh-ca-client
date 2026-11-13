@@ -94,6 +94,15 @@ func (c *hostCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 		return fmt.Errorf("renewat must be between 0 and 1")
 	}
 
+	// these only apply to a renewal, so would otherwise be ignored
+	if !c.renew {
+		for _, name := range []string{"force", "renewat"} {
+			if this.CobraCommand.Flags().Changed(name) {
+				return fmt.Errorf("%w: --%s requires --renew", ErrInvalidFlags, name)
+			}
+		}
+	}
+
 	if os.Geteuid() != 0 {
 		c.logger.Warn("not running as root", "uid", os.Geteuid())
 	}

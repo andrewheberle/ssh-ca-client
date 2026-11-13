@@ -9,8 +9,7 @@ revoked host or user certificates respectively.
 
 The downloaded KRL is verified against its SSHSIG signature using the trusted_ca
 public key from the configuration, and must only revoke certificates issued by
-that CA. A KRL that fails verification is not written. The --force flag is
-deprecated and has no effect.
+that CA. A KRL that fails verification is not written.
 
 When --out is an existing KRL, the downloaded KRL is only written if it is not
 older than the existing one, comparing the KRL version and then the time it was

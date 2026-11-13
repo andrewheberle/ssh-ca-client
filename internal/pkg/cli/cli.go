@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 
@@ -25,6 +26,10 @@ type rootCommand struct {
 
 var (
 	ErrNoPrivateKey = errors.New("no private key found")
+
+	// ErrInvalidFlags is returned when a flag is given without a flag it
+	// depends on, or with one it cannot be used with
+	ErrInvalidFlags = errors.New("invalid combination of flags")
 
 	// to allow input and output redirection for tests
 	stdin  io.Reader     = os.Stdin
@@ -60,6 +65,7 @@ func newRootCommand() *rootCommand {
 			"ssh-ca-client-cli",
 			"A CLI based client for a serverless SSH CA",
 			simplecommand.WithLong(rootLong),
+			simplecommand.WithArgs(cobra.NoArgs),
 			simplecommand.WithSubCommands(commands()...),
 		),
 	}
@@ -87,6 +93,13 @@ func Execute(ctx context.Context, args []string) error {
 
 	// run command with the provided args
 	if _, err := x.Execute(ctx, args); err != nil {
+		// simplecobra's CommandError does not unwrap, so wrap its error again
+		// with the same message to keep it visible to errors.Is and errors.As
+		var commandErr *simplecobra.CommandError
+		if errors.As(err, &commandErr) && commandErr.Err != nil {
+			return fmt.Errorf("command error: %w", commandErr.Err)
+		}
+
 		return err
 	}
 

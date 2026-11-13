@@ -60,6 +60,15 @@ func (c *loginCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 	}
 	c.logger = logger
 
+	// --add only adds the existing certificate, so these would be ignored
+	if c.add {
+		for _, name := range []string{"force", "life", "skip-agent"} {
+			if this.CobraCommand.Flags().Changed(name) {
+				return fmt.Errorf("%w: --add cannot be used with --%s", ErrInvalidFlags, name)
+			}
+		}
+	}
+
 	c.logger.Debug("attempting load config", "command", this.CobraCommand.Name())
 
 	// load config

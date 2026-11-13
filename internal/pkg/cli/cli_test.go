@@ -79,6 +79,7 @@ func TestExecute_InvalidFlags(t *testing.T) {
 		{"removed --keyfile", []string{"--keyfile", "keyfile", "login"}},
 		{"removed login --addr", []string{"login", "--addr", "localhost:3000"}},
 		{"removed show --status", []string{"show", "--status"}},
+		{"removed krl --force", []string{"krl", "--force"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -98,6 +99,7 @@ func TestExecute(t *testing.T) {
 		{"no args", []string{}, false},
 		{"version", []string{"version"}, false},
 		{"version as json", []string{"version", "--json"}, false},
+		{"version with an argument", []string{"version", "extra"}, true},
 		{"generate with missing config", []string{"--config", missingConfig, "generate", "--dryrun"}, true},
 		{"login with missing config", []string{"--config", missingConfig, "login"}, true},
 		{"show with missing config", []string{"--config", missingConfig, "show"}, true},
