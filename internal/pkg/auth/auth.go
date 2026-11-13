@@ -488,7 +488,7 @@ func (h *OidcHandler) discover(ctx context.Context) error {
 func (h *OidcHandler) interactiveLogin(ctx context.Context) (loginResult, error) {
 	// listen before opening the browser so the callback endpoint is ready and
 	// bind errors are returned immediately
-	ln, err := net.Listen("tcp", h.listenAddr)
+	ln, err := listen(ctx, h.listenAddr)
 	if err != nil {
 		return loginResult{}, fmt.Errorf("could not listen on %s: %w", h.listenAddr, err)
 	}
