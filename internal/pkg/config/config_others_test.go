@@ -86,6 +86,66 @@ scopes: ["openid", "offline_access"]
 			wantErr: ErrMissingClientID,
 		},
 		{
+			name:    "unknown key",
+			content: required + "foo_bar: 1\n",
+			wantErr: ErrUnknownKey,
+		},
+		{
+			// a misspelt optional key must not leave the default in place
+			name:    "misspelt scopes",
+			content: required + "scope: [openid, offline_access]\n",
+			wantErr: ErrUnknownKey,
+		},
+		{
+			name:    "misspelt redirect url",
+			content: required + "redirect-url: http://localhost:8250/cb\n",
+			wantErr: ErrUnknownKey,
+		},
+		{
+			name:    "key in another case",
+			content: required + "Scopes: [openid]\n",
+			wantErr: ErrUnknownKey,
+		},
+		{
+			name:    "nested key",
+			content: required + "scopes:\n  openid: true\n",
+			wantErr: ErrUnknownKey,
+		},
+		{
+			name:    "scopes as a string",
+			content: required + "scopes: openid offline_access\n",
+			wantAny: true,
+		},
+		{
+			name: "client id as a number",
+			content: fmt.Sprintf(`issuer: https://idp.example.com/
+client_id: 12345
+ca_url: https://ca.example.com/
+trusted_ca: %s
+`, trusted),
+			wantAny: true,
+		},
+		{
+			name: "two trusted ca keys",
+			content: fmt.Sprintf(`issuer: https://idp.example.com/
+client_id: client
+ca_url: https://ca.example.com/
+trusted_ca: |
+  %s
+  %s
+`, trusted, trusted),
+			wantErr: ErrInvalidTrustedCertificateAuthority,
+		},
+		{
+			name: "http certificate authority url",
+			content: fmt.Sprintf(`issuer: https://idp.example.com/
+client_id: client
+ca_url: http://ca.example.com/
+trusted_ca: %s
+`, trusted),
+			wantErr: ErrInvalidCertificateAuthorityURL,
+		},
+		{
 			name:    "not yaml",
 			content: "issuer: [https://idp.example.com/\n",
 			wantAny: true,

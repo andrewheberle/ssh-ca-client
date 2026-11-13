@@ -76,8 +76,24 @@ func loadRegistryKey(k *koanf.Koanf, key registry.Key, path string) error {
 	}
 	_ = rk.Close()
 
-	return k.Load(winreg.Provider(winreg.Config{Key: key, Path: path, MaxDepth: 2}), nil)
+	values := koanf.New(".")
+	if err := values.Load(winreg.Provider(winreg.Config{Key: key, Path: path, MaxDepth: 2}), nil); err != nil {
+		return err
+	}
+
+	// the MSI writes values to the config key that are not configuration,
+	// and existing installs keep them, so they are ignored
+	for _, name := range ignoredRegistryValues {
+		values.Delete(name)
+	}
+
+	return k.Merge(values)
 }
+
+// ignoredRegistryValues are values in the config key that are not
+// configuration. installed0 is the per-user marker for the Start menu
+// shortcut that the MSI writes under HKCU (templates/product.wxs).
+var ignoredRegistryValues = []string{"installed0"}
 
 // ConfigPath returns the default config location, which on Windows is the
 // HKLM registry hive.

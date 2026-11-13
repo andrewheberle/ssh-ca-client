@@ -192,6 +192,13 @@ On Linux/BSD/Darwin this is a YAML file, by default
 `/etc/serverless-ssh-ca/config.yml`, however this may also be overidden using
 the `--config` command line flag.
 
+Keys must be spelt exactly as shown, in lower case. An unknown key is an error
+rather than being ignored, so a misspelt key cannot silently leave a setting at
+its default. Values must have the type shown: `scopes` is a list, and a
+`client_id` that YAML would read as a number must be quoted. `ca_url` and
+`issuer` must use `https` unless the host is `localhost` or a loopback address,
+and `trusted_ca` holds exactly one key.
+
 On Windows both the GUI and CLI read their configuration from the registry
 under `SOFTWARE\Andrew Heberle\Serverless SSH CA Client`, with `--config`
 selecting the hive to use: `HKLM` (the default) or `HKCU`. Any configuration

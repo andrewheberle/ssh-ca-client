@@ -108,6 +108,53 @@ func TestValidateConfig(t *testing.T) {
 			conf: defaults(),
 		},
 		{
+			name:     "http certificate authority url",
+			conf:     valid(func(c *ClientConfig) { c.CertificateAuthorityURL = "http://ca.example.com" }),
+			wantErrs: []error{ErrInvalidCertificateAuthorityURL},
+		},
+		{
+			name:     "http issuer",
+			conf:     valid(func(c *ClientConfig) { c.Issuer = "http://issuer.example.com" }),
+			wantErrs: []error{ErrInvalidIssuer},
+		},
+		{
+			name: "http on localhost",
+			conf: valid(func(c *ClientConfig) {
+				c.CertificateAuthorityURL = "http://localhost:8787"
+				c.Issuer = "http://LOCALHOST:8080/realms/test"
+			}),
+		},
+		{
+			name: "http on loopback addresses",
+			conf: valid(func(c *ClientConfig) {
+				c.CertificateAuthorityURL = "http://127.0.0.1:8787"
+				c.Issuer = "http://[::1]:8080"
+			}),
+		},
+		{
+			name: "http on other loopback address",
+			conf: valid(func(c *ClientConfig) { c.CertificateAuthorityURL = "http://127.1.2.3:8787" }),
+		},
+		{
+			// a name that only looks like loopback is not resolved
+			name:     "http on name starting with localhost",
+			conf:     valid(func(c *ClientConfig) { c.CertificateAuthorityURL = "http://localhost.example.com" }),
+			wantErrs: []error{ErrInvalidCertificateAuthorityURL},
+		},
+		{
+			name: "two trusted ca keys",
+			conf: valid(func(c *ClientConfig) {
+				c.TrustedCertificateAuthority = trustedCA + trustedCA
+			}),
+			wantErrs: []error{ErrInvalidTrustedCertificateAuthority},
+		},
+		{
+			name: "trusted ca with trailing newlines",
+			conf: valid(func(c *ClientConfig) {
+				c.TrustedCertificateAuthority = trustedCA + "\n\n"
+			}),
+		},
+		{
 			name: "defaults only",
 			conf: func() *ClientConfig { c := clientConfigDefaults(); return &c }(),
 			wantErrs: []error{
