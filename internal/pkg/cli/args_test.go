@@ -1,6 +1,7 @@
 package cli_test
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cli"
@@ -50,12 +51,18 @@ func TestRenamedFlags(t *testing.T) {
 	tests := []struct {
 		command  string
 		old, new string
+		skipOn   string // GOOS where the command has no flags
 	}{
-		{"generate", "dryrun", "dry-run"},
-		{"host", "renewat", "renew-at"},
+		{"generate", "dryrun", "dry-run", ""},
+		// on Windows host only reports that it is not supported
+		{"host", "renewat", "renew-at", "windows"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.command+" "+tt.old, func(t *testing.T) {
+			if runtime.GOOS == tt.skipOn {
+				t.Skipf("%s has no flags on %s", tt.command, runtime.GOOS)
+			}
+
 			cmd, _, err := root.Find([]string{tt.command})
 			if err != nil || cmd == root {
 				t.Skipf("%s is not in this build", tt.command)
