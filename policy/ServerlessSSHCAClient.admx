@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<policyDefinitions revision="1.1" schemaVersion="1.0">
+<!--
+    Whenever this file or an ADML file changes, set the namespace version to
+    the release that ships the change and raise the revisions in both files
+    (docs/adr/0003). Intune can't import a changed template under a namespace
+    it already has.
+-->
+<policyDefinitions revision="1.2" schemaVersion="1.0">
     <policyNamespaces>
-        <target prefix="sshcaclient" namespace="SSHCAClient_v0.26.0" />
+        <target prefix="sshcaclient" namespace="SSHCAClient_v1.0.0" />
     </policyNamespaces>
-    <resources minRequiredRevision="1.1" />
+    <resources minRequiredRevision="1.2" />
     <supportedOn>
         <definitions>
             <definition name="SUPPORTED_All" displayName="$(string.SupportedOn_All)" />
@@ -18,42 +24,42 @@
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <text id="ClientID_Element" valueName="client_id" />
+                <text id="ClientID_Element" valueName="client_id" required="true" />
             </elements>
         </policy>
         <policy name="SSHCAClient_Issuer" class="Machine" displayName="$(string.Issuer)" explainText="$(string.Issuer_Explain)" presentation="$(presentation.Issuer)" key="Software\Policies\Serverless SSH CA Client">
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <text id="Issuer_Element" valueName="issuer" />
+                <text id="Issuer_Element" valueName="issuer" required="true" />
             </elements>
         </policy>
         <policy name="SSHCAClient_Scopes" class="Machine" displayName="$(string.Scopes)" explainText="$(string.Scopes_Explain)" presentation="$(presentation.Scopes)" key="Software\Policies\Serverless SSH CA Client">
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <multiText id="Scopes_Element"  valueName="scopes" />
+                <multiText id="Scopes_Element" valueName="scopes" required="true" />
             </elements>
         </policy>
         <policy name="SSHCAClient_RedirectURL" class="Machine" displayName="$(string.RedirectURL)" explainText="$(string.RedirectURL_Explain)" presentation="$(presentation.RedirectURL)" key="Software\Policies\Serverless SSH CA Client">
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <text id="RedirectURL_Element" valueName="redirect_url" />
+                <text id="RedirectURL_Element" valueName="redirect_url" required="true" />
             </elements>
         </policy>
         <policy name="SSHCAClient_CertificateAuthorityURL" class="Machine" displayName="$(string.CertificateAuthorityURL)" explainText="$(string.CertificateAuthorityURL_Explain)" presentation="$(presentation.CertificateAuthorityURL)" key="Software\Policies\Serverless SSH CA Client">
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <text id="CertificateAuthorityURL_Element" valueName="ca_url" />
+                <text id="CertificateAuthorityURL_Element" valueName="ca_url" required="true" />
             </elements>
         </policy>
         <policy name="SSHCAClient_TrustedCertificateAuthority" class="Machine" displayName="$(string.TrustedCertificateAuthority)" explainText="$(string.TrustedCertificateAuthority_Explain)" presentation="$(presentation.TrustedCertificateAuthority)" key="Software\Policies\Serverless SSH CA Client">
             <parentCategory ref="SSHCAClient_Category" />
             <supportedOn ref="SUPPORTED_All" />
             <elements>
-                <text id="TrustedCertificateAuthority_Element" valueName="trusted_ca" />
+                <text id="TrustedCertificateAuthority_Element" valueName="trusted_ca" required="true" />
             </elements>
         </policy>
     </policies>
