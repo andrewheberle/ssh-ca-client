@@ -53,6 +53,12 @@ func LoadClientConfig(configpath string) (*ClientConfig, error) {
 		return nil, err
 	}
 
+	return decodeConfig(k)
+}
+
+// decodeConfig checks, decodes and validates the configuration loaded into k
+// from any source, over the defaults.
+func decodeConfig(k *koanf.Koanf) (*ClientConfig, error) {
 	if err := checkKeys(k.Keys()); err != nil {
 		return nil, err
 	}

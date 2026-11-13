@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"testing"
@@ -11,6 +12,7 @@ import (
 
 // errAny is used in tests where an error is expected but its specific value
 // is not checked
+var errAny = errors.New("any error")
 
 func TestConfigPath(t *testing.T) {
 	if got := ConfigPath(); got != "HKLM" {
