@@ -67,22 +67,22 @@ ssh-ca-client-cli host --renew --reload-command "systemctl try-reload-or-restart
 
 ```
       --delay duration          Delay between requests/renewals (randomised between 50% and 150%, 0 disables) (default 250ms)
-      --force                   Force renewal even if current certificate has more than 50.0% validity left
-  -h, --help                    help for host
+      --force[=true|false]      Force renewal even if current certificate has more than 50.0% validity left
+  -h, --help[=true|false]       help for host
       --key strings             Path to private key(s) (default [/etc/ssh/ssh_host_ed25519_key,/etc/ssh/ssh_host_ecdsa_key,/etc/ssh/ssh_host_rsa_key])
       --life duration           Lifetime of SSH certificate (default 720h0m0s)
       --principals strings      Principals to add to the host certificate request (default [<hostname>])
       --reload-command string   Command run with /bin/sh -c once host certificates have changed, such as to reload sshd
-      --renew                   Renew existing certificate
+      --renew[=true|false]      Renew existing certificate
       --renewat float           Renew once this fraction (0 to 1) of the certificate lifetime has passed (default 0.5)
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
-      --debug           Enable debug logging
-      --json            Enable JSON logging
+      --config string        Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug[=true|false]   Enable debug logging
+      --json[=true|false]    Enable JSON logging
 ```
 
 ### SEE ALSO

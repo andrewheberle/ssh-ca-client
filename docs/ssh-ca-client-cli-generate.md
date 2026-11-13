@@ -25,17 +25,17 @@ ssh-ca-client-cli generate --force --dryrun
 ### Options
 
 ```
-  -n, --dryrun   Show what would be done
-      --force    Force replacing an existing private key
-  -h, --help     help for generate
+  -n, --dryrun[=true|false]   Show what would be done
+      --force[=true|false]    Force replacing an existing private key
+  -h, --help[=true|false]     help for generate
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
-      --debug           Enable debug logging
-      --json            Enable JSON logging
+      --config string        Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug[=true|false]   Enable debug logging
+      --json[=true|false]    Enable JSON logging
 ```
 
 ### SEE ALSO

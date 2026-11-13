@@ -36,19 +36,19 @@ ssh-ca-client-cli show --public
 ### Options
 
 ```
-      --certificate   Display certificate if one exists
-      --git           Output certificate in a format suitable for git signing
-  -h, --help          help for show
-      --private       Display private key
-      --public        Display public key
+      --certificate[=true|false]   Display certificate if one exists
+      --git[=true|false]           Output certificate in a format suitable for git signing
+  -h, --help[=true|false]          help for show
+      --private[=true|false]       Display private key
+      --public[=true|false]        Display public key
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --config string   Configuration location (default "/etc/serverless-ssh-ca/config.yml")
-      --debug           Enable debug logging
-      --json            Enable JSON logging
+      --config string        Configuration location (default "/etc/serverless-ssh-ca/config.yml")
+      --debug[=true|false]   Enable debug logging
+      --json[=true|false]    Enable JSON logging
 ```
 
 ### SEE ALSO
