@@ -6,3 +6,30 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/ssh-ca-client-cli krl --out /etc/ssh/revocation_list
+
+# Sandboxing. The KRL is written to /etc/ssh, which is the only path that can be
+# written. A drop-in that writes it elsewhere needs ReadWritePaths= for that
+# directory. No capabilities are needed, as /etc/ssh is owned by root.
+ProtectSystem=strict
+ReadWritePaths=/etc/ssh
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM

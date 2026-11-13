@@ -9,3 +9,30 @@ Type=oneshot
 # later keep presenting the previous (revoked) certificate until reloaded. On
 # RHEL and derivatives the unit is sshd.service rather than ssh.service.
 ExecStart=/usr/bin/ssh-ca-client-cli host --renew --reload-command "systemctl try-reload-or-restart ssh.service"
+
+# Sandboxing. Host certificates are written next to the host keys in /etc/ssh,
+# which is the only path that can be written. A drop-in that renews keys
+# elsewhere needs ReadWritePaths= for their directory. The reload command runs
+# in this sandbox too, so NoNewPrivileges=, CapabilityBoundingSet= and
+# MemoryDenyWriteExecute= are not set: a reload command may need sudo,
+# capabilities or a JIT-compiled runtime.
+ProtectSystem=strict
+ReadWritePaths=/etc/ssh
+ProtectHome=read-only
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
