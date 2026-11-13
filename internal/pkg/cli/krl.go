@@ -30,7 +30,17 @@ func (c *krlCommand) Init(cd *simplecobra.Commandeer) error {
 
 	cmd := cd.CobraCommand
 	cmd.Flags().BoolVar(&c.host, "host", false, "Retrieve host KRL instead of user KRL")
-	cmd.Flags().StringVarP(&c.out, "out", "f", "", "Output file for KRL")
+	cmd.Flags().StringVarP(&c.out, "out", "o", "", "Output file for KRL")
+	// -f was the short form of --out before 1.0. A flag has one short form,
+	// so -f belongs to a hidden flag that sets the same value.
+	cmd.Flags().StringVarP(&c.out, "out-f", "f", "", "Output file for KRL")
+	if err := cmd.Flags().MarkHidden("out-f"); err != nil {
+		return err
+	}
+	if err := cmd.Flags().MarkShorthandDeprecated("out-f", "use -o or --out instead"); err != nil {
+		return err
+	}
+	cmd.MarkFlagsMutuallyExclusive("out", "out-f")
 
 	return nil
 }

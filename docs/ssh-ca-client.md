@@ -13,9 +13,9 @@ ssh-ca-client [options]
 Runs as a system tray application that requests, renews and adds user SSH
 certificates to the local SSH Agent.
 
-Certificates are renewed in the background using a refresh token from the OIDC
-IdP (if available) once less than `--renew` of their validity remains. If a
-refresh is not possible, the certificate can be renewed from the tray menu,
+Certificates are refreshed in the background using a refresh token from the OIDC
+IdP (if available) once less than `--refresh-before` of their validity remains.
+If a refresh is not possible, the certificate can be renewed from the tray menu,
 which opens a browser for an interactive login. During an interactive login a
 local web server is run on the host and port of the configured `redirect_url`.
 
@@ -53,7 +53,7 @@ Disable proxying of PuTTY Agent (pageant) requests to the native OpenSSH SSH
 Agent (Windows only option).
 
 `--json`
-Enable JSON logging (on Windows this flag is only relevant when `--log.file`
+Enable JSON logging (on Windows this flag is only relevant when `--log-file`
 is passed).
 
 `--life <duration>`
@@ -71,15 +71,15 @@ The default is `log` inside the state directory, which is
 (Linux) or `$SNAP_USER_COMMON` (snap). The lock file that prevents
 more than one instance running is also kept in the state directory.
 
-`--log.file`
+`--log-file`
 Log to a file (Windows only option).
 
 By default on Windows logs are sent to the Event Log however this can be
 directed to a file inside the configured log directory with this flag.
 
-`--renew <duration>`
-Renew once remaining time gets below this value (default 1h0m0s). This cannot
-be larger than `--life`.
+`--refresh-before <duration>`
+Refresh the certificate once less than this remains of its lifetime (default
+1h0m0s). This cannot be larger than `--life`.
 
 `--version`
 Show version and exit.
@@ -97,6 +97,9 @@ The following changes affect users of previous versions:
   a new private key and then request a new certificate.
 * On Windows the configuration is read from the registry (or Group Policy)
   rather than a YAML configuration file.
+* `--renew` was renamed to `--refresh-before`, and `--log.file` to
+  `--log-file`. The old names still work, with a deprecation warning, in every
+  1.x release.
 * Logs, and the lock file, are kept in the state directory described under
   `--log` rather than `%APPDATA%\Serverless SSH CA Client` (Windows) or
   `$HOME/.config/serverless-ssh-ca` (Linux). Logs in the previous location are

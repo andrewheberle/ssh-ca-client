@@ -43,7 +43,9 @@ func Execute(ctx context.Context, args []string) error {
 	flags := pflag.NewFlagSet("ssh-ca-client", pflag.ExitOnError)
 
 	flags.DurationVar(&lifetime, "life", time.Hour*24, "Lifetime of SSH certificate")
-	flags.DurationVar(&renewAt, "renew", time.Hour, "Renew once remaining time gets below this value")
+	flags.DurationVar(&renewAt, "refresh-before", time.Hour, "Refresh the certificate once less than this remains of its lifetime")
+	flags.DurationVar(&renewAt, "renew", time.Hour, "Refresh the certificate once less than this remains of its lifetime")
+	deprecateRenamed(flags, "renew", "refresh-before")
 	flags.StringVar(&logDir, "log", filepath.Join(state, "log"), "Log directory")
 	flags.StringVar(&configLocation, "config", config.ConfigPath(), "Configuration location")
 	flags.BoolVar(&showVersion, "version", false, "Show version and exit")
@@ -52,7 +54,9 @@ func Execute(ctx context.Context, args []string) error {
 	if runtime.GOOS == "windows" {
 		// windows specific flags
 		flags.BoolVar(&disableProxy, "disable-proxy", false, "Disable proxying of PuTTY Agent (pageant) requests")
+		flags.BoolVar(&logToFile, "log-file", false, "Log to file instead of the Windows Event Log")
 		flags.BoolVar(&logToFile, "log.file", false, "Log to file instead of the Windows Event Log")
+		deprecateRenamed(flags, "log.file", "log-file")
 	} else {
 		// always disabled on non-Windows platforms
 		disableProxy = true
@@ -70,7 +74,7 @@ func Execute(ctx context.Context, args []string) error {
 
 	// check renewAt is not larger than lifetime
 	if renewAt > lifetime {
-		return fmt.Errorf("--renew cannot be larger than --life")
+		return fmt.Errorf("--refresh-before cannot be larger than --life")
 	}
 
 	// make sure the state directory (for the lock file) exists
@@ -178,4 +182,14 @@ func Execute(ctx context.Context, args []string) error {
 	app.RunLogged(logger)
 
 	return nil
+}
+
+// deprecateRenamed marks the flag old, which was renamed to new, as deprecated.
+// It keeps working, with a warning, and is hidden from the usage message.
+// Renamed flags are kept for every 1.x release.
+func deprecateRenamed(flags *pflag.FlagSet, old, new string) {
+	// MarkDeprecated only fails for a flag that does not exist
+	if err := flags.MarkDeprecated(old, "use --"+new+" instead"); err != nil {
+		panic(err)
+	}
 }

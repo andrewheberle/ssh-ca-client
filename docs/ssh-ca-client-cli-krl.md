@@ -52,7 +52,7 @@ ssh-ca-client-cli krl --host --out /home/example/.ssh/revocation_list
 ```
   -h, --help[=true|false]   help for krl
       --host[=true|false]   Retrieve host KRL instead of user KRL
-  -f, --out string          Output file for KRL
+  -o, --out string          Output file for KRL
 ```
 
 ### Options inherited from parent commands

@@ -52,11 +52,12 @@ func TestExecute_Generate(t *testing.T) {
 		wantReplace bool
 	}{
 		{name: "new key", args: nil, wantKey: true},
-		{name: "new key dry run", args: []string{"--dryrun"}},
+		{name: "new key dry run", args: []string{"--dry-run"}},
 		{name: "existing key is kept", existing: true, wantErr: true, wantKey: true},
 		{name: "existing key replaced with force", existing: true, args: []string{"--force"}, wantKey: true, wantReplace: true},
-		{name: "existing key dry run", existing: true, args: []string{"--dryrun"}, wantKey: true},
-		{name: "existing key dry run with force", existing: true, args: []string{"--dryrun", "--force"}, wantKey: true},
+		{name: "existing key dry run", existing: true, args: []string{"--dry-run"}, wantKey: true},
+		{name: "new key deprecated dryrun", args: []string{"--dryrun"}},
+		{name: "existing key dry run with force", existing: true, args: []string{"--dry-run", "--force"}, wantKey: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
