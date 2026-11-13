@@ -7,6 +7,10 @@
 This provides the client-side service to interact with the [Serverless
 Certificate Authority](https://github.com/andrewheberle/serverless-ssh-ca).
 
+Upgrading from 0.x? Read [Upgrading to 1.0](docs/upgrading-to-1.0.md) first:
+the command line and configuration are checked more strictly, the systemd
+units are sandboxed, and Intune needs the new Group Policy templates.
+
 ## Installing
 
 There are two versions of the client, one CLI based and the other GUI based both of which
@@ -320,6 +324,9 @@ Releases are built with the Go toolchain pinned by the `toolchain` line in
 [Building From Source](#building-from-source).
 
 ## Requirements
+
+The client needs a CA that serves `/api/v4`, such as serverless-ssh-ca 1.0.0
+or later.
 
 Regardless of the version being run there must be a running `ssh-agent` to handle
 private keys, certificates and authentication to your SSH client of choice.

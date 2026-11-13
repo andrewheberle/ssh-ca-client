@@ -86,7 +86,8 @@ Show version and exit.
 
 ## Upgrading
 
-The following changes affect users of previous versions:
+See [Upgrading to 1.0](upgrading-to-1.0.md) for every change in 1.0.0. The
+following changes affect users of previous versions of the GUI:
 
 * The `--addr` option has been removed. The listen address for the OIDC
   authentication flow is taken from the configured `redirect_url`, which must
