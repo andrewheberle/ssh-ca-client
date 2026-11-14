@@ -40,6 +40,17 @@
       <Condition Message="A newer version of this software is already installed.">NOT NEWERVERSIONDETECTED</Condition>
 
       <!--
+      Reinstall files of an equal version ("e"), not only missing or older
+      ones ("o", the default). The client's version resource does not change
+      between releases, so an upgrade finds ssh-ca-client.exe, the key path
+      of ApplicationFiles, at an equal version, and decides that component
+      needs no install. RemoveExistingProducts then removes the old version,
+      and with it both programs. The files are private to this product, so
+      replacing one of an equal version is safe.
+      -->
+      <Property Id="REINSTALLMODE" Value="emus" />
+
+      <!--
       Install options, given on the msiexec command line:
         msiexec /i ssh-ca-client.msi /qn INSTALLDIR="D:\Tools\SSH CA\" START_ON_LOGIN=0 START_SSH_AGENT=0
 
