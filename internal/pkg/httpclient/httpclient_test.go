@@ -1,10 +1,13 @@
 package httpclient
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -56,5 +59,75 @@ func TestNew(t *testing.T) {
 	}
 	if req.Header.Get("User-Agent") != "overridden" {
 		t.Errorf("original request was modified")
+	}
+}
+
+func TestLimitTransport(t *testing.T) {
+	const max = 1000
+
+	tests := []struct {
+		name    string
+		size    int
+		wantErr bool
+	}{
+		{"empty", 0, false},
+		{"under the limit", max - 1, false},
+		{"at the limit", max, false},
+		{"one byte over", max + 1, true},
+		{"far over", 100 * max, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			body := strings.Repeat("x", tt.size)
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				_, _ = io.WriteString(w, body)
+			}))
+			defer srv.Close()
+
+			c := &http.Client{Transport: &limitTransport{Max: max, Transport: http.DefaultTransport}}
+			res, err := c.Get(srv.URL)
+			if err != nil {
+				t.Fatalf("Get() error = %v", err)
+			}
+			defer func() {
+				_ = res.Body.Close()
+			}()
+
+			got, err := io.ReadAll(res.Body)
+			if tt.wantErr {
+				if !errors.Is(err, ErrResponseTooLarge) {
+					t.Errorf("ReadAll() error = %v, want %v", err, ErrResponseTooLarge)
+				}
+				if len(got) > max {
+					t.Errorf("ReadAll() read %d bytes, want at most %d", len(got), max)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("ReadAll() error = %v", err)
+			}
+			if string(got) != body {
+				t.Errorf("ReadAll() read %d bytes, want %d", len(got), len(body))
+			}
+		})
+	}
+}
+
+func TestNew_ResponseLimit(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.WriteString(w, strings.Repeat("x", MaxResponseSize+1))
+	}))
+	defer srv.Close()
+
+	res, err := New().Get(srv.URL)
+	if err != nil {
+		t.Fatalf("Get() error = %v", err)
+	}
+	defer func() {
+		_ = res.Body.Close()
+	}()
+
+	if _, err := io.ReadAll(res.Body); !errors.Is(err, ErrResponseTooLarge) {
+		t.Errorf("ReadAll() error = %v, want %v", err, ErrResponseTooLarge)
 	}
 }
