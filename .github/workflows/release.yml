@@ -7,6 +7,16 @@ on:
 
 permissions: {}
 
+env:
+  # Release tooling is pinned, so a new release of a tool can't change the
+  # build between CI and tagging. Renovate updates GORELEASER_VERSION, and
+  # build.yml and release.yml must use the same versions.
+  # renovate: datasource=github-releases depName=goreleaser/goreleaser
+  GORELEASER_VERSION: v2.20.2
+  # snapcraft's major version track. Renovate doesn't update snap channels,
+  # so move to the next track by hand.
+  SNAPCRAFT_CHANNEL: 9.x/stable
+
 jobs:
   client:
     name: goreleaser
@@ -26,7 +36,8 @@ jobs:
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
-          cache: true
+          # no cache, as this job can write releases and sign
+          cache: false
       - name: Generate code with go generate
         run: |
           go generate ./...
@@ -35,11 +46,13 @@ jobs:
       - uses: anchore/sbom-action/download-syft@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
       - name: Install Snapcraft
         uses: samuelmeuli/action-snapcraft@fceeb3c308e76f3487e72ef608618de625fb7fe8 # v3.0.1
+        with:
+          channel: ${{ env.SNAPCRAFT_CHANNEL }}
       - name: Release with GoReleaser
         uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
         with:
           distribution: goreleaser
-          version: "~> v2"
+          version: ${{ env.GORELEASER_VERSION }}
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -66,6 +79,8 @@ jobs:
           path: dist
       - name: Install Snapcraft and Log In
         uses: samuelmeuli/action-snapcraft@fceeb3c308e76f3487e72ef608618de625fb7fe8 # v3.0.1
+        with:
+          channel: ${{ env.SNAPCRAFT_CHANNEL }}
       - name: Upload to Snap Store
         run: find dist -name *.snap -exec snapcraft upload {} --release=stable \;
         env:
