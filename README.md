@@ -49,7 +49,9 @@ sudo apt-get install ssh-ca-client
 ```
 
 Removing the package stops the `host-ssh-certificate-renewal` and
-`user-ssh-krl-refresh` timers, and purging it also disables them. If you
+`user-ssh-krl-refresh` timers, and purging it also disables them. Installing
+the package again after removing it starts the timers that are still enabled.
+If you
 enabled the `host-ssh-krl-refresh` user timer, disable it yourself with
 `systemctl --user disable --now host-ssh-krl-refresh.timer`, as it is not
 stopped when the package is removed.
