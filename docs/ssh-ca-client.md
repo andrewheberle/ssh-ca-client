@@ -52,6 +52,10 @@ Enable debug logging.
 Disable proxying of PuTTY Agent (pageant) requests to the native OpenSSH SSH
 Agent (Windows only option).
 
+The Pageant proxy isn't started if another Pageant, such as PuTTY's own or
+KeeAgent, is already running. A warning is logged, and PuTTY uses that agent,
+which doesn't hold this client's certificate.
+
 `--json`
 Enable JSON logging (on Windows this flag is only relevant when `--log-file`
 is passed).
@@ -76,6 +80,10 @@ Log to a file (Windows only option).
 
 By default on Windows logs are sent to the Event Log however this can be
 directed to a file inside the configured log directory with this flag.
+
+The GUI has no console on Windows, so anything written to standard output or
+standard error, such as errors from the Pageant proxy, is logged as a warning
+instead.
 
 `--refresh-before <duration>`
 Refresh the certificate once less than this remains of its lifetime (default

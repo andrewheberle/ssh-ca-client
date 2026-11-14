@@ -12,6 +12,10 @@ _Avoid_: CA key, signing key
 Settings an administrator manages centrally for a Windows machine, applied over its local configuration.
 _Avoid_: GPO, override
 
+**Pageant proxy**:
+The part of the Windows client that answers PuTTY's agent requests with the keys and certificates held by the OpenSSH agent.
+_Avoid_: Pageant process, PuTTY agent bridge
+
 **Snap option**:
 A setting an administrator gives the snap with `snap set`; the snap's configuration is generated from them.
 _Avoid_: Snap key, snap config
