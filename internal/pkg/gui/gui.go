@@ -122,6 +122,9 @@ func Execute(ctx context.Context, args []string) error {
 		logger = slog.New(newLogHandler(nil, level, json))
 	}
 
+	// without a console, output to stdout and stderr is logged instead
+	redirectOutput(logger)
+
 	// make sure we are only running once
 	release, err := lockSingleInstance(filepath.Join(state, "tray.lock"))
 	if err != nil {
@@ -160,11 +163,15 @@ func Execute(ctx context.Context, args []string) error {
 		defer cancel()
 
 		go func() {
-			if err := pageant.Run(ctx); err != nil {
-				// dont log an error if the error indicates the context was cancelled
-				if !errors.Is(err, context.Canceled) {
-					logger.Error("error from pageant proxy", "error", err)
-				}
+			err := pageant.Run(ctx)
+			switch {
+			case err == nil, errors.Is(err, context.Canceled):
+				// the GUI is exiting
+			case errors.Is(err, pageant.ErrPageantRunning):
+				logger.Warn("pageant proxy not started as another Pageant is running, so PuTTY won't use this client's certificate", "error", err)
+			default:
+				// the reason is logged by the proxy just before
+				logger.Error("error from pageant proxy", "error", err)
 			}
 		}()
 	}
