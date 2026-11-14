@@ -1,25 +1,65 @@
 #!/bin/sh
+#
+# Writes the client's configuration, $SNAP_DATA/etc/config.yml, which the snap
+# reads as /etc/serverless-ssh-ca/config.yml, from the snap options. snapd runs
+# this on install, on every refresh, and on every "snap set" or "snap unset".
+# A failure makes "snap set" reject the change.
+#
 
 # shellcheck source=../scripts/management
 . "$SNAP/bin/management"
 
 handle_config() {
-    # Check required config values are set
+    # Leave the configuration alone until every required snap option is set,
+    # so options can be set one at a time, and a configuration written by
+    # hand is kept until then
     if ! has_config_set; then
-        return $?
+        return 0
     fi
 
-    # Write out those values
-    printf 'issuer: %s\nclient_id: %s\nscopes: %s\nredirect_url: %s\nca_url: %s\n' \
-        "$(issuer)" "$(client_id)" "$(scopes)" "$(redirect_url)" "$(ca_url)" > "$SNAP_DATA/etc/config.yml"
+    for o in $all_options; do
+        if v="$(get_value "$o")" && has_control_chars "$v"; then
+            printf 'snap option %s must not contain a newline or other control character\n' "$o" >&2
+            return 1
+        fi
+    done
 
-    # Write out optional trusted_ca option
-    if ca="$(trusted_ca)"; then
-        printf 'trusted_ca: %s\n' "$ca" >> "$SNAP_DATA/etc/config.yml"
+    dir="$SNAP_DATA/etc"
+    if ! mkdir -p "$dir"; then
+        return 1
     fi
 
-    # Set permissions on config file
-    chmod 0644 "$SNAP_DATA/etc/config.yml"
+    # write a new file and move it into place, so a failure never leaves a
+    # partly written configuration
+    if ! tmp="$(mktemp "$dir/.config.yml.XXXXXX")"; then
+        return 1
+    fi
+
+    if ! write_config > "$tmp" || ! chmod 0644 "$tmp" || ! mv -f "$tmp" "$dir/config.yml"; then
+        rm -f "$tmp"
+        return 1
+    fi
+}
+
+# write_config prints the configuration from the snap options. Every value is
+# a YAML string, and the optional options are left out when unset so the
+# client's defaults apply.
+write_config() {
+    printf 'issuer: %s\n' "$(yaml_string "$(get_value issuer)")" &&
+        printf 'client_id: %s\n' "$(yaml_string "$(get_value client-id)")" &&
+        printf 'ca_url: %s\n' "$(yaml_string "$(get_value ca-url)")" &&
+        printf 'trusted_ca: %s\n' "$(yaml_string "$(get_value trusted-ca)")" || return 1
+
+    if scopes="$(get_value scopes)"; then
+        list="$(yaml_list "$scopes")"
+        if [ "$list" != "[]" ]; then
+            printf 'scopes: %s\n' "$list"
+        fi
+    fi
+
+    if url="$(get_value redirect-url)"; then
+        printf 'redirect_url: %s\n' "$(yaml_string "$url")"
+    fi
 }
 
 handle_config

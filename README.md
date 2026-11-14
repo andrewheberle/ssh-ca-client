@@ -276,21 +276,29 @@ SSH CA configuration with user specific data kept seperate.
 
 ### As A Snap
 
-The snap build must be configured as follows:
+The snap is configured with snap options, set with `snap set`, which is the
+only supported way to configure it:
 
 ```sh
 sudo snap set ssh-ca-client issuer="OIDC Issuer"
 sudo snap set ssh-ca-client client-id="OIDC Client ID"
-# This is the default value
-sudo snap set ssh-ca-client scopes=openid,email,profile
-# This is the default value
-sudo snap set ssh-ca-client redirect-url=http://localhost:3000/auth/callback
 sudo snap set ssh-ca-client ca-url=https://ca.example.com/
 sudo snap set ssh-ca-client trusted-ca="ecdsa-sha2-nistp256 AAAAE2VjZ..."
+# Optional, as these are the defaults
+sudo snap set ssh-ca-client scopes=openid,email,profile
+sudo snap set ssh-ca-client redirect-url=http://localhost:3000/auth/callback
 ```
 
 The above commands would generate the same configuration as the YAML example
 above.
+
+`issuer`, `client-id`, `ca-url` and `trusted-ca` are required. Once all four
+are set, the snap writes its configuration from the snap options, replacing any
+configuration file there, and writes it again whenever an option changes and
+when the snap is refreshed. Until then the configuration is left as it is, so
+the options can be set one at a time. `scopes` is a comma separated list, and
+`scopes` and `redirect-url` use the defaults above when unset. A value
+containing a newline or another control character is rejected.
 
 ### Configuration Privacy/Security
 

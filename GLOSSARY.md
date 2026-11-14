@@ -12,6 +12,10 @@ _Avoid_: CA key, signing key
 Settings an administrator manages centrally for a Windows machine, applied over its local configuration.
 _Avoid_: GPO, override
 
+**Snap option**:
+A setting an administrator gives the snap with `snap set`; the snap's configuration is generated from them.
+_Avoid_: Snap key, snap config
+
 **Certificate store**:
 The place one private key and its certificate are kept together, which only ever holds a certificate issued by the Trusted CA for that key.
 _Avoid_: Storage, key store, keyring store, file store
