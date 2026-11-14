@@ -9,10 +9,10 @@ import (
 
 // inform prints msg, which is only information, to stdout
 var inform = func(msg string) {
-	fmt.Fprint(os.Stdout, msg)
+	_, _ = fmt.Fprint(os.Stdout, msg)
 }
 
 // fail prints msg, which is an error, to stderr
 var fail = func(msg string) {
-	fmt.Fprint(os.Stderr, msg)
+	_, _ = fmt.Fprint(os.Stderr, msg)
 }
