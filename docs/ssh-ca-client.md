@@ -90,6 +90,10 @@ Log to a file (Windows only option).
 By default on Windows logs are sent to the Event Log however this can be
 directed to a file inside the configured log directory with this flag.
 
+A `.zip` install doesn't register the Event Log source, so either use this flag
+or register the source as described in the
+[README](../README.md#supported-platforms).
+
 The GUI has no console on Windows, so anything written to standard output or
 standard error, such as errors from the Pageant proxy, is logged as a warning
 instead.

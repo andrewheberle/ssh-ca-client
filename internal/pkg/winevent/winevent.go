@@ -3,11 +3,11 @@
 // Package winevent provides an slog.Handler that writes log records to the
 // Windows Event Log via golang.org/x/sys/windows/svc/eventlog.
 //
-// The named event source must already be registered on the target machine
-// (for example by an MSI/WiX installer, via New-EventLog in PowerShell, or
-// via eventlog.InstallAsEventCreate at install time) before NewHandler is
-// called. This handler only opens and writes to an existing source; it
-// does not register or deregister one.
+// The named event source should be registered on the target machine (for
+// example by an MSI/WiX installer, or via eventlog.InstallAsEventCreate at
+// install time). If it isn't, events are still written to the Application
+// log, but Event Viewer can't show their descriptions. This handler only
+// opens and writes to a source; it does not register or deregister one.
 package winevent
 
 import (
