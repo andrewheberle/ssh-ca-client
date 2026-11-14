@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"fyne.io/systray"
@@ -85,13 +86,21 @@ type Application struct {
 	setTooltip func(tooltip string)
 	notifier   func(title, message string, icon any) error
 
-	mu             sync.Mutex
-	refreshBackOff int
-	refreshFailure int
+	// mu is held by a refresh or renewal, which may include an interactive
+	// login lasting minutes
+	mu sync.Mutex
+
+	// refreshFailure counts failed automatic refreshes in a row, and
+	// refreshBackOff how many more attempts to skip. They are written while
+	// mu is held, but are also read for logging while a renewal from the menu
+	// may hold it, so they are atomic.
+	refreshBackOff atomic.Int64
+	refreshFailure atomic.Int64
 
 	// renewing is set by the event loop while a renewal started from the
-	// menu is running. It is only used by the event loop, which is the only
-	// caller of setState once it has started.
+	// menu is running, so no automatic refresh competes with it for mu. It is
+	// only used by the event loop, which is the only caller of setState once
+	// it has started.
 	renewing bool
 
 	logger *slog.Logger
@@ -333,23 +342,17 @@ func (app *Application) setState() {
 
 		// keep trying to refresh, with the backoff, as an earlier attempt may
 		// have failed only because the network was not up yet, such as after
-		// a resume or at logon. Not while a renewal from the menu is running,
-		// as both would need the lock and the menu renewal would fail.
-		if !app.renewing {
-			err := app.refreshWithBackoff()
-			if err == nil {
-				app.logger.Info("refresh of expired certificate succeeded")
-				app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
-				app.state = stateCertificateOK
-				// re-run to handle change
-				app.setState()
-				// finish now
-				break
-			}
-
-			if !errors.Is(err, ErrRenewSkipped) && !errors.Is(err, ErrRenewRunning) {
-				app.logger.Warn("could not refresh expired certificate", "error", err, "failures", app.refreshFailure, "backoff", app.refreshBackOff)
-			}
+		// a resume or at logon
+		if err := app.refreshWithBackoff(); err == nil {
+			app.logger.Info("refresh of expired certificate succeeded")
+			app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
+			app.state = stateCertificateOK
+			// re-run to handle change
+			app.setState()
+			// finish now
+			break
+		} else if !errors.Is(err, ErrRenewSkipped) && !errors.Is(err, ErrRenewRunning) {
+			app.logger.Warn("could not refresh expired certificate", "error", err, "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
 		}
 
 		app.mRenew.SetTitle("Renew")
@@ -393,9 +396,9 @@ func (app *Application) setState() {
 				}
 
 				if errors.Is(err, ErrRenewSkipped) {
-					app.logger.Error("expired certificate was not renewed due to recent failures", "failures", app.refreshFailure, "backoff", app.refreshBackOff)
+					app.logger.Error("expired certificate was not renewed due to recent failures", "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
 				} else {
-					app.logger.Error("could not refresh expired certificate", "error", err, "failures", app.refreshFailure, "backoff", app.refreshBackOff)
+					app.logger.Error("could not refresh expired certificate", "error", err, "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
 				}
 			}
 
@@ -427,9 +430,9 @@ func (app *Application) setState() {
 
 				// just log error
 				if errors.Is(err, ErrRenewSkipped) {
-					app.logger.Error("certificate near expiry was not renewed due to recent failures", "failures", app.refreshFailure, "backoff", app.refreshBackOff)
+					app.logger.Error("certificate near expiry was not renewed due to recent failures", "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
 				} else {
-					app.logger.Error("could not refresh certificate close to expiry", "error", err, "failures", app.refreshFailure, "backoff", app.refreshBackOff)
+					app.logger.Error("could not refresh certificate close to expiry", "error", err, "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
 				}
 			}
 		}
@@ -532,16 +535,26 @@ func (app *Application) refreshOrRenew() error {
 	return app.renew()
 }
 
+// refreshWithBackoff is the automatic refresh, run by setState. It is skipped
+// while a renewal from the menu is running, and after failures, which back off
+// for twice the number of failures in a row.
 func (app *Application) refreshWithBackoff() error {
+	// a renewal from the menu holds the lock, possibly for an interactive
+	// login. Leave it alone rather than racing it for the lock, which would
+	// fail whichever starts second.
+	if app.renewing {
+		return ErrRenewRunning
+	}
+
 	// try to take lock and error immediately if we cant
 	if !app.mu.TryLock() {
 		return ErrRenewRunning
 	}
 	defer app.mu.Unlock()
 
-	if app.refreshBackOff > 0 {
+	if app.refreshBackOff.Load() > 0 {
 		// reduce our backoff counter
-		app.refreshBackOff--
+		app.refreshBackOff.Add(-1)
 
 		// exit
 		return ErrRenewSkipped
@@ -550,17 +563,20 @@ func (app *Application) refreshWithBackoff() error {
 	// we are ok to attempt a refresh
 	if err := app.identity.Obtain(app.ctx, identity.WithoutInteractiveLogin); err != nil {
 		// increment our failure count and set a backoff of double our failure count
-		app.refreshFailure++
-		app.refreshBackOff = app.refreshFailure * 2
+		app.refreshBackOff.Store(app.refreshFailure.Add(1) * 2)
 
 		return err
 	}
 
-	// reset on success
-	app.refreshFailure = 0
-	app.refreshBackOff = 0
+	app.resetBackoff()
 
 	return nil
+}
+
+// resetBackoff clears the failures after a certificate was obtained
+func (app *Application) resetBackoff() {
+	app.refreshFailure.Store(0)
+	app.refreshBackOff.Store(0)
 }
 
 // refresh requests a new certificate without an interactive login, so only
@@ -578,9 +594,7 @@ func (app *Application) refresh() error {
 		return err
 	}
 
-	// reset on success
-	app.refreshFailure = 0
-	app.refreshBackOff = 0
+	app.resetBackoff()
 
 	return nil
 }
@@ -598,9 +612,7 @@ func (app *Application) renew() error {
 		return err
 	}
 
-	// reset on success
-	app.refreshFailure = 0
-	app.refreshBackOff = 0
+	app.resetBackoff()
 
 	return nil
 }
