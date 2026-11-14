@@ -204,6 +204,13 @@ jobs:
           $msi = Get-ChildItem -Path msi -Filter *.msi | Select-Object -First 1
           $upgrade = Get-ChildItem -Path msi/upgrade -Filter *.msi | Select-Object -First 1
           ./templates/test-msi.ps1 -Msi $msi.FullName -UpgradeMsi $upgrade.FullName
+      - name: Upload msiexec logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: msiexec-logs
+          path: ${{ runner.temp }}/msi-*.log
+          retention-days: 7
 
   # Single required check for branch protection, so the ruleset doesn't need
   # updating when jobs or matrix entries change. Runs even when a needed job

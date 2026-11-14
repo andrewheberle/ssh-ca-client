@@ -28,11 +28,18 @@ $files = @(
     'policy\ServerlessSSHCAClient.admx',
     'policy\en-US\ServerlessSSHCAClient.adml'
 )
+# msiexec verbose logs go to the runner's temp directory in CI, where the
+# workflow uploads them if the test fails
+$logDir = if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } else { $env:TEMP }
 $clientRun = 'Serverless SSH CA Client'
 $agentRun = 'OpenSSH Authentication Agent'
 $agentPath = Join-Path $env:SystemRoot 'System32\OpenSSH\ssh-agent.exe'
 
+# the verbose log of the last msiexec run, shown when a check fails
+$script:lastLog = $null
+
 function Invoke-Msiexec([string[]]$Arguments, [string]$Log) {
+    $script:lastLog = $Log
     $p = Start-Process -FilePath msiexec.exe -ArgumentList ($Arguments + @('/qn', '/l*v', $Log)) -Wait -PassThru
     if ($p.ExitCode -ne 0) {
         Get-Content $Log -Tail 100
@@ -40,8 +47,35 @@ function Invoke-Msiexec([string[]]$Arguments, [string]$Log) {
     }
 }
 
+# Write-Diagnostics shows what the last msiexec run did, so a failed check
+# can be understood from the job log alone: where the files are, the saved
+# options, and the lines of the verbose log about the install options,
+# directories and files
+function Write-Diagnostics {
+    Write-Output '== diagnostics'
+    foreach ($d in @($installDir, (Join-Path $env:ProgramFiles 'SSH CA Test'))) {
+        if (Test-Path $d) {
+            Write-Output "-- files in $d"
+            Get-ChildItem -Path $d -Recurse -File | ForEach-Object { Write-Output "   $($_.FullName)" }
+        } else {
+            Write-Output "-- $d does not exist"
+        }
+    }
+    Write-Output "-- $installerKey"
+    Get-ItemProperty -Path $installerKey -ErrorAction SilentlyContinue | Out-String | Write-Output
+    Write-Output "-- $runKey"
+    Get-ItemProperty -Path $runKey -ErrorAction SilentlyContinue | Out-String | Write-Output
+
+    if ($null -ne $script:lastLog -and (Test-Path $script:lastLog)) {
+        Write-Output "-- $($script:lastLog)"
+        $pattern = 'Doing action: |Skipping action: |Action ended .*Return value [^1]|AppSearch|INSTALLDIR|START_ON_LOGIN|START_SSH_AGENT|StartOnLoginValue|StartSSHAgentValue|RemoveExistingProducts|UPGRADINGPRODUCTCODE|OLDERVERSIONBEINGUPGRADED|ApplicationFile|Overwrite|FileCopy|Note: 1: |Error '
+        Select-String -Path $script:lastLog -Pattern $pattern | ForEach-Object { Write-Output $_.Line }
+    }
+}
+
 function Assert-True([bool]$Condition, [string]$Message) {
     if (-not $Condition) {
+        Write-Diagnostics
         throw "FAIL: $Message"
     }
     Write-Output "ok: $Message"
@@ -110,10 +144,10 @@ $tests = @(
 foreach ($t in $tests) {
     Write-Output "== $($t.Name)"
 
-    Invoke-Msiexec -Arguments (@('/i', "`"$Msi`"") + $t.Properties) -Log (Join-Path $env:TEMP 'msi-install.log')
+    Invoke-Msiexec -Arguments (@('/i', "`"$Msi`"") + $t.Properties) -Log (Join-Path $logDir 'msi-install.log')
     Assert-Installed -Dir $installDir -StartOnLogin $t.Enabled -StartSSHAgent $t.Enabled
 
-    Invoke-Msiexec -Arguments @('/x', "`"$Msi`"") -Log (Join-Path $env:TEMP 'msi-uninstall.log')
+    Invoke-Msiexec -Arguments @('/x', "`"$Msi`"") -Log (Join-Path $logDir 'msi-uninstall.log')
     Assert-Uninstalled -Dir $installDir
 }
 
@@ -122,12 +156,12 @@ foreach ($t in $tests) {
 Write-Output '== upgrade keeps the install options'
 $customDir = Join-Path $env:ProgramFiles 'SSH CA Test'
 
-Invoke-Msiexec -Arguments @('/i', "`"$Msi`"", "INSTALLDIR=`"$customDir`"", 'START_ON_LOGIN=0', 'START_SSH_AGENT=0') -Log (Join-Path $env:TEMP 'msi-install.log')
+Invoke-Msiexec -Arguments @('/i', "`"$Msi`"", "INSTALLDIR=`"$customDir`"", 'START_ON_LOGIN=0', 'START_SSH_AGENT=0') -Log (Join-Path $logDir 'msi-install.log')
 Assert-Installed -Dir $customDir -StartOnLogin $false -StartSSHAgent $false
 
-Invoke-Msiexec -Arguments @('/i', "`"$UpgradeMsi`"", 'START_SSH_AGENT=1') -Log (Join-Path $env:TEMP 'msi-upgrade.log')
+Invoke-Msiexec -Arguments @('/i', "`"$UpgradeMsi`"", 'START_SSH_AGENT=1') -Log (Join-Path $logDir 'msi-upgrade.log')
 Assert-Installed -Dir $customDir -StartOnLogin $false -StartSSHAgent $true
 Assert-True (-not (Test-Path $installDir)) "default install directory $installDir not used"
 
-Invoke-Msiexec -Arguments @('/x', "`"$UpgradeMsi`"") -Log (Join-Path $env:TEMP 'msi-uninstall.log')
+Invoke-Msiexec -Arguments @('/x', "`"$UpgradeMsi`"") -Log (Join-Path $logDir 'msi-uninstall.log')
 Assert-Uninstalled -Dir $customDir
