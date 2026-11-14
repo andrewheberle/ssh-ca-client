@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
+	"github.com/spf13/pflag"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -77,11 +79,20 @@ type fakeHostStore struct {
 	cert.Storage
 
 	cert *ssh.Certificate
+
+	// err is returned by Certificate for a certificate that is stored but
+	// can't be read
+	err error
 }
 
+// Certificate returns the errors a [store.Store] does: a certificate that
+// isn't stored wraps [store.ErrNotFound], and one that can't be read doesn't
 func (s *fakeHostStore) Certificate() (*ssh.Certificate, error) {
+	if s.err != nil {
+		return nil, fmt.Errorf("%w: %w", cert.ErrCertificateNotFound, s.err)
+	}
 	if s.cert == nil {
-		return nil, cert.ErrCertificateNotFound
+		return nil, fmt.Errorf("%w: %w", cert.ErrCertificateNotFound, store.ErrNotFound)
 	}
 
 	return s.cert, nil
@@ -149,15 +160,19 @@ func TestHostCommand_Run(t *testing.T) {
 	// key describes a host key, its stored certificate and the result of a
 	// request or renewal for it
 	type key struct {
-		cert   *ssh.Certificate
-		err    error
-		cancel bool
+		cert    *ssh.Certificate
+		certErr error // the stored certificate can't be read
+		err     error
+		cancel  bool
 	}
+
+	unreadable := errors.New("unreadable certificate")
 
 	tests := []struct {
 		name      string
 		renew     bool
 		force     bool
+		defaults  bool // renewing the default keys, as --key was not given
 		keys      []key
 		wantCalls []string
 		wantErrs  []string // keys that must be named in the error
@@ -190,6 +205,31 @@ func TestHostCommand_Run(t *testing.T) {
 			wantErr:   cert.ErrCertificateNotFound,
 		},
 		{
+			// #215: a host may only have certificates for some default keys
+			name:      "renew default keys skips keys without a certificate",
+			renew:     true,
+			defaults:  true,
+			keys:      []key{{}, {cert: due}, {}},
+			wantCalls: []string{"renew key1"},
+		},
+		{
+			name:     "renew default keys with none certified fails",
+			renew:    true,
+			defaults: true,
+			keys:     []key{{}, {}},
+			wantErr:  cert.ErrCertificateNotFound,
+		},
+		{
+			// only a certificate that isn't stored is skipped
+			name:      "renew default keys with an unreadable certificate fails",
+			renew:     true,
+			defaults:  true,
+			keys:      []key{{certErr: unreadable}, {cert: due}},
+			wantCalls: []string{"renew key1"},
+			wantErrs:  []string{"key0"},
+			wantErr:   unreadable,
+		},
+		{
 			name:      "failed request continues",
 			keys:      []key{{err: failed}, {}},
 			wantCalls: []string{"request key0", "request key1"},
@@ -218,14 +258,15 @@ func TestHostCommand_Run(t *testing.T) {
 
 			var calls []string
 			c := &hostCommand{
-				renew:   tt.renew,
-				force:   tt.force,
-				renewat: defaultHostRenewAt,
-				logger:  slog.New(slog.DiscardHandler),
+				renew:           tt.renew,
+				force:           tt.force,
+				skipUncertified: tt.defaults,
+				renewat:         defaultHostRenewAt,
+				logger:          slog.New(slog.DiscardHandler),
 			}
 			for i, k := range tt.keys {
 				fc := &fakeHostCert{
-					store: &fakeHostStore{cert: k.cert},
+					store: &fakeHostStore{cert: k.cert, err: k.certErr},
 					err:   k.err,
 					calls: &calls,
 					name:  fmt.Sprintf("key%d", i),
@@ -254,6 +295,35 @@ func TestHostCommand_Run(t *testing.T) {
 				if !strings.Contains(err.Error(), name+":") {
 					t.Errorf("Run() error = %v, want it to name %s", err, name)
 				}
+			}
+		})
+	}
+}
+
+func TestRenewsDefaultKeys(t *testing.T) {
+	tests := []struct {
+		name  string
+		renew bool
+		args  []string
+		want  bool
+	}{
+		{"renew default keys", true, nil, true},
+		{"renew keys given", true, []string{"--key", "/etc/ssh/ssh_host_ed25519_key"}, false},
+		// giving the default list explicitly still requires every certificate
+		{"renew default keys given", true, []string{"--key", strings.Join(defaultHostKeys, ",")}, false},
+		{"request default keys", false, nil, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var keys []string
+			flags := pflag.NewFlagSet("host", pflag.ContinueOnError)
+			flags.StringSliceVar(&keys, "key", defaultHostKeys, "")
+			if err := flags.Parse(tt.args); err != nil {
+				t.Fatalf("Parse() error = %v", err)
+			}
+
+			if got := renewsDefaultKeys(tt.renew, flags); got != tt.want {
+				t.Errorf("renewsDefaultKeys() = %v, want %v", got, tt.want)
 			}
 		})
 	}

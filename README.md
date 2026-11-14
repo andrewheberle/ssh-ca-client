@@ -467,6 +467,12 @@ The renewed certificate will be issued with identical principals and extensions
 as the current certificate with renewals being skipped unless the certificate
 has less than 50% of validity left (based on the default of 30-days validity).
 
+Without `--key`, a renewal covers the default Ed25519, ECDSA and RSA host keys,
+and skips any of them that have no certificate, so a host that only certified
+some of its keys renews those without failing. The renewal fails if none of
+them has a certificate. A key given with `--key` must have a certificate to
+renew.
+
 A renewal revokes the certificate it replaces. From OpenSSH 9.8, `sshd` only
 reads host certificates when it starts or is reloaded, so until it is reloaded
 it keeps presenting the previous, revoked certificate, and then an expired one.
