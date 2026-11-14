@@ -43,10 +43,11 @@
       Reinstall files of an equal version ("e"), not only missing or older
       ones ("o", the default). An upgrade decides which files to copy before
       RemoveExistingProducts removes the old version, so a file of an equal
-      version that was left in place would then be removed with it. The
-      client's version resource does not change between releases. The files
-      are private to this product, so replacing one of an equal version is
-      safe.
+      version that was left in place would then be removed with it. Releases
+      have increasing versions, as go generate stamps the release's version
+      into ssh-ca-client.exe, but msi-test upgrades between two MSIs of the
+      same build. The files are private to this product, so replacing one of
+      an equal version is safe.
       -->
       <Property Id="REINSTALLMODE" Value="emus" />
 
@@ -116,8 +117,10 @@
                  program as the key path, an upgrade that finds it already
                  installed at an equal version gives the component no install
                  action, and RemoveExistingProducts then removes both programs
-                 with the old version. The value records the installed
-                 version, in the Installer subkey the client ignores.
+                 with the old version. Releases have increasing versions, but
+                 msi-test upgrades between two MSIs of the same build. The
+                 value records the installed version, in the Installer subkey
+                 the client ignores.
                -->
                <Component Id="ApplicationFiles" Guid="66807fd7-177d-4462-822a-24211b9fb0f1">
                   <File Id="ApplicationFile0" Source="$(var.DistDir)/gui_windows_amd64_v1/ssh-ca-client.exe"/>
