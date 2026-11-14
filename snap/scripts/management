@@ -1,66 +1,78 @@
 #!/bin/sh
 #
-# This utility script is used as part of the Snap build of the client
+# Helpers for the snap's hooks, which write the client's configuration from
+# the snap options set with "snap set".
 #
 
+# required_options are the snap options the client can't run without. The
+# others, scopes and redirect-url, are left out of the configuration when
+# unset, so the client's defaults apply.
+required_options="issuer client-id ca-url trusted-ca"
+
+# all_options are every snap option written to the configuration
+all_options="$required_options scopes redirect-url"
+
+# get_value prints the snap option $1, and fails if it is unset or empty
 get_value() {
     if [ $# -ne 1 ]; then
         return 1
     fi
 
-    v="$(snapctl get "$1")"
+    if ! v="$(snapctl get "$1")"; then
+        return 1
+    fi
 
     if [ -z "$v" ]; then
         return 1
     fi
 
-    echo "$v"
+    printf '%s\n' "$v"
 }
 
+# has_config_set succeeds when every required snap option is set
 has_config_set() {
-    for v in "issuer" "client-id" "scopes" "redirect-url" "ca-url"; do
-        if ! get_value "$v"; then
-            return $?
+    for o in $required_options; do
+        if ! get_value "$o" >/dev/null; then
+            return 1
         fi
     done
 }
 
-issuer() {
-    get_value "issuer"
+# has_control_chars succeeds when $1 contains a newline or any other control
+# character, which can't be written in a YAML string here
+has_control_chars() {
+    case "$1" in
+        *[[:cntrl:]]*) return 0 ;;
+    esac
+
+    return 1
 }
 
-client_id() {
-    get_value "client-id"
+# yaml_string prints $1 as a double-quoted YAML string, so a value containing
+# ": ", "#" or quotes is written exactly as given
+yaml_string() {
+    printf '"%s"' "$(printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')"
 }
 
-scopes() {
-    if ! s="$(get_value "scopes")"; then
-        return $?
-    fi
+# yaml_list prints the comma separated list $1 as a YAML list of strings, with
+# the spaces around each entry trimmed and empty entries dropped
+yaml_list() {
+    out=""
+    old_ifs="$IFS"
+    IFS=','
+    set -f
+    for item in $1; do
+        item="$(printf '%s' "$item" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+        if [ -z "$item" ]; then
+            continue
+        fi
+        if [ -n "$out" ]; then
+            out="$out, "
+        fi
+        out="$out$(yaml_string "$item")"
+    done
+    set +f
+    IFS="$old_ifs"
 
-    if [ -z "$s" ]; then
-        printf '[ "openid", "email", "profile" ]'
-    fi
-
-    echo "$s" | awk -F',' '{printf "[ "; for(i=1; i<=NF; i++) {printf "\"%s\"", $i; if(i<NF) printf ", "} printf " ]\n"}'
-}
-
-redirect_url() {
-    if ! r="$(get_value "redirect-url")"; then
-        return $?
-    fi
-
-    if [ -z "$r" ]; then
-        printf 'http://localhost:3000/auth/callback'
-    fi
-
-    echo "$r"
-}
-
-ca_url() {
-    get_value "ca-url"
-}
-
-trusted_ca() {
-    get_value "trusted-ca"
+    printf '[%s]' "$out"
 }

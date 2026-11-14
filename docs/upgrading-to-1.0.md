@@ -28,8 +28,8 @@ version:
     units, and host certificates written as `<key>-cert.pub` next to the
     host keys.
   - **snap**: `/snap/bin/ssh-ca-client.ssh-ca-client-cli`,
-    `/snap/bin/ssh-ca-client`, and the `snap set ssh-ca-client` keys for the
-    configuration.
+    `/snap/bin/ssh-ca-client`, and the snap options for the configuration,
+    set with `snap set ssh-ca-client`.
   - **MSI**: `ssh-ca-client-cli.exe` and `ssh-ca-client.exe` in the install
     directory, the configuration key
     `HKLM\SOFTWARE\Andrew Heberle\Serverless SSH CA Client` (or the same key
