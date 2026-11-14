@@ -70,6 +70,11 @@ than once. It is recommended to request the hostname and IP address(es) of the
 host as principals so the client can properly verify the host when connecting
 via SSH. The default principal is the hostname of the system.
 
+With --renew, a key given with --key must already have a certificate. Without
+--key, the default keys that have no certificate are skipped, as a host may
+only have certificates for some of them, but the renewal fails if none of them
+has one.
+
 As this command writes certificates issued for host SSH keys it needs write
 access to the directory holding the SSH host keys, which by default is /etc/ssh,
 so this command should be run as root.

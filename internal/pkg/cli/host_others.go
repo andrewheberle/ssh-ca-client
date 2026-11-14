@@ -17,6 +17,7 @@ import (
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert/store"
 	"github.com/bep/simplecobra"
+	"github.com/spf13/pflag"
 )
 
 const (
@@ -37,6 +38,10 @@ type hostCommand struct {
 	principals []string
 	renewat    float64
 	reloadCmd  string
+
+	// skipUncertified is set when renewing the default keys, as --key was not
+	// given, so a key that was never certified is skipped rather than an error
+	skipUncertified bool
 
 	certs []hostCert
 
@@ -109,6 +114,8 @@ func (c *hostCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 		}
 	}
 
+	c.skipUncertified = renewsDefaultKeys(c.renew, this.CobraCommand.Flags())
+
 	if os.Geteuid() != 0 {
 		c.logger.Warn("not running as root", "uid", os.Geteuid())
 	}
@@ -169,8 +176,13 @@ func (c *hostCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args 
 	todo := c.certs
 	if c.renew {
 		todo = make([]hostCert, 0, len(c.certs))
+		uncertified := 0
 		for _, hc := range c.certs {
 			due, err := c.renewalDue(c.logger.With("key", hc.keypath), hc.cert)
+			if errors.Is(err, errUncertified) {
+				uncertified++
+				continue
+			}
 			if err != nil {
 				errs = append(errs, fmt.Errorf("%s: %w", hc.keypath, err))
 				continue
@@ -178,6 +190,11 @@ func (c *hostCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args 
 			if due {
 				todo = append(todo, hc)
 			}
+		}
+
+		// with no certificate to renew, the host was never certified
+		if uncertified > 0 && uncertified == len(c.certs) {
+			errs = append(errs, fmt.Errorf("%w: none of the host keys has a certificate, so request one first", cert.ErrCertificateNotFound))
 		}
 	}
 
@@ -226,10 +243,28 @@ func (c *hostCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args 
 	return errors.Join(errs...)
 }
 
+// renewsDefaultKeys reports whether this is a renewal of the default host
+// keys, as --key was not given. A host may only have certificates for some of
+// them, so any that were never certified are skipped. A key given with --key
+// must have a certificate to renew.
+func renewsDefaultKeys(renew bool, flags *pflag.FlagSet) bool {
+	return renew && !flags.Changed("key")
+}
+
+// errUncertified is returned by renewalDue for a key that has no certificate
+// when c.skipUncertified is set
+var errUncertified = errors.New("key has no certificate")
+
 // renewalDue reports whether the certificate should be renewed, which is when
-// c.renewat of its lifetime has passed or c.force is set
+// c.renewat of its lifetime has passed or c.force is set. It returns
+// errUncertified for a key that has no certificate when c.skipUncertified is
+// set.
 func (c *hostCommand) renewalDue(logger *slog.Logger, hc cert.Renewable) (bool, error) {
 	existing, err := hc.Store().Certificate()
+	if c.skipUncertified && errors.Is(err, store.ErrNotFound) {
+		logger.Info("skipping renewal as the key has no certificate")
+		return false, errUncertified
+	}
 	if err != nil {
 		logger.Error("could not get existing certificate", "error", err)
 		return false, err
