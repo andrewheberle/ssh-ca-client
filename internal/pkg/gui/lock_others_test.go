@@ -3,6 +3,7 @@
 package gui
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -18,8 +19,8 @@ func TestLockSingleInstance(t *testing.T) {
 		t.Fatalf("first lockSingleInstance() error = %v", err)
 	}
 
-	if _, err := lockSingleInstance(path); err == nil {
-		t.Fatalf("lockSingleInstance() while locked error = nil, want error")
+	if _, err := lockSingleInstance(path); !errors.Is(err, ErrAlreadyRunning) {
+		t.Fatalf("lockSingleInstance() while locked error = %v, want %v", err, ErrAlreadyRunning)
 	}
 
 	if err := releaseA(); err != nil {
@@ -40,7 +41,12 @@ func TestLockSingleInstance(t *testing.T) {
 		_ = releaseB()
 	}()
 
-	if _, err := lockSingleInstance(path); err == nil {
-		t.Errorf("lockSingleInstance() while the next instance holds the lock error = nil, want error")
+	if _, err := lockSingleInstance(path); !errors.Is(err, ErrAlreadyRunning) {
+		t.Errorf("lockSingleInstance() while the next instance holds the lock error = %v, want %v", err, ErrAlreadyRunning)
+	}
+
+	// a lock that can't be taken for another reason isn't reported as running
+	if _, err := lockSingleInstance(filepath.Join(t.TempDir(), "missing", "tray.lock")); err == nil || errors.Is(err, ErrAlreadyRunning) {
+		t.Errorf("lockSingleInstance() in a missing directory error = %v, want an error other than %v", err, ErrAlreadyRunning)
 	}
 }

@@ -29,6 +29,15 @@ The users private key, certificate and refresh token are stored in the
 operating system keyring and are shared with the CLI
 ([ssh-ca-client-cli](ssh-ca-client-cli.md)).
 
+Only one GUI runs at a time for each user. Starting another reports that it is
+already running and exits, with exit code 0.
+
+On Windows the GUI has no console, so if it can't start, for example because
+the configuration is missing or invalid, it shows the error in a message box
+as well as logging it to the Windows Event Log. A problem with the command
+line, `--help` and `--version` are shown in a message box too, as is a second
+start while the GUI is already running.
+
 ## Options
 
 `--add-on-start`
