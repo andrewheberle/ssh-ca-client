@@ -93,7 +93,7 @@
               Condition restricts installation to when START_ON_LOGIN=1.
               MSI handles removal of the registry value on uninstall automatically.
             -->
-            <Component Id="C.RunOnLogin" Guid="d4e5f6a7-b8c9-0123-defa-456789012345">
+            <Component Id="C.RunOnLogin" Guid="b6a2ec5d-8254-43b9-a291-fa03b4944579">
                <Condition>START_ON_LOGIN = 1</Condition>
                <RegistryValue Root="HKLM"
                               Key="Software\Microsoft\Windows\CurrentVersion\Run"
@@ -110,7 +110,7 @@
               users, this requires the OpenSSH Authentication Agent service to be set
               to "Manual" startup.
             -->
-            <Component Id="C.SSHAgent" Guid="e5f6a7b8-c9d0-1234-efab-567890123456">
+            <Component Id="C.SSHAgent" Guid="e7fe564c-a51c-4bc3-b790-16a11958bb72">
                <Condition>START_SSH_AGENT = 1</Condition>
                <RegistryValue Root="HKLM"
                               Key="Software\Microsoft\Windows\CurrentVersion\Run"
