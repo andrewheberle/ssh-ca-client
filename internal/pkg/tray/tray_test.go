@@ -230,13 +230,14 @@ func TestApplication_refresh(t *testing.T) {
 
 	t.Run("resets backoff on success", func(t *testing.T) {
 		app, _, _ := newTestApp(t)
-		app.refreshFailure, app.refreshBackOff = 3, 6
+		app.refreshFailure.Store(3)
+		app.refreshBackOff.Store(6)
 
 		if err := app.refresh(); err != nil {
 			t.Fatalf("refresh() error = %v", err)
 		}
-		if app.refreshFailure != 0 || app.refreshBackOff != 0 {
-			t.Errorf("failures = %d, backoff = %d, want 0 and 0", app.refreshFailure, app.refreshBackOff)
+		if app.refreshFailure.Load() != 0 || app.refreshBackOff.Load() != 0 {
+			t.Errorf("failures = %d, backoff = %d, want 0 and 0", app.refreshFailure.Load(), app.refreshBackOff.Load())
 		}
 	})
 
@@ -346,8 +347,8 @@ func TestApplication_refreshWithBackoff(t *testing.T) {
 	if err := app.refreshWithBackoff(); !errors.Is(err, auth.ErrInteractiveLoginRequired) {
 		t.Fatalf("refreshWithBackoff() error = %v, want %v", err, auth.ErrInteractiveLoginRequired)
 	}
-	if app.refreshFailure != 1 || app.refreshBackOff != 2 {
-		t.Fatalf("failures = %d, backoff = %d, want 1 and 2", app.refreshFailure, app.refreshBackOff)
+	if app.refreshFailure.Load() != 1 || app.refreshBackOff.Load() != 2 {
+		t.Fatalf("failures = %d, backoff = %d, want 1 and 2", app.refreshFailure.Load(), app.refreshBackOff.Load())
 	}
 
 	// the next two attempts are skipped without a request
@@ -364,8 +365,8 @@ func TestApplication_refreshWithBackoff(t *testing.T) {
 	if err := app.refreshWithBackoff(); err == nil {
 		t.Fatalf("refreshWithBackoff() error = nil, want error")
 	}
-	if app.refreshFailure != 2 || app.refreshBackOff != 4 {
-		t.Errorf("failures = %d, backoff = %d, want 2 and 4", app.refreshFailure, app.refreshBackOff)
+	if app.refreshFailure.Load() != 2 || app.refreshBackOff.Load() != 4 {
+		t.Errorf("failures = %d, backoff = %d, want 2 and 4", app.refreshFailure.Load(), app.refreshBackOff.Load())
 	}
 
 	// every request was non-interactive
@@ -379,12 +380,12 @@ func TestApplication_refreshWithBackoff(t *testing.T) {
 	c.mu.Lock()
 	c.refreshErr = nil
 	c.mu.Unlock()
-	app.refreshBackOff = 0
+	app.refreshBackOff.Store(0)
 	if err := app.refreshWithBackoff(); err != nil {
 		t.Fatalf("refreshWithBackoff() error = %v", err)
 	}
-	if app.refreshFailure != 0 || app.refreshBackOff != 0 {
-		t.Errorf("failures = %d, backoff = %d, want 0 and 0", app.refreshFailure, app.refreshBackOff)
+	if app.refreshFailure.Load() != 0 || app.refreshBackOff.Load() != 0 {
+		t.Errorf("failures = %d, backoff = %d, want 0 and 0", app.refreshFailure.Load(), app.refreshBackOff.Load())
 	}
 }
 
@@ -640,5 +641,254 @@ func TestApplication_setState_backoff(t *testing.T) {
 		if app.state != stateCertificateOK {
 			t.Fatalf("tick %d: state = %s, want %s", i+1, app.state, stateCertificateOK)
 		}
+	}
+}
+
+// TestApplication_setState_expiredRetry checks that an expired certificate is
+// refreshed once a refresh works again, such as when the network comes up
+// after a resume or at logon, rather than staying expired until the user
+// renews it from the menu (#223)
+func TestApplication_setState_expiredRetry(t *testing.T) {
+	for _, start := range []appState{stateInit, stateCertificateOK} {
+		t.Run(string(start), func(t *testing.T) {
+			app, c, tray := newTestApp(t)
+			app.state = start
+			c.cert = expiresIn(-time.Minute)
+			c.refreshErr = errors.New("dial tcp: network is unreachable")
+
+			app.setState()
+			if app.state != stateCertificateExpired {
+				t.Fatalf("state after failed refresh = %s, want %s", app.state, stateCertificateExpired)
+			}
+
+			// the network comes back and the refresh token still works
+			c.refreshErr = nil
+			for range 10 {
+				app.setState()
+			}
+
+			if app.state != stateCertificateOK {
+				t.Fatalf("state = %s, want %s", app.state, stateCertificateOK)
+			}
+			for _, nonInteractive := range c.requestKinds() {
+				if !nonInteractive {
+					t.Errorf("requests = %v, want only refreshes, which need no login", c.requestKinds())
+					break
+				}
+			}
+			// the user is told it expired once, and then that it was refreshed
+			want := []string{"Certificate Expired", "Certificate Refreshed"}
+			if !slices.Equal(tray.notifications, want) {
+				t.Errorf("notifications = %q, want %q", tray.notifications, want)
+			}
+		})
+	}
+}
+
+// TestApplication_setState_expiredBackoff checks that refreshes of an expired
+// certificate that keep failing are backed off, counting the failure at
+// start-up, and that the user is only told once that it expired
+func TestApplication_setState_expiredBackoff(t *testing.T) {
+	app, c, tray := newTestApp(t)
+	c.cert = expiresIn(-time.Minute)
+	c.refreshErr = errors.New("refresh failed")
+
+	// each failure backs off for twice the number of failures so far
+	wantRequests := []int{1, 1, 2, 2, 2, 2, 2, 3}
+	for i, want := range wantRequests {
+		app.setState()
+
+		if got := len(c.requestKinds()); got != want {
+			t.Fatalf("tick %d: %d requests made, want %d", i+1, got, want)
+		}
+		if app.state != stateCertificateExpired {
+			t.Fatalf("tick %d: state = %s, want %s", i+1, app.state, stateCertificateExpired)
+		}
+	}
+
+	if want := []string{"Certificate Expired"}; !slices.Equal(tray.notifications, want) {
+		t.Errorf("notifications = %q, want %q", tray.notifications, want)
+	}
+}
+
+// TestApplication_setState_expiredWhileRenewing checks that an expired
+// certificate is not refreshed while a renewal from the menu is running, as
+// both need the lock and the renewal from the menu would fail (#224)
+func TestApplication_setState_expiredWhileRenewing(t *testing.T) {
+	app, c, _ := newTestApp(t)
+	app.state = stateCertificateExpired
+	c.cert = expiresIn(-time.Minute)
+	app.renewing = true
+
+	app.setState()
+
+	if got := c.requestKinds(); len(got) != 0 {
+		t.Errorf("requests = %v, want none while a renewal from the menu is running", got)
+	}
+	if app.state != stateCertificateExpired {
+		t.Errorf("state = %s, want %s", app.state, stateCertificateExpired)
+	}
+
+	// once it has finished, the refresh is tried again
+	app.renewing = false
+	app.setState()
+
+	if got := len(c.requestKinds()); got != 1 {
+		t.Errorf("%d requests after the renewal finished, want 1", got)
+	}
+}
+
+// slowIdentity makes a refresh take as long as a network round trip, as a
+// real one does
+type slowIdentity struct {
+	*fakeIdentity
+	delay time.Duration
+}
+
+func (s *slowIdentity) Obtain(ctx context.Context, opts ...identity.ObtainOption) error {
+	if slices.Contains(opts, identity.WithoutInteractiveLogin) {
+		time.Sleep(s.delay)
+	}
+
+	return s.fakeIdentity.Obtain(ctx, opts...)
+}
+
+// TestApplication_eventloop_renewNearExpiry checks that clicking Renew while
+// the certificate is close to expiry renews it. The automatic refresh that
+// runs after the click used to take the lock first, so the renewal from the
+// menu failed with "The certificate renewal failed" (#224).
+func TestApplication_eventloop_renewNearExpiry(t *testing.T) {
+	for i := range 30 {
+		app, c, _ := newTestApp(t)
+		app.identity = &slowIdentity{c, 20 * time.Millisecond}
+		app.state = stateCertificateOK
+		c.cert = expiresIn(2 * time.Hour)
+		// background refreshes fail, so the renewal falls back to a login
+		c.refreshErr = errors.New("refresh token expired")
+
+		renew := make(chan struct{})
+		app.renewClicked = renew
+
+		// the first setState of the event loop has finished once the
+		// tooltip is set
+		ready := make(chan struct{}, 1)
+		app.setTooltip = func(string) {
+			select {
+			case ready <- struct{}{}:
+			default:
+			}
+		}
+		result := make(chan string, 8)
+		app.notifier = func(title, message string, icon any) error {
+			result <- title
+			return nil
+		}
+
+		// the event loop only stops when the application quits, which needs
+		// a running system tray, so it is left running until the test ends
+		go app.eventloop()
+		<-ready
+
+		// the certificate is now within renewAt, so every setState tries an
+		// automatic refresh
+		c.mu.Lock()
+		c.cert = expiresIn(30 * time.Minute)
+		c.mu.Unlock()
+		renew <- struct{}{}
+
+		select {
+		case got := <-result:
+			if got != "Certificate Issued" {
+				t.Fatalf("run %d: notification = %q, want %q", i+1, got, "Certificate Issued")
+			}
+		case <-time.After(5 * time.Second):
+			t.Fatalf("run %d: the renewal did not finish", i+1)
+		}
+	}
+}
+
+// TestApplication_backoffConcurrent runs a renewal alongside setState, which
+// logs the backoff counters, so `go test -race` reports them if they are not
+// synchronised (#224)
+func TestApplication_backoffConcurrent(t *testing.T) {
+	app, c, _ := newTestApp(t)
+	c.cert = expiresIn(30 * time.Minute)
+	c.refreshErr = errors.New("refresh failed")
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for range 200 {
+			_ = app.renew()
+		}
+	}()
+
+	for range 200 {
+		app.setState()
+	}
+	<-done
+}
+
+// TestApplication_setState_refreshAgentError checks that an automatic refresh
+// that issues a certificate but can't add it to the SSH agent counts as a
+// refresh: the user is warned about the agent rather than told the
+// certificate expired, and no failure is counted towards the backoff (#222)
+func TestApplication_setState_refreshAgentError(t *testing.T) {
+	tests := []struct {
+		name  string
+		state appState
+		cert  *ssh.Certificate
+	}{
+		{"expired on start", stateInit, expiresIn(-time.Minute)},
+		{"expires while running", stateCertificateOK, expiresIn(-time.Minute)},
+		{"close to expiry", stateCertificateOK, expiresIn(30 * time.Minute)},
+		{"still expired", stateCertificateExpired, expiresIn(-time.Minute)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			app, c, tray := newTestApp(t)
+			app.state = tt.state
+			c.cert = tt.cert
+			c.agentErr = cert.ErrAddingToAgent
+
+			app.setState()
+
+			if app.state != stateCertificateOK {
+				t.Errorf("state = %s, want %s", app.state, stateCertificateOK)
+			}
+			if want := []string{"Warning"}; !slices.Equal(tray.notifications, want) {
+				t.Errorf("notifications = %q, want %q", tray.notifications, want)
+			}
+			if f, b := app.refreshFailure.Load(), app.refreshBackOff.Load(); f != 0 || b != 0 {
+				t.Errorf("failures = %d, backoff = %d, want 0 and 0", f, b)
+			}
+			if got := len(c.requestKinds()); got != 1 {
+				t.Errorf("%d requests made, want 1", got)
+			}
+		})
+	}
+}
+
+// TestApplication_refreshAgentError checks that a refresh from the menu that
+// issues a certificate but can't add it to the SSH agent clears the backoff,
+// as a certificate was obtained (#222)
+func TestApplication_refreshAgentError(t *testing.T) {
+	for name, obtain := range map[string]func(*Application) error{
+		"refresh": (*Application).refresh,
+		"renew":   (*Application).renew,
+	} {
+		t.Run(name, func(t *testing.T) {
+			app, c, _ := newTestApp(t)
+			c.agentErr = cert.ErrAddingToAgent
+			app.refreshFailure.Store(3)
+			app.refreshBackOff.Store(6)
+
+			if err := obtain(app); !errors.Is(err, cert.ErrAddingToAgent) {
+				t.Fatalf("%s() error = %v, want %v", name, err, cert.ErrAddingToAgent)
+			}
+			if f, b := app.refreshFailure.Load(), app.refreshBackOff.Load(); f != 0 || b != 0 {
+				t.Errorf("failures = %d, backoff = %d, want 0 and 0", f, b)
+			}
+		})
 	}
 }

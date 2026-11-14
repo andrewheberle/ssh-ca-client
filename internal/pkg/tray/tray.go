@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"fyne.io/systray"
@@ -85,9 +86,22 @@ type Application struct {
 	setTooltip func(tooltip string)
 	notifier   func(title, message string, icon any) error
 
-	mu             sync.Mutex
-	refreshBackOff int
-	refreshFailure int
+	// mu is held by a refresh or renewal, which may include an interactive
+	// login lasting minutes
+	mu sync.Mutex
+
+	// refreshFailure counts failed automatic refreshes in a row, and
+	// refreshBackOff how many more attempts to skip. They are written while
+	// mu is held, but are also read for logging while a renewal from the menu
+	// may hold it, so they are atomic.
+	refreshBackOff atomic.Int64
+	refreshFailure atomic.Int64
+
+	// renewing is set by the event loop while a renewal started from the
+	// menu is running, so no automatic refresh competes with it for mu. It is
+	// only used by the event loop, which is the only caller of setState once
+	// it has started.
+	renewing bool
 
 	logger *slog.Logger
 }
@@ -252,13 +266,13 @@ func (app *Application) setState() {
 			// have a private key
 			app.state = stateKeyOK
 
-			// if we have a certificate but it's expired on start, try to refresh
+			// if we have a certificate but it's expired on start, try to
+			// refresh. A failure counts towards the backoff, so the expired
+			// state below does not try again straight away.
 			if app.hasCertificate() {
 				if !app.certificateValid() {
-					if err := app.refresh(); err == nil {
+					if err := app.refreshWithBackoff(); app.refreshed(err) {
 						app.state = stateCertificateOK
-						app.logger.Info("refresh of certificate succeeded")
-						app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
 						app.setState()
 						break
 					} else {
@@ -324,6 +338,19 @@ func (app *Application) setState() {
 			break
 		}
 
+		// keep trying to refresh, with the backoff, as an earlier attempt may
+		// have failed only because the network was not up yet, such as after
+		// a resume or at logon
+		if err := app.refreshWithBackoff(); app.refreshed(err) {
+			app.state = stateCertificateOK
+			// re-run to handle change
+			app.setState()
+			// finish now
+			break
+		} else if !errors.Is(err, ErrRenewSkipped) && !errors.Is(err, ErrRenewRunning) {
+			app.logger.Warn("could not refresh expired certificate", "error", err, "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
+		}
+
 		app.mRenew.SetTitle("Renew")
 		app.mRenew.Enable()
 		app.mExpiry.SetTitle("Certificate expired")
@@ -350,10 +377,7 @@ func (app *Application) setState() {
 			app.logger.Info("current certificate expired")
 
 			// try to refresh
-			if err := app.refreshWithBackoff(); err == nil {
-				app.logger.Info("refresh of certificate succeeded")
-				// send notification
-				app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
+			if err := app.refreshWithBackoff(); app.refreshed(err) {
 				// re-run to handle change
 				app.setState()
 				// finish now
@@ -365,9 +389,9 @@ func (app *Application) setState() {
 				}
 
 				if errors.Is(err, ErrRenewSkipped) {
-					app.logger.Error("expired certificate was not renewed due to recent failures", "failures", app.refreshFailure, "backoff", app.refreshBackOff)
+					app.logger.Error("expired certificate was not renewed due to recent failures", "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
 				} else {
-					app.logger.Error("could not refresh expired certificate", "error", err, "failures", app.refreshFailure, "backoff", app.refreshBackOff)
+					app.logger.Error("could not refresh expired certificate", "error", err, "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
 				}
 			}
 
@@ -387,11 +411,7 @@ func (app *Application) setState() {
 			// try to refresh. On success the menu below is updated with the new
 			// expiry rather than re-running, so a certificate issued with less
 			// than renewAt validity is not refreshed again immediately.
-			if err := app.refreshWithBackoff(); err == nil {
-				app.logger.Info("refresh of certificate succeeded")
-				// send notification
-				app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
-			} else {
+			if err := app.refreshWithBackoff(); !app.refreshed(err) {
 				// return if renewal is in progress
 				if errors.Is(err, ErrRenewRunning) {
 					break
@@ -399,9 +419,9 @@ func (app *Application) setState() {
 
 				// just log error
 				if errors.Is(err, ErrRenewSkipped) {
-					app.logger.Error("certificate near expiry was not renewed due to recent failures", "failures", app.refreshFailure, "backoff", app.refreshBackOff)
+					app.logger.Error("certificate near expiry was not renewed due to recent failures", "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
 				} else {
-					app.logger.Error("could not refresh certificate close to expiry", "error", err, "failures", app.refreshFailure, "backoff", app.refreshBackOff)
+					app.logger.Error("could not refresh certificate close to expiry", "error", err, "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
 				}
 			}
 		}
@@ -444,11 +464,13 @@ func (app *Application) eventloop() {
 			app.mRenew.Disable()
 
 			renewDone = make(chan error, 1)
+			app.renewing = true
 			go func(done chan<- error) {
 				done <- app.refreshOrRenew()
 			}(renewDone)
 		case err := <-renewDone:
 			renewDone = nil
+			app.renewing = false
 
 			switch {
 			case err == nil:
@@ -493,7 +515,7 @@ func (app *Application) eventloop() {
 // renewal is attempted.
 func (app *Application) refreshOrRenew() error {
 	err := app.refresh()
-	if err == nil || errors.Is(err, cert.ErrAddingToAgent) {
+	if obtained(err) {
 		return err
 	}
 
@@ -502,35 +524,75 @@ func (app *Application) refreshOrRenew() error {
 	return app.renew()
 }
 
+// refreshWithBackoff is the automatic refresh, run by setState. It is skipped
+// while a renewal from the menu is running, and after failures, which back off
+// for twice the number of failures in a row.
 func (app *Application) refreshWithBackoff() error {
+	// a renewal from the menu holds the lock, possibly for an interactive
+	// login. Leave it alone rather than racing it for the lock, which would
+	// fail whichever starts second.
+	if app.renewing {
+		return ErrRenewRunning
+	}
+
 	// try to take lock and error immediately if we cant
 	if !app.mu.TryLock() {
 		return ErrRenewRunning
 	}
 	defer app.mu.Unlock()
 
-	if app.refreshBackOff > 0 {
+	if app.refreshBackOff.Load() > 0 {
 		// reduce our backoff counter
-		app.refreshBackOff--
+		app.refreshBackOff.Add(-1)
 
 		// exit
 		return ErrRenewSkipped
 	}
 
 	// we are ok to attempt a refresh
-	if err := app.identity.Obtain(app.ctx, identity.WithoutInteractiveLogin); err != nil {
-		// increment our failure count and set a backoff of double our failure count
-		app.refreshFailure++
-		app.refreshBackOff = app.refreshFailure * 2
+	err := app.identity.Obtain(app.ctx, identity.WithoutInteractiveLogin)
+	if obtained(err) {
+		app.resetBackoff()
 
 		return err
 	}
 
-	// reset on success
-	app.refreshFailure = 0
-	app.refreshBackOff = 0
+	// increment our failure count and set a backoff of double our failure count
+	app.refreshBackOff.Store(app.refreshFailure.Add(1) * 2)
 
-	return nil
+	return err
+}
+
+// obtained reports whether err, from obtaining a certificate, means a new
+// certificate was issued and saved. One that could not be added to the SSH
+// agent was still issued, and the error wraps [cert.ErrAddingToAgent].
+func obtained(err error) bool {
+	return err == nil || errors.Is(err, cert.ErrAddingToAgent)
+}
+
+// refreshed reports whether err, from an automatic refresh, means a new
+// certificate was issued, and tells the user. A certificate that could not be
+// added to the SSH agent is still valid, so the user is warned rather than
+// told it expired.
+func (app *Application) refreshed(err error) bool {
+	switch {
+	case err == nil:
+		app.logger.Info("refresh of certificate succeeded")
+		app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
+	case errors.Is(err, cert.ErrAddingToAgent):
+		app.logger.Warn("certificate refreshed but could not be added to the SSH agent", "error", err)
+		app.notify("Warning", "The certificate was refreshed but could not be added to the local SSH Authentication Agent", warningIcon)
+	default:
+		return false
+	}
+
+	return true
+}
+
+// resetBackoff clears the failures after a certificate was obtained
+func (app *Application) resetBackoff() {
+	app.refreshFailure.Store(0)
+	app.refreshBackOff.Store(0)
 }
 
 // refresh requests a new certificate without an interactive login, so only
@@ -544,15 +606,12 @@ func (app *Application) refresh() error {
 
 	app.logger.Info("attempting a refresh")
 
-	if err := app.identity.Obtain(app.ctx, identity.WithoutInteractiveLogin); err != nil {
-		return err
+	err := app.identity.Obtain(app.ctx, identity.WithoutInteractiveLogin)
+	if obtained(err) {
+		app.resetBackoff()
 	}
 
-	// reset on success
-	app.refreshFailure = 0
-	app.refreshBackOff = 0
-
-	return nil
+	return err
 }
 
 // renew requests a new certificate, running an interactive login if required.
@@ -564,15 +623,12 @@ func (app *Application) renew() error {
 	}
 	defer app.mu.Unlock()
 
-	if err := app.identity.Obtain(app.ctx); err != nil {
-		return err
+	err := app.identity.Obtain(app.ctx)
+	if obtained(err) {
+		app.resetBackoff()
 	}
 
-	// reset on success
-	app.refreshFailure = 0
-	app.refreshBackOff = 0
-
-	return nil
+	return err
 }
 
 func (app *Application) generate() error {
