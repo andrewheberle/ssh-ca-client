@@ -41,12 +41,12 @@
 
       <!--
       Reinstall files of an equal version ("e"), not only missing or older
-      ones ("o", the default). The client's version resource does not change
-      between releases, so an upgrade finds ssh-ca-client.exe, the key path
-      of ApplicationFiles, at an equal version, and decides that component
-      needs no install. RemoveExistingProducts then removes the old version,
-      and with it both programs. The files are private to this product, so
-      replacing one of an equal version is safe.
+      ones ("o", the default). An upgrade decides which files to copy before
+      RemoveExistingProducts removes the old version, so a file of an equal
+      version that was left in place would then be removed with it. The
+      client's version resource does not change between releases. The files
+      are private to this product, so replacing one of an equal version is
+      safe.
       -->
       <Property Id="REINSTALLMODE" Value="emus" />
 
@@ -111,9 +111,23 @@
 
          <Directory Id="$(var.Program_Files)">
             <Directory Id="INSTALLDIR" Name="$(var.Product)">
+               <!--
+                 The key path is a registry value, not a program. With a
+                 program as the key path, an upgrade that finds it already
+                 installed at an equal version gives the component no install
+                 action, and RemoveExistingProducts then removes both programs
+                 with the old version. The value records the installed
+                 version, in the Installer subkey the client ignores.
+               -->
                <Component Id="ApplicationFiles" Guid="66807fd7-177d-4462-822a-24211b9fb0f1">
                   <File Id="ApplicationFile0" Source="$(var.DistDir)/gui_windows_amd64_v1/ssh-ca-client.exe"/>
                   <File Id="ApplicationFile1" Source="$(var.DistDir)/cli_windows_amd64_v1/ssh-ca-client-cli.exe"/>
+                  <RegistryValue Root="HKLM"
+                                 Key="SOFTWARE\$(var.Company)\$(var.Product)\Installer"
+                                 Name="Version"
+                                 Type="string"
+                                 Value="[ProductVersion]"
+                                 KeyPath="yes" />
                </Component>
 
                <!--

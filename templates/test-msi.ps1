@@ -68,7 +68,7 @@ function Write-Diagnostics {
 
     if ($null -ne $script:lastLog -and (Test-Path $script:lastLog)) {
         Write-Output "-- $($script:lastLog)"
-        $pattern = 'Doing action: |Skipping action: |Action ended .*Return value [^1]|AppSearch|INSTALLDIR|START_ON_LOGIN|START_SSH_AGENT|StartOnLoginValue|StartSSHAgentValue|RemoveExistingProducts|UPGRADINGPRODUCTCODE|OLDERVERSIONBEINGUPGRADED|ApplicationFile|Overwrite|FileCopy|Note: 1: |Error '
+        $pattern = 'Component: |Doing action: |Skipping action: |Action ended .*Return value [^1]|AppSearch|INSTALLDIR|START_ON_LOGIN|START_SSH_AGENT|StartOnLoginValue|StartSSHAgentValue|RemoveExistingProducts|UPGRADINGPRODUCTCODE|OLDERVERSIONBEINGUPGRADED|ApplicationFile|Overwrite|FileCopy|Note: 1: |Error '
         Select-String -Path $script:lastLog -Pattern $pattern | ForEach-Object { Write-Output $_.Line }
     }
 }
@@ -131,7 +131,7 @@ function Assert-Uninstalled([string]$Dir) {
     foreach ($v in @($clientRun, $agentRun)) {
         Assert-True ($null -eq (Get-RegistryValue $runKey $v)) "Run value '$v' removed"
     }
-    foreach ($v in @('InstallDir', 'StartOnLogin', 'StartSSHAgent')) {
+    foreach ($v in @('InstallDir', 'StartOnLogin', 'StartSSHAgent', 'Version')) {
         Assert-True ($null -eq (Get-RegistryValue $installerKey $v)) "saved $v removed"
     }
 }

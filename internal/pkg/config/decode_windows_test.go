@@ -127,6 +127,7 @@ func TestDecodeConfig_Registry(t *testing.T) {
 					"InstallDir":    `C:\Program Files\Serverless SSH CA Client\`,
 					"StartOnLogin":  "1",
 					"StartSSHAgent": "0",
+					"Version":       "1.0.1",
 				},
 			},
 			want: want(nil),
