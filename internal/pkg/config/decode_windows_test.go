@@ -64,6 +64,7 @@ func TestDecodeConfig_Registry(t *testing.T) {
 	tests := []struct {
 		name    string
 		config  map[string]any
+		subkeys map[string]map[string]any // subkeys of the config key
 		policy  map[string]any
 		want    ClientConfig
 		wantErr error // checked with errors.Is; errAny for any error
@@ -115,6 +116,31 @@ func TestDecodeConfig_Registry(t *testing.T) {
 			name:   "installer value",
 			config: required(map[string]any{"installed0": uint32(1)}),
 			want:   want(nil),
+		},
+		{
+			// the MSI keeps the properties it was installed with in the
+			// Installer subkey of the HKLM config key
+			name:   "installer subkey",
+			config: required(nil),
+			subkeys: map[string]map[string]any{
+				"Installer": {
+					"InstallDir":    `C:\Program Files\Serverless SSH CA Client\`,
+					"StartOnLogin":  "1",
+					"StartSSHAgent": "0",
+					"Version":       "1.0.1",
+				},
+			},
+			want: want(nil),
+		},
+		{
+			// any other subkey is an unknown key, as a value put there by
+			// mistake would otherwise be silently ignored
+			name:   "other subkey",
+			config: required(nil),
+			subkeys: map[string]map[string]any{
+				"Settings": {"scopes": []string{"openid"}},
+			},
+			wantErr: ErrUnknownKey,
 		},
 		{
 			// an enabled Policy left empty does not replace the setting
@@ -175,6 +201,11 @@ func TestDecodeConfig_Registry(t *testing.T) {
 			policyPath := base + `-policy`
 			if tt.config != nil {
 				createTestKey(t, configPath, tt.config)
+			}
+			// a subkey is removed before its parent, as cleanups run last
+			// in first out
+			for name, values := range tt.subkeys {
+				createTestKey(t, configPath+`\`+name, values)
 			}
 			if tt.policy != nil {
 				createTestKey(t, policyPath, tt.policy)

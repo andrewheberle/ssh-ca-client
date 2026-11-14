@@ -135,7 +135,8 @@ of being silently ignored:
   default with nothing.
 
 The `installed0` value that the MSI writes under the HKCU configuration key is
-ignored.
+ignored, as is the `Installer` subkey where later MSIs save their install
+options (see [MSI](#msi)).
 
 ## Windows Group Policy
 
@@ -184,12 +185,18 @@ The packaged units are now sandboxed:
 
 ## MSI
 
-The MSI does not remember the properties it was installed with. When you
-upgrade an install that used a custom `INSTALLDIR`, or `START_ON_LOGIN=0` or
-`START_SSH_AGENT=0`, give the same properties again, or the upgrade installs
-to the default directory and turns autostart back on
+The 1.0.0 MSI, and every earlier one, does not remember the properties it was
+installed with. When you upgrade an install that used a custom `INSTALLDIR`,
+or `START_ON_LOGIN=0` or `START_SSH_AGENT=0`, give the same properties again,
+or the upgrade installs to the default directory and turns autostart back on
 ([#235](https://github.com/andrewheberle/ssh-ca-client/issues/235)):
 
 ```powershell
 msiexec /i ssh-ca-client_1.0.0_windows_amd64.msi INSTALLDIR="D:\Tools\SSH CA\" START_SSH_AGENT=0
 ```
+
+MSIs after 1.0.0 save these properties under
+`HKLM\SOFTWARE\Andrew Heberle\Serverless SSH CA Client\Installer`, and an
+upgrade reuses them unless they are given again on the command line. Once a
+release after 1.0.0 is installed, later upgrades don't need the properties.
+The `Installer` key is not covered by the 1.0 promise.
