@@ -12,7 +12,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/allan-simon/go-singleinstance"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/identity"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
@@ -124,14 +123,13 @@ func Execute(ctx context.Context, args []string) error {
 	}
 
 	// make sure we are only running once
-	lockFile, err := singleinstance.CreateLockFile(filepath.Join(state, "tray.lock"))
+	release, err := lockSingleInstance(filepath.Join(state, "tray.lock"))
 	if err != nil {
 		logger.Error("could not take lock", "error", err)
 		return err
 	}
 	defer func() {
-		_ = lockFile.Close()
-		_ = os.Remove(lockFile.Name())
+		_ = release()
 	}()
 
 	// load config
