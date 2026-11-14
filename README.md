@@ -55,7 +55,18 @@ enabled the `host-ssh-krl-refresh` user timer, disable it yourself with
 stopped when the package is removed.
 
 On Windows there is an MSI build that includes both the GUI and CLI versions
-and is the recommended option for Windows users.
+and is the recommended option for Windows users. By default it installs to
+`Program Files` and starts both the client and the OpenSSH Authentication
+Agent at login. A silent install can change these with the `INSTALLDIR`,
+`START_ON_LOGIN=0` and `START_SSH_AGENT=0` properties:
+
+```powershell
+msiexec /i ssh-ca-client_<version>_windows_amd64.msi /qn INSTALLDIR="D:\Tools\SSH CA\" START_SSH_AGENT=0
+```
+
+An upgrade keeps the options the install used, unless they are given again.
+MSIs up to 1.0.0 did not save them, so upgrading from one of those needs the
+properties once more.
 
 ### Verifying Releases
 

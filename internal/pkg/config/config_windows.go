@@ -92,7 +92,7 @@ func loadRegistryKey(k *koanf.Koanf, key registry.Key, path string) error {
 		// the MSI writes values to the config key that are not
 		// configuration, and existing installs keep them, so they are
 		// ignored
-		if slices.Contains(ignoredRegistryValues, name) {
+		if slices.Contains(ignoredRegistryValues, name) || ignoredRegistrySubkey(name) {
 			continue
 		}
 
@@ -114,6 +114,17 @@ func loadRegistryKey(k *koanf.Koanf, key registry.Key, path string) error {
 // configuration. installed0 is the per-user marker for the Start menu
 // shortcut that the MSI writes under HKCU (templates/product.wxs).
 var ignoredRegistryValues = []string{"installed0"}
+
+// installerSubkey is the subkey of the HKLM config key where the MSI keeps
+// the properties it was installed with, so an upgrade can reuse them
+// (templates/product.wxs). Any other subkey is still an unknown key.
+const installerSubkey = "installer"
+
+// ignoredRegistrySubkey reports whether name, lower-cased, is a value in the
+// installer subkey. The provider names a value in a subkey <subkey>.<value>.
+func ignoredRegistrySubkey(name string) bool {
+	return strings.HasPrefix(name, installerSubkey+".")
+}
 
 // ConfigPath returns the default config location, which on Windows is the
 // HKLM registry hive.

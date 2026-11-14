@@ -40,12 +40,61 @@
       <Condition Message="A newer version of this software is already installed.">NOT NEWERVERSIONDETECTED</Condition>
 
       <!--
-      Properties for install options.
-      Both default to enabled (1). Can be overridden on the msiexec command line:
-        msiexec /i ssh-ca-client.msi /qn START_ON_LOGIN=0 START_SSH_AGENT=0
+      Install options, given on the msiexec command line:
+        msiexec /i ssh-ca-client.msi /qn INSTALLDIR="D:\Tools\SSH CA\" START_ON_LOGIN=0 START_SSH_AGENT=0
+
+      The options an install used are saved under the Installer subkey of the
+      config key (C.InstallerOptions), and an upgrade reuses them, so a custom
+      install directory or a disabled option is kept. Each option takes, in
+      order: the command line, the saved value, then the default, which is
+      Program Files for INSTALLDIR and enabled (1) for the others. The client
+      ignores the Installer subkey when it loads the config.
+
+      The saved values are read by AppSearch, which runs before
+      RemoveExistingProducts removes the old install and its saved values.
+      The options are then set by the custom actions below, which run once:
+      in the UI sequence, or in the execute sequence for a silent install.
+      START_ON_LOGIN and START_SSH_AGENT are left unset when disabled, rather
+      than "0", as a checkbox is ticked whenever its property has a value. The
+      Unset actions set them to [NoValue], a property that is never set, which
+      removes them.
       -->
-      <Property Id="START_ON_LOGIN" Value="1" Secure="yes" />
-      <Property Id="START_SSH_AGENT" Value="1" Secure="yes" />
+      <Property Id="START_ON_LOGIN" Secure="yes" />
+      <Property Id="START_SSH_AGENT" Secure="yes" />
+
+      <Property Id="INSTALLDIR_SAVED">
+         <RegistrySearch Id="SearchInstallDir" Root="HKLM"
+                         Key="SOFTWARE\$(var.Company)\$(var.Product)\Installer"
+                         Name="InstallDir" Type="raw" />
+      </Property>
+      <Property Id="START_ON_LOGIN_SAVED">
+         <RegistrySearch Id="SearchStartOnLogin" Root="HKLM"
+                         Key="SOFTWARE\$(var.Company)\$(var.Product)\Installer"
+                         Name="StartOnLogin" Type="raw" />
+      </Property>
+      <Property Id="START_SSH_AGENT_SAVED">
+         <RegistrySearch Id="SearchStartSSHAgent" Root="HKLM"
+                         Key="SOFTWARE\$(var.Company)\$(var.Product)\Installer"
+                         Name="StartSSHAgent" Type="raw" />
+      </Property>
+
+      <CustomAction Id="RestoreInstallDir" Property="INSTALLDIR" Value="[INSTALLDIR_SAVED]" Execute="firstSequence" />
+      <CustomAction Id="RestoreStartOnLogin" Property="START_ON_LOGIN" Value="[START_ON_LOGIN_SAVED]" Execute="firstSequence" />
+      <CustomAction Id="DefaultStartOnLogin" Property="START_ON_LOGIN" Value="1" Execute="firstSequence" />
+      <CustomAction Id="UnsetStartOnLogin" Property="START_ON_LOGIN" Value="[NoValue]" Execute="firstSequence" />
+      <CustomAction Id="RestoreStartSSHAgent" Property="START_SSH_AGENT" Value="[START_SSH_AGENT_SAVED]" Execute="firstSequence" />
+      <CustomAction Id="DefaultStartSSHAgent" Property="START_SSH_AGENT" Value="1" Execute="firstSequence" />
+      <CustomAction Id="UnsetStartSSHAgent" Property="START_SSH_AGENT" Value="[NoValue]" Execute="firstSequence" />
+
+      <!--
+      The values saved for the options: "1" when enabled and "0" when
+      disabled, as an empty value would read back as nothing saved. Set in the
+      execute sequence, which writes them.
+      -->
+      <Property Id="StartOnLoginValue" Value="0" />
+      <Property Id="StartSSHAgentValue" Value="0" />
+      <CustomAction Id="SaveStartOnLogin" Property="StartOnLoginValue" Value="1" />
+      <CustomAction Id="SaveStartSSHAgent" Property="StartSSHAgentValue" Value="1" />
 
       <Directory Id="TARGETDIR" Name="SourceDir">
 
@@ -89,9 +138,35 @@
             </Component>
 
             <!--
+              Component: install options, read back on upgrade (see the
+              properties above). Kept in a subkey of the config key, which the
+              client ignores.
+            -->
+            <Component Id="C.InstallerOptions" Guid="7fdce4a8-1f18-4a02-8a73-45d3c4f2c152">
+               <RegistryValue Root="HKLM"
+                              Key="SOFTWARE\$(var.Company)\$(var.Product)\Installer"
+                              Name="InstallDir"
+                              Type="string"
+                              Value="[INSTALLDIR]"
+                              KeyPath="yes" />
+               <RegistryValue Root="HKLM"
+                              Key="SOFTWARE\$(var.Company)\$(var.Product)\Installer"
+                              Name="StartOnLogin"
+                              Type="string"
+                              Value="[StartOnLoginValue]" />
+               <RegistryValue Root="HKLM"
+                              Key="SOFTWARE\$(var.Company)\$(var.Product)\Installer"
+                              Name="StartSSHAgent"
+                              Type="string"
+                              Value="[StartSSHAgentValue]" />
+            </Component>
+
+            <!--
               Component: Run on login (HKLM).
               Condition restricts installation to when START_ON_LOGIN=1.
               MSI handles removal of the registry value on uninstall automatically.
+              The path is quoted, as it can contain spaces, which Windows would
+              otherwise split it on to find the program to run.
             -->
             <Component Id="C.RunOnLogin" Guid="b6a2ec5d-8254-43b9-a291-fa03b4944579">
                <Condition>START_ON_LOGIN = 1</Condition>
@@ -99,7 +174,7 @@
                               Key="Software\Microsoft\Windows\CurrentVersion\Run"
                               Name="Serverless SSH CA Client"
                               Type="string"
-                              Value="[INSTALLDIR]ssh-ca-client.exe"
+                              Value="&quot;[INSTALLDIR]ssh-ca-client.exe&quot;"
                               KeyPath="yes" />
             </Component>
 
@@ -116,7 +191,7 @@
                               Key="Software\Microsoft\Windows\CurrentVersion\Run"
                               Name="OpenSSH Authentication Agent"
                               Type="expandable"
-                              Value="%SystemRoot%\System32\OpenSSH\ssh-agent.exe"
+                              Value="&quot;%SystemRoot%\System32\OpenSSH\ssh-agent.exe&quot;"
                               KeyPath="yes" />
             </Component>
          </Directory>
@@ -140,7 +215,33 @@
 
       </Directory>
 
+      <!--
+      Install options: see the properties above. The same actions are in both
+      sequences, and run in the first. They have fixed numbers, so they run in
+      order straight after AppSearch (50), and before CostFinalize (1000)
+      resolves INSTALLDIR and the component conditions are checked, rather
+      than wherever wixl's own ordering puts an action sequenced with After.
+      -->
+      <InstallUISequence>
+         <Custom Action="RestoreInstallDir" Sequence="51">INSTALLDIR_SAVED AND NOT INSTALLDIR</Custom>
+         <Custom Action="RestoreStartOnLogin" Sequence="52">START_ON_LOGIN_SAVED AND NOT START_ON_LOGIN</Custom>
+         <Custom Action="DefaultStartOnLogin" Sequence="53">NOT START_ON_LOGIN</Custom>
+         <Custom Action="UnsetStartOnLogin" Sequence="54">START_ON_LOGIN &lt;&gt; "1"</Custom>
+         <Custom Action="RestoreStartSSHAgent" Sequence="55">START_SSH_AGENT_SAVED AND NOT START_SSH_AGENT</Custom>
+         <Custom Action="DefaultStartSSHAgent" Sequence="56">NOT START_SSH_AGENT</Custom>
+         <Custom Action="UnsetStartSSHAgent" Sequence="57">START_SSH_AGENT &lt;&gt; "1"</Custom>
+      </InstallUISequence>
+
       <InstallExecuteSequence>
+         <Custom Action="RestoreInstallDir" Sequence="51">INSTALLDIR_SAVED AND NOT INSTALLDIR</Custom>
+         <Custom Action="RestoreStartOnLogin" Sequence="52">START_ON_LOGIN_SAVED AND NOT START_ON_LOGIN</Custom>
+         <Custom Action="DefaultStartOnLogin" Sequence="53">NOT START_ON_LOGIN</Custom>
+         <Custom Action="UnsetStartOnLogin" Sequence="54">START_ON_LOGIN &lt;&gt; "1"</Custom>
+         <Custom Action="RestoreStartSSHAgent" Sequence="55">START_SSH_AGENT_SAVED AND NOT START_SSH_AGENT</Custom>
+         <Custom Action="DefaultStartSSHAgent" Sequence="56">NOT START_SSH_AGENT</Custom>
+         <Custom Action="UnsetStartSSHAgent" Sequence="57">START_SSH_AGENT &lt;&gt; "1"</Custom>
+         <Custom Action="SaveStartOnLogin" Sequence="58">START_ON_LOGIN = "1"</Custom>
+         <Custom Action="SaveStartSSHAgent" Sequence="59">START_SSH_AGENT = "1"</Custom>
          <RemoveExistingProducts After="InstallValidate"/>
       </InstallExecuteSequence>
 
@@ -150,6 +251,7 @@
          <ComponentRef Id="C.PolicyADMX" />
          <ComponentRef Id="C.PolicyADML" />
          <ComponentRef Id="C.EventLog" />
+         <ComponentRef Id="C.InstallerOptions" />
          <ComponentRef Id="C.RunOnLogin" />
          <ComponentRef Id="C.SSHAgent" />
       </Feature>
