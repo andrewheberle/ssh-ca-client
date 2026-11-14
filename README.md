@@ -387,7 +387,7 @@ interactive authentication flow.
 
 ### Host Certificates
 
-The CLI can be used to request certificates for pre-exisiting SSH host keys using the
+The CLI can be used to request certificates for pre-existing SSH host keys using the
 `host` sub-command as follows:
 
 ```sh
@@ -401,25 +401,27 @@ ssh-ca-client-cli host --renew
 #### Overview
 
 Requesting host certificates is restricted to users that have been explicitly
-allowed to do this in tge configuration of the CA.
+allowed to do this in the configuration of the CA.
 
-By default the CLI will attempt to request certificates for the following keys:
+By default the CLI will attempt to request certificates for the following keys,
+in this order:
 
-* /etc/ssh/ssh_host_rsa_key
-* /etc/ssh/ssh_host_ecdsa_key
 * /etc/ssh/ssh_host_ed25519_key
+* /etc/ssh/ssh_host_ecdsa_key
+* /etc/ssh/ssh_host_rsa_key
 
 Certificates will be saved as `KEYNAME-cert.pub` and can be used by `sshd` by
-adding the following to your `sshd_config` (or `/etc/ssh/sshd_conf.d/*.conf`):
+adding the following to your `sshd_config` (or `/etc/ssh/sshd_config.d/*.conf`):
 
 ```
-HostCertificate /etc/ssh/ssh_host_rsa_key-cert.pub
-HostCertificate /etc/ssh/ssh_host_ecdsa_key-cert.pub
 HostCertificate /etc/ssh/ssh_host_ed25519_key-cert.pub
+HostCertificate /etc/ssh/ssh_host_ecdsa_key-cert.pub
+HostCertificate /etc/ssh/ssh_host_rsa_key-cert.pub
 ```
 
 To ensure your ssh client trusts hosts with certificates issued by your CA you
-must add the following to your `authorized_keys` file:
+must add the following to your `~/.ssh/known_hosts` file, or to
+`/etc/ssh/ssh_known_hosts` to trust the CA for all users of the machine:
 
 ```
 @cert-authority *.example.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdH...
@@ -431,15 +433,18 @@ a certificate signed by the specified CA public key (ie the
 CA for all hosts.
 
 By default the CLI will request a certificate with the hostname of the system
-you are running the command on, however it is recommeded to include the FQDN
+you are running the command on, however it is recommended to include the FQDN
 and IP addresses of the host using the `--principals` option as follows:
 
 ```sh
 ssh-ca-client-cli host --principals hostname,hostname.example.com,192.168.1.1,etc
 ```
 
-The CA does not currently enforce any restrictions on what principals it will
-issue a certificate for at this time.
+The CA refuses principals that are empty, or that contain wildcard or pattern
+characters (`*`, `?`, `!` or `,`), whitespace or control characters, as OpenSSH
+would read them as patterns or lists. A principal of `*` would otherwise make the
+certificate valid for every host. Who may request host certificates is set in
+the configuration of the CA.
 
 #### Renewals
 
@@ -502,18 +507,15 @@ sandboxing needs unprivileged user namespaces, which some systems disable.
 
 #### Command Line Options
 
-The `host` sub-command supports the following command-line options:
+The options of the `host` sub-command, with their defaults, are listed in
+[ssh-ca-client-cli host](docs/ssh-ca-client-cli-host.md), which is generated
+from the CLI. In particular:
 
-| Flag        | Type       | Default | Description |
-|---|---|---|---|
-| `--life` | `time.Duration` | 30d | Lifetime of certificate |
-| `--delay` | `time.Duration` | 250ms | Delay between requests/renewals for multiple keys (randomised between 50% and 150%) |
-| `--key` | `[]string` | /etc/ssh/ssh_host_ed25519_key,/etc/ssh/ssh_host_ecdsa_key,/etc/ssh/ssh_host_rsa_key | Key(s) to request/renew certificates for (may be specified multiple times or as a comma seperated string). ECDSA, Ed25519 and RSA (2048 bits or larger) keys are supported |
-| `--principals` | `[]string` | `hostname` | Principal(s) to request on certificate (may be specified multiple times or as a comma seperated string) |
-| `--renew` | `bool` | false | Attempt to renew existing certificate(s) for the specified key(s) |
-| `--force` | `bool` | false | Force renewal of certificate(s) regardless of remaining validity |
-| `--renew-at` | `float64` | 0.5 | Renew at this fraction of remaining validity for existing certificate(s) |
-| `--reload-command` | `string` | | Command run with `/bin/sh -c` once host certificates have changed, such as to reload `sshd` |
+* `--life` sets the lifetime of a new certificate, which defaults to 30 days
+  (`720h`).
+* `--renew-at` sets when `--renew` renews a certificate, as the fraction of its
+  lifetime that has passed. The default of `0.5` renews once half of the
+  lifetime has passed, and `0.8` once four fifths have.
 
 The `--addr` option from previous versions has been removed as the listen
 address for the OIDC auth flow is now taken from the configured `redirect_url`.
