@@ -1,6 +1,7 @@
 package gui
 
 import (
+	"bytes"
 	"context"
 	"embed"
 	"errors"
@@ -39,7 +40,11 @@ func Execute(ctx context.Context, args []string) error {
 		disableProxy, addOnStart, showVersion, debugLogging, logToFile, json bool
 	)
 
-	flags := pflag.NewFlagSet("ssh-ca-client", pflag.ExitOnError)
+	// the usage and any problem with the command line are returned as an
+	// [Exit], as on Windows the GUI has no console to print them to
+	var usage bytes.Buffer
+	flags := pflag.NewFlagSet("ssh-ca-client", pflag.ContinueOnError)
+	flags.SetOutput(&usage)
 
 	flags.DurationVar(&lifetime, "life", time.Hour*24, "Lifetime of SSH certificate")
 	flags.DurationVar(&renewAt, "refresh-before", time.Hour, "Refresh the certificate once less than this remains of its lifetime")
@@ -63,12 +68,18 @@ func Execute(ctx context.Context, args []string) error {
 		logToFile = true
 	}
 	flags.BoolVar(&addOnStart, "add-on-start", true, "Add current key and certificate (if valid) to SSH agent on start")
-	_ = flags.Parse(args)
+	if err := flags.Parse(args); err != nil {
+		if errors.Is(err, pflag.ErrHelp) {
+			return &Exit{Message: usage.String(), Code: 0}
+		}
+		// as pflag prints it with ExitOnError, which it doesn't otherwise
+		fmt.Fprintf(&usage, "%v\nUsage of %s:\n%s", err, flags.Name(), flags.FlagUsages())
+		return &Exit{Message: usage.String(), Code: 2}
+	}
 
 	// handle version flag
 	if showVersion {
-		fmt.Printf("ssh-ca-client %s\n", version.Version())
-		os.Exit(0)
+		return &Exit{Message: fmt.Sprintf("ssh-ca-client %s\n", version.Version()), Code: 0}
 	}
 
 	// check renewAt is not larger than lifetime
@@ -125,8 +136,17 @@ func Execute(ctx context.Context, args []string) error {
 	// without a console, output to stdout and stderr is logged instead
 	redirectOutput(logger)
 
+	// warnings from parsing the command line, such as a deprecated flag
+	if usage.Len() > 0 {
+		_, _ = os.Stderr.Write(usage.Bytes())
+	}
+
 	// make sure we are only running once
 	release, err := lockSingleInstance(filepath.Join(state, "tray.lock"))
+	if errors.Is(err, ErrAlreadyRunning) {
+		logger.Info("not starting as the GUI is already running")
+		return &Exit{Message: names.FriendlyAppName + " is already running. Look for its icon in the notification area.\n", Code: 0}
+	}
 	if err != nil {
 		logger.Error("could not take lock", "error", err)
 		return err
