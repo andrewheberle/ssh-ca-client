@@ -136,6 +136,66 @@ jobs:
             failed=1
           fi
           exit "$failed"
+  deb:
+    name: deb
+    # The maintainer scripts handle the timers themselves, as nfpm doesn't, so
+    # the deb is installed, removed, reinstalled and purged with the real dpkg
+    # and systemd, which the runner runs as PID 1
+    runs-on: ubuntu-latest
+    needs: client
+    permissions: {}
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist-artifact
+          path: dist
+      - name: Check the timers across remove, reinstall, upgrade and purge
+        run: |
+          set -euo pipefail
+
+          deb="$(find dist -name 'ssh-ca-client_*_amd64.deb' | head -n 1)"
+          if [ -z "$deb" ]; then
+            echo "::error::no amd64 deb found in dist"
+            exit 1
+          fi
+          timer=host-ssh-certificate-renewal.timer
+          # the link that enabling the timer creates, which is checked directly as
+          # systemctl can't report a timer enabled once its unit file is removed
+          link="/etc/systemd/system/timers.target.wants/$timer"
+
+          check() {
+            local want_active="$1" want_enabled="$2" step="$3"
+            local active enabled=no
+            active="$(systemctl is-active "$timer" || true)"
+            [ -L "$link" ] && enabled=yes
+            echo "$step: $timer is $active, enabled $enabled"
+            if [ "$active" != "$want_active" ] || [ "$enabled" != "$want_enabled" ]; then
+              echo "::error::after $step, $timer is $active and enabled $enabled, want $want_active and enabled $want_enabled"
+              exit 1
+            fi
+          }
+
+          sudo dpkg -i "$deb"
+          sudo systemctl enable --now "$timer"
+          check active yes "install and enable"
+
+          # remove stops the timer but keeps it enabled until purge
+          sudo dpkg -r ssh-ca-client
+          check inactive yes "remove"
+
+          # a reinstall after remove starts the enabled timer again (#236)
+          sudo dpkg -i "$deb"
+          check active yes "reinstall"
+
+          # installing over an installed package is an upgrade
+          sudo dpkg -i "$deb"
+          check active yes "upgrade"
+
+          # purge disables the timer
+          sudo dpkg -P ssh-ca-client
+          check inactive no "purge"
+
   snapcraft:
     name: Publish Snap
     runs-on: ubuntu-latest
@@ -232,7 +292,7 @@ jobs:
   build-ok:
     name: build-ok
     runs-on: ubuntu-latest
-    needs: [client, schema, units, msi, msi-test]
+    needs: [client, schema, units, deb, msi, msi-test]
     if: ${{ always() }}
     permissions: {}
     steps:
