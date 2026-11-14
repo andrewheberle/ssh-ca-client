@@ -1,6 +1,8 @@
 package api_test
 
 import (
+	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/api"
@@ -21,6 +23,11 @@ func TestStatusError(t *testing.T) {
 		{"no errors field", 401, `{"success":false}`, "bad status code: 401"},
 		{"not json", 502, "<html>bad gateway</html>", "bad status code: 502"},
 		{"empty body", 404, "", "bad status code: 404"},
+		// messages are cut to 512 bytes, so a misbehaving CA can't fill the logs
+		{"message at the limit", 500, errorBody(strings.Repeat("x", 512)), "bad status code: 500: " + strings.Repeat("x", 512)},
+		{"long message cut", 500, errorBody(strings.Repeat("x", 100_000)), "bad status code: 500: " + strings.Repeat("x", 512) + "..."},
+		// byte 512 is in the middle of an "é", which is left out whole
+		{"cut at a character boundary", 500, errorBody("a" + strings.Repeat("é", 300)), "bad status code: 500: a" + strings.Repeat("é", 255) + "..."},
 	}
 
 	for _, tt := range tests {
@@ -30,4 +37,17 @@ func TestStatusError(t *testing.T) {
 			}
 		})
 	}
+}
+
+// errorBody returns an error response from the CA with message
+func errorBody(message string) string {
+	b, err := json.Marshal(map[string]any{
+		"success": false,
+		"errors":  []map[string]any{{"code": 1, "message": message}},
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	return string(b)
 }
