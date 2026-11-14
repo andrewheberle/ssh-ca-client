@@ -828,3 +828,67 @@ func TestApplication_backoffConcurrent(t *testing.T) {
 	}
 	<-done
 }
+
+// TestApplication_setState_refreshAgentError checks that an automatic refresh
+// that issues a certificate but can't add it to the SSH agent counts as a
+// refresh: the user is warned about the agent rather than told the
+// certificate expired, and no failure is counted towards the backoff (#222)
+func TestApplication_setState_refreshAgentError(t *testing.T) {
+	tests := []struct {
+		name  string
+		state appState
+		cert  *ssh.Certificate
+	}{
+		{"expired on start", stateInit, expiresIn(-time.Minute)},
+		{"expires while running", stateCertificateOK, expiresIn(-time.Minute)},
+		{"close to expiry", stateCertificateOK, expiresIn(30 * time.Minute)},
+		{"still expired", stateCertificateExpired, expiresIn(-time.Minute)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			app, c, tray := newTestApp(t)
+			app.state = tt.state
+			c.cert = tt.cert
+			c.agentErr = cert.ErrAddingToAgent
+
+			app.setState()
+
+			if app.state != stateCertificateOK {
+				t.Errorf("state = %s, want %s", app.state, stateCertificateOK)
+			}
+			if want := []string{"Warning"}; !slices.Equal(tray.notifications, want) {
+				t.Errorf("notifications = %q, want %q", tray.notifications, want)
+			}
+			if f, b := app.refreshFailure.Load(), app.refreshBackOff.Load(); f != 0 || b != 0 {
+				t.Errorf("failures = %d, backoff = %d, want 0 and 0", f, b)
+			}
+			if got := len(c.requestKinds()); got != 1 {
+				t.Errorf("%d requests made, want 1", got)
+			}
+		})
+	}
+}
+
+// TestApplication_refreshAgentError checks that a refresh from the menu that
+// issues a certificate but can't add it to the SSH agent clears the backoff,
+// as a certificate was obtained (#222)
+func TestApplication_refreshAgentError(t *testing.T) {
+	for name, obtain := range map[string]func(*Application) error{
+		"refresh": (*Application).refresh,
+		"renew":   (*Application).renew,
+	} {
+		t.Run(name, func(t *testing.T) {
+			app, c, _ := newTestApp(t)
+			c.agentErr = cert.ErrAddingToAgent
+			app.refreshFailure.Store(3)
+			app.refreshBackOff.Store(6)
+
+			if err := obtain(app); !errors.Is(err, cert.ErrAddingToAgent) {
+				t.Fatalf("%s() error = %v, want %v", name, err, cert.ErrAddingToAgent)
+			}
+			if f, b := app.refreshFailure.Load(), app.refreshBackOff.Load(); f != 0 || b != 0 {
+				t.Errorf("failures = %d, backoff = %d, want 0 and 0", f, b)
+			}
+		})
+	}
+}
