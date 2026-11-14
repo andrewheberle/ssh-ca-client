@@ -81,10 +81,13 @@ jobs:
         uses: samuelmeuli/action-snapcraft@fceeb3c308e76f3487e72ef608618de625fb7fe8 # v3.0.1
         with:
           channel: ${{ env.SNAPCRAFT_CHANNEL }}
+      # a prerelease goes to the candidate channel, not stable, matching the
+      # apt job, which skips prereleases, and GoReleaser's prerelease: auto
       - name: Upload to Snap Store
-        run: find dist -name *.snap -exec snapcraft upload {} --release=stable \;
+        run: find dist -name *.snap -exec snapcraft upload {} --release="$SNAP_CHANNEL" \;
         env:
           TERM: dumb
+          SNAP_CHANNEL: ${{ contains(github.ref_name, '-') && 'candidate' || 'stable' }}
     env:
       SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
