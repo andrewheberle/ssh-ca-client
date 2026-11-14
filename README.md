@@ -704,11 +704,11 @@ The `--addr` and `--user` options from previous versions have been removed. The
 listen address for the OIDC auth flow is taken from the configured
 `redirect_url` and user data is stored in the operating system keyring.
 
-On Linux the default log directory follows `$XDG_STATE_HOME` if set, and when
-running as a snap logs are written to `$SNAP_USER_COMMON`. Previous versions
-logged to `%APPDATA%\Serverless SSH CA Client\log` (Windows) or
-`~/.config/serverless-ssh-ca/log` (Linux), and any logs there are no longer
-used.
+On Linux the default log directory is `$XDG_STATE_HOME/serverless-ssh-ca/log`
+if `$XDG_STATE_HOME` is set, and `$SNAP_USER_COMMON/log` when running as a
+snap. Previous versions logged to `%APPDATA%\Serverless SSH CA Client\log`
+(Windows) or `~/.config/serverless-ssh-ca/log` (Linux), and any logs there are
+no longer used.
 
 # Attributions
 
