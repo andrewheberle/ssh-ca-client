@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.0.1](https://github.com/andrewheberle/ssh-ca-client/compare/v1.0.0...v1.0.1) (2026-11-14)
+
+
+### Bug Fixes
+
+* **deb:** start enabled timers when the package is installed again ([#260](https://github.com/andrewheberle/ssh-ca-client/issues/260)) ([e87643b](https://github.com/andrewheberle/ssh-ca-client/commit/e87643bbe1a0ade268b2abd063b54e6ab1a552ff))
+* **deps:** update module github.com/gen2brain/beeep to v0.12.0 ([#248](https://github.com/andrewheberle/ssh-ca-client/issues/248)) ([fd6474c](https://github.com/andrewheberle/ssh-ca-client/commit/fd6474cb8d848f5ef3514c04b2c61c076a6ce876))
+* **gui:** keep the lock file when the GUI exits ([#259](https://github.com/andrewheberle/ssh-ca-client/issues/259)) ([224c1a2](https://github.com/andrewheberle/ssh-ca-client/commit/224c1a22bcaf62cfdc2f73e6819ac63159359c28))
+* **gui:** log Pageant proxy failures on Windows ([#261](https://github.com/andrewheberle/ssh-ca-client/issues/261)) ([e7f5edf](https://github.com/andrewheberle/ssh-ca-client/commit/e7f5edf32f5157927be78a5db59d31a66b1a17fa))
+* **gui:** show start-up errors in a message box on Windows ([#262](https://github.com/andrewheberle/ssh-ca-client/issues/262)) ([b21d555](https://github.com/andrewheberle/ssh-ca-client/commit/b21d55527c7bacc88bdf32fd6ae65471c6cbd9db))
+* **host:** skip default host keys with no certificate when renewing ([#256](https://github.com/andrewheberle/ssh-ca-client/issues/256)) ([8fe83bf](https://github.com/andrewheberle/ssh-ca-client/commit/8fe83bf93e7dd2d402ed1dd0fa502b4275a37d4b))
+* limit the size of responses read from the CA ([#263](https://github.com/andrewheberle/ssh-ca-client/issues/263)) ([e10c152](https://github.com/andrewheberle/ssh-ca-client/commit/e10c152f6825b06d116c465de9a2b75e7681097f))
+* **msi:** quote the paths in the Run values ([#237](https://github.com/andrewheberle/ssh-ca-client/issues/237)) ([8e091d5](https://github.com/andrewheberle/ssh-ca-client/commit/8e091d574cac34cba639e5f2e402259116d3391c))
+* **msi:** remember the install directory and options on upgrade ([#235](https://github.com/andrewheberle/ssh-ca-client/issues/235)) ([8e091d5](https://github.com/andrewheberle/ssh-ca-client/commit/8e091d574cac34cba639e5f2e402259116d3391c))
+* **msi:** replace two placeholder component GUIDs ([#252](https://github.com/andrewheberle/ssh-ca-client/issues/252)) ([8246552](https://github.com/andrewheberle/ssh-ca-client/commit/824655291bb7d4f615244a873fbdbacca2a14494))
+* **snap:** only write the configuration once the required options are set ([#258](https://github.com/andrewheberle/ssh-ca-client/issues/258)) ([97c1ce0](https://github.com/andrewheberle/ssh-ca-client/commit/97c1ce06fcc7cf73825a4582bc71eded9196cc64))
+* **tray:** keep refreshing an expired certificate in the background ([1fc4d67](https://github.com/andrewheberle/ssh-ca-client/commit/1fc4d678ceb1addfcb0796898c5287ac379a0797))
+* **tray:** stop automatic refreshes racing a renewal from the menu ([1fc4d67](https://github.com/andrewheberle/ssh-ca-client/commit/1fc4d678ceb1addfcb0796898c5287ac379a0797))
+* **tray:** treat a refreshed certificate that couldn't be added to the agent as refreshed ([1fc4d67](https://github.com/andrewheberle/ssh-ca-client/commit/1fc4d678ceb1addfcb0796898c5287ac379a0797))
+
 ## [1.0.0](https://github.com/andrewheberle/ssh-ca-client/compare/v0.27.4...v1.0.0) (2026-11-13)
 
 
