@@ -47,8 +47,8 @@ func Execute(ctx context.Context, args []string) error {
 	flags.SetOutput(&usage)
 
 	flags.DurationVar(&lifetime, "life", time.Hour*24, "Lifetime of SSH certificate")
-	flags.DurationVar(&renewAt, "refresh-before", time.Hour, "Refresh the certificate once less than this remains of its lifetime")
-	flags.DurationVar(&renewAt, "renew", time.Hour, "Refresh the certificate once less than this remains of its lifetime")
+	flags.DurationVar(&renewAt, "refresh-before", time.Hour, "Refresh the certificate once less than this, or half its lifetime if less, remains")
+	flags.DurationVar(&renewAt, "renew", time.Hour, "Refresh the certificate once less than this, or half its lifetime if less, remains")
 	deprecateRenamed(flags, "renew", "refresh-before")
 	flags.StringVar(&logDir, "log", filepath.Join(state, "log"), "Log directory")
 	flags.StringVar(&configLocation, "config", config.ConfigPath(), "Configuration location")
