@@ -1,23 +1,26 @@
 # Smoke test for the MSI: install, check the result and uninstall, both with
-# the default options and with the optional start on login entries disabled.
-# Then install with custom options and upgrade to a newer MSI, which must keep
-# them unless they are given again.
+# the default install options and with a custom directory and the start on
+# login entries disabled. Then install the previous release with custom
+# options and upgrade it to the MSI, which must keep them unless they are
+# given again, and uninstall it. Each uninstall must leave nothing behind.
 #
 # Usage (elevated):
-#   templates/test-msi.ps1 -Msi path\to\ssh-ca-client.msi -UpgradeMsi path\to\newer.msi
+#   templates/test-msi.ps1 -Msi path\to\ssh-ca-client.msi -PreviousMsi path\to\previous.msi
+#
+# templates/get-previous-msi.ps1 downloads the previous release's MSI.
 param(
     [Parameter(Mandatory = $true)]
     [string]$Msi,
 
-    # an MSI of the same product with a higher version
+    # the MSI of the previous release, which has a lower version
     [Parameter(Mandatory = $true)]
-    [string]$UpgradeMsi
+    [string]$PreviousMsi
 )
 
 $ErrorActionPreference = 'Stop'
 
 $Msi = (Resolve-Path $Msi).Path
-$UpgradeMsi = (Resolve-Path $UpgradeMsi).Path
+$PreviousMsi = (Resolve-Path $PreviousMsi).Path
 $installDir = Join-Path $env:ProgramFiles 'Serverless SSH CA Client'
 $runKey = 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Run'
 $eventLogKey = 'HKLM:\SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client'
@@ -131,37 +134,41 @@ function Assert-Uninstalled([string]$Dir) {
     foreach ($v in @($clientRun, $agentRun)) {
         Assert-True ($null -eq (Get-RegistryValue $runKey $v)) "Run value '$v' removed"
     }
+    # 1.0.1 also saved Version, which an upgrade from it must remove
     foreach ($v in @('InstallDir', 'StartOnLogin', 'StartSSHAgent', 'Version')) {
         Assert-True ($null -eq (Get-RegistryValue $installerKey $v)) "saved $v removed"
     }
 }
 
+# a directory with a space in its name, as the Run value must be quoted
+$customDir = Join-Path $env:ProgramFiles 'SSH CA Test'
+$customOptions = @("INSTALLDIR=`"$customDir`"", 'START_ON_LOGIN=0', 'START_SSH_AGENT=0')
+
 $tests = @(
-    @{ Name = 'default options'; Properties = @(); Enabled = $true },
-    @{ Name = 'start on login disabled'; Properties = @('START_ON_LOGIN=0', 'START_SSH_AGENT=0'); Enabled = $false }
+    @{ Name = 'default install options'; Properties = @(); Dir = $installDir; Enabled = $true },
+    @{ Name = 'custom directory, start on login disabled'; Properties = $customOptions; Dir = $customDir; Enabled = $false }
 )
 
 foreach ($t in $tests) {
-    Write-Output "== $($t.Name)"
+    Write-Output "== fresh install: $($t.Name)"
 
     Invoke-Msiexec -Arguments (@('/i', "`"$Msi`"") + $t.Properties) -Log (Join-Path $logDir 'msi-install.log')
-    Assert-Installed -Dir $installDir -StartOnLogin $t.Enabled -StartSSHAgent $t.Enabled
+    Assert-Installed -Dir $t.Dir -StartOnLogin $t.Enabled -StartSSHAgent $t.Enabled
 
     Invoke-Msiexec -Arguments @('/x', "`"$Msi`"") -Log (Join-Path $logDir 'msi-uninstall.log')
-    Assert-Uninstalled -Dir $installDir
+    Assert-Uninstalled -Dir $t.Dir
 }
 
-# An upgrade keeps the options the install used, except any given again on
-# the command line, which win
-Write-Output '== upgrade keeps the install options'
-$customDir = Join-Path $env:ProgramFiles 'SSH CA Test'
+# An upgrade from the previous release keeps the install options it used,
+# except any given again on the command line, which win
+Write-Output '== upgrade from the previous release keeps the install options'
 
-Invoke-Msiexec -Arguments @('/i', "`"$Msi`"", "INSTALLDIR=`"$customDir`"", 'START_ON_LOGIN=0', 'START_SSH_AGENT=0') -Log (Join-Path $logDir 'msi-install.log')
+Invoke-Msiexec -Arguments (@('/i', "`"$PreviousMsi`"") + $customOptions) -Log (Join-Path $logDir 'msi-previous.log')
 Assert-Installed -Dir $customDir -StartOnLogin $false -StartSSHAgent $false
 
-Invoke-Msiexec -Arguments @('/i', "`"$UpgradeMsi`"", 'START_SSH_AGENT=1') -Log (Join-Path $logDir 'msi-upgrade.log')
+Invoke-Msiexec -Arguments @('/i', "`"$Msi`"", 'START_SSH_AGENT=1') -Log (Join-Path $logDir 'msi-upgrade.log')
 Assert-Installed -Dir $customDir -StartOnLogin $false -StartSSHAgent $true
 Assert-True (-not (Test-Path $installDir)) "default install directory $installDir not used"
 
-Invoke-Msiexec -Arguments @('/x', "`"$UpgradeMsi`"") -Log (Join-Path $logDir 'msi-uninstall.log')
+Invoke-Msiexec -Arguments @('/x', "`"$Msi`"") -Log (Join-Path $logDir 'msi-uninstall.log')
 Assert-Uninstalled -Dir $customDir

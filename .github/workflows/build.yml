@@ -22,6 +22,8 @@ jobs:
   client:
     name: build
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -37,6 +39,30 @@ jobs:
         run: |
           go generate ./...
           git diff --exit-code -- . || (echo "Generated code is out of date. Please run 'go generate ./...' and commit the changes." && exit 1)
+      # The version of this build: the tag on a tagged commit, otherwise the
+      # next patch version, as an untagged commit comes after the last
+      # release. go generate gives the GUI the last tag's version, which
+      # would make its MSI the same version as that release, so msi-test
+      # couldn't upgrade to it from there
+      - name: Work out the build version
+        id: version
+        run: |
+          tag="$(git describe --tags --abbrev=0)"
+          version="${tag#v}"
+          if [ "$(git describe --tags)" != "$tag" ]; then
+            version="$(printf '%s' "$version" | awk -F. '{ printf "%d.%d.%d", $1, $2, $3 + 1 }')"
+          fi
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::invalid build version $version from tag $tag"
+            exit 1
+          fi
+          echo "Build version: $version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Set the GUI's version resource to the build version
+        working-directory: cmd/ssh-ca-client
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: go tool go-winres make --product-version="$VERSION" --file-version="$VERSION"
       # macOS and BSD aren't supported platforms, but the CLI is meant to
       # build from source there, and the GUI to be left out
       - name: Vet for macOS and FreeBSD
@@ -241,7 +267,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
           persist-credentials: false
       - name: Download artifacts
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -249,28 +274,24 @@ jobs:
           name: dist-artifact
           path: dist
       - name: Build MSI
-        run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          version="$(git describe --tags)"
-          templates/build-msi.sh "$version" "dist/ssh-ca-client_${version#v}_windows_amd64.msi"
-      # The same MSI one patch version higher, for msi-test to upgrade to
-      - name: Build upgrade MSI
-        run: |
-          version="$(git describe --tags | sed -e 's/^v//' -e 's/[-+].*$//')"
-          upgrade="$(printf '%s' "$version" | awk -F. '{ printf "%d.%d.%d", $1, $2, $3 + 1 }')"
-          mkdir -p dist/upgrade
-          templates/build-msi.sh "$upgrade" "dist/upgrade/ssh-ca-client_${upgrade}_windows_amd64.msi"
+        env:
+          VERSION: ${{ needs.client.outputs.version }}
+        run: templates/build-msi.sh "$VERSION" "dist/ssh-ca-client_${VERSION}_windows_amd64.msi"
       - name: Upload MSI as artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: msi-artifact
-          path: dist/**/*.msi
+          path: dist/*.msi
           retention-days: 1
 
+  # Fresh installs of the MSI, and an upgrade to it from the previous release:
+  # the latest published release below this build's version
   msi-test:
     name: msi-test
     runs-on: windows-latest
-    needs: msi
+    needs: [client, msi]
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -281,12 +302,22 @@ jobs:
         with:
           name: msi-artifact
           path: msi
-      - name: Install, check, upgrade and uninstall MSI
+      - name: Download the previous release's MSI
+        id: previous
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.client.outputs.version }}
+        run: |
+          $previous = ./templates/get-previous-msi.ps1 -Repository $env:GITHUB_REPOSITORY -Version $env:VERSION -OutDir (Join-Path $env:RUNNER_TEMP 'previous')
+          "msi=$previous" >> $env:GITHUB_OUTPUT
+      - name: Install, upgrade, check and uninstall MSI
+        shell: pwsh
+        env:
+          PREVIOUS_MSI: ${{ steps.previous.outputs.msi }}
         run: |
           $msi = Get-ChildItem -Path msi -Filter *.msi | Select-Object -First 1
-          $upgrade = Get-ChildItem -Path msi/upgrade -Filter *.msi | Select-Object -First 1
-          ./templates/test-msi.ps1 -Msi $msi.FullName -UpgradeMsi $upgrade.FullName
+          ./templates/test-msi.ps1 -Msi $msi.FullName -PreviousMsi $env:PREVIOUS_MSI
       - name: Upload msiexec logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
