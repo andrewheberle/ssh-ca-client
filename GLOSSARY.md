@@ -20,6 +20,10 @@ _Avoid_: Pageant process, PuTTY agent bridge
 A setting an administrator gives the snap with `snap set`; the snap's configuration is generated from them.
 _Avoid_: Snap key, snap config
 
+**Install option**:
+A setting chosen when the client is installed with the MSI: where it is installed, and whether the client and the OpenSSH agent start at login. An upgrade keeps them unless they are given again.
+_Avoid_: MSI property, installer setting
+
 **Certificate store**:
 The place one private key and its certificate are kept together, which only ever holds a certificate issued by the Trusted CA for that key.
 _Avoid_: Storage, key store, keyring store, file store
