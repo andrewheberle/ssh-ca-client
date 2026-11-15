@@ -37,6 +37,15 @@ jobs:
         run: |
           go generate ./...
           git diff --exit-code -- . || (echo "Generated code is out of date. Please run 'go generate ./...' and commit the changes." && exit 1)
+      # macOS and BSD aren't supported platforms, but the CLI is meant to
+      # build from source there, and the GUI to be left out
+      - name: Vet for macOS and FreeBSD
+        run: |
+          for goos in darwin freebsd; do
+            echo "::group::GOOS=$goos"
+            GOOS="$goos" go vet ./...
+            echo "::endgroup::"
+          done
       - name: Install Syft
         uses: anchore/sbom-action/download-syft@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
       - name: Install Snapcraft

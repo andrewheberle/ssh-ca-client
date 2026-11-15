@@ -346,8 +346,9 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless 
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client" /v TypesSupported /t REG_DWORD /d 7 /f
 ```
 
-macOS and BSD: the CLI can be built from source but is untested, and the GUI
-is not available. Bug reports are welcome, but no support is promised.
+macOS and BSD are not supported platforms: the CLI can be built from source but
+is untested, and the GUI is left out of the build, as it is only available on
+Linux and Windows. Bug reports are welcome, but no support is promised.
 
 Both hosts (`sshd`) and user machines (`ssh` and `ssh-agent`) need OpenSSH 8.0
 or later. On Windows this is the built-in OpenSSH Client and OpenSSH Agent. From
