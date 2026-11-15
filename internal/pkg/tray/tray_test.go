@@ -92,7 +92,8 @@ func (c *fakeIdentity) Obtain(ctx context.Context, opts ...identity.ObtainOption
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	c.cert = &ssh.Certificate{ValidBefore: uint64(time.Now().Add(c.validFor).Unix())}
+	now := time.Now()
+	c.cert = &ssh.Certificate{ValidAfter: uint64(now.Unix()), ValidBefore: uint64(now.Add(c.validFor).Unix())}
 
 	if slices.Contains(opts, identity.WithoutAgent) {
 		return nil
@@ -890,5 +891,152 @@ func TestApplication_refreshAgentError(t *testing.T) {
 				t.Errorf("failures = %d, backoff = %d, want 0 and 0", f, b)
 			}
 		})
+	}
+}
+
+// limitedIdentity fails every request after the first max, so a test of a
+// loop that keeps requesting certificates ends
+type limitedIdentity struct {
+	*fakeIdentity
+	max int
+}
+
+func (l *limitedIdentity) Obtain(ctx context.Context, opts ...identity.ObtainOption) error {
+	if len(l.requestKinds()) >= l.max {
+		l.mu.Lock()
+		l.requests = append(l.requests, slices.Contains(opts, identity.WithoutInteractiveLogin))
+		l.mu.Unlock()
+
+		return errors.New("request limit reached")
+	}
+
+	return l.fakeIdentity.Obtain(ctx, opts...)
+}
+
+// TestApplication_refreshNotUsable checks that a refresh which issues a
+// certificate that is already expired by the local clock, such as when the
+// clock is ahead of the CA, is treated as a failure rather than refreshed
+// again straight away, which looped, sending a request and a notification
+// each time
+func TestApplication_refreshNotUsable(t *testing.T) {
+	for _, start := range []appState{stateInit, stateCertificateOK, stateCertificateExpired} {
+		t.Run(string(start), func(t *testing.T) {
+			app, c, tray := newTestApp(t)
+			app.identity = &limitedIdentity{c, 20}
+			app.state = start
+			c.cert = expiresIn(-time.Hour)
+			c.validFor = -time.Minute
+
+			app.setState()
+
+			if got := len(c.requestKinds()); got != 1 {
+				t.Errorf("%d requests made, want 1", got)
+			}
+			if slices.Contains(tray.notifications, "Certificate Refreshed") {
+				t.Errorf("notifications = %q, want no %q", tray.notifications, "Certificate Refreshed")
+			}
+		})
+	}
+}
+
+// TestApplication_refreshShortLifetime checks that a certificate with less
+// than renewAt of lifetime, such as when --life equals --refresh-before or the
+// CA issues a shorter lifetime than requested, is not refreshed again as soon
+// as it is issued, which refreshed it on every tick
+func TestApplication_refreshShortLifetime(t *testing.T) {
+	t.Run("refreshed once from expired", func(t *testing.T) {
+		app, c, tray := newTestApp(t)
+		c.cert = expiresIn(-time.Hour)
+		c.validFor = 30 * time.Minute
+
+		app.setState()
+
+		if got := len(c.requestKinds()); got != 1 {
+			t.Errorf("%d requests made, want 1", got)
+		}
+		if want := []string{"Certificate Refreshed"}; !slices.Equal(tray.notifications, want) {
+			t.Errorf("notifications = %q, want %q", tray.notifications, want)
+		}
+	})
+
+	t.Run("not refreshed every tick", func(t *testing.T) {
+		app, c, _ := newTestApp(t)
+		app.state = stateCertificateOK
+		now := time.Now()
+		c.cert = &ssh.Certificate{
+			ValidAfter:  uint64(now.Add(-5 * time.Minute).Unix()),
+			ValidBefore: uint64(now.Add(25 * time.Minute).Unix()),
+		}
+		c.validFor = 30 * time.Minute
+
+		for range 5 {
+			app.setState()
+		}
+
+		if got := len(c.requestKinds()); got != 0 {
+			t.Errorf("%d requests made, want 0", got)
+		}
+	})
+}
+
+// blockingIdentity blocks refreshes until ctx is done, as one does while a
+// network that is down times out
+type blockingIdentity struct {
+	*fakeIdentity
+	started chan struct{}
+}
+
+func (b *blockingIdentity) Obtain(ctx context.Context, opts ...identity.ObtainOption) error {
+	if slices.Contains(opts, identity.WithoutInteractiveLogin) {
+		select {
+		case b.started <- struct{}{}:
+		default:
+		}
+		<-ctx.Done()
+
+		return ctx.Err()
+	}
+
+	return b.fakeIdentity.Obtain(ctx, opts...)
+}
+
+// click sends a click to ch the way the system tray does, which drops it if
+// the event loop is not waiting for it. The user clicks again a few times.
+func click(ch chan<- struct{}) bool {
+	for range 50 {
+		select {
+		case ch <- struct{}{}:
+			return true
+		default:
+			time.Sleep(10 * time.Millisecond)
+		}
+	}
+
+	return false
+}
+
+// TestApplication_eventloop_clickDuringRefresh checks that a click is not lost
+// while an automatic refresh is waiting on the network, which used to run on
+// the event loop
+func TestApplication_eventloop_clickDuringRefresh(t *testing.T) {
+	app, c, _ := newTestApp(t)
+	started := make(chan struct{}, 1)
+	app.identity = &blockingIdentity{c, started}
+	app.state = stateCertificateOK
+	c.cert = expiresIn(30 * time.Minute)
+
+	quit := make(chan struct{})
+	app.quitClicked = quit
+
+	go app.eventloop()
+
+	select {
+	case <-started:
+	case <-time.After(5 * time.Second):
+		t.Fatal("no automatic refresh was started")
+	}
+
+	if !click(quit) {
+		t.Error("click on Quit was dropped while an automatic refresh was running")
 	}
 }
