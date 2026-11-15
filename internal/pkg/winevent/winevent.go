@@ -30,7 +30,9 @@ import (
 //
 // Structured attributes and groups are rendered as an indented "key: value"
 // list appended below the log message, one per line, which is more
-// readable in Event Viewer than a single logfmt/JSON line.
+// readable in Event Viewer than a single logfmt/JSON line. Carriage returns
+// and line feeds in the message, keys and values are written as \r and \n,
+// so a value can't add lines that look like other attributes.
 type Handler struct {
 	log     *eventlog.Log
 	level   slog.Leveler
@@ -91,8 +93,23 @@ func (h *Handler) Enabled(_ context.Context, level slog.Level) bool {
 
 // Handle implements slog.Handler.
 func (h *Handler) Handle(_ context.Context, r slog.Record) error {
+	msg := h.format(r)
+
+	switch {
+	case r.Level >= slog.LevelError:
+		return h.log.Error(h.eventID, msg)
+	case r.Level >= slog.LevelWarn:
+		return h.log.Warning(h.eventID, msg)
+	default:
+		return h.log.Info(h.eventID, msg)
+	}
+}
+
+// format renders r as the text of an event: the message, then the source if
+// enabled, then one "key: value" line for each attribute
+func (h *Handler) format(r slog.Record) string {
 	var b strings.Builder
-	b.WriteString(r.Message)
+	b.WriteString(escape(r.Message))
 
 	if h.addSrc && r.PC != 0 {
 		frames := runtime.CallersFrames([]uintptr{r.PC})
@@ -115,16 +132,7 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 		return true
 	})
 
-	msg := b.String()
-
-	switch {
-	case r.Level >= slog.LevelError:
-		return h.log.Error(h.eventID, msg)
-	case r.Level >= slog.LevelWarn:
-		return h.log.Warning(h.eventID, msg)
-	default:
-		return h.log.Info(h.eventID, msg)
-	}
+	return b.String()
 }
 
 // WithAttrs implements slog.Handler.
@@ -188,5 +196,15 @@ func formatAttr(prefix string, a slog.Attr) []string {
 		return lines
 	}
 
-	return []string{fmt.Sprintf("%s: %s", key, a.Value.String())}
+	return []string{fmt.Sprintf("%s: %s", escape(key), escape(a.Value.String()))}
+}
+
+// newlines writes carriage returns and line feeds as \r and \n. Backslashes
+// are left alone so that Windows paths stay readable.
+var newlines = strings.NewReplacer("\r", `\r`, "\n", `\n`)
+
+// escape returns s with carriage returns and line feeds escaped, so it stays
+// on one line of an event
+func escape(s string) string {
+	return newlines.Replace(s)
 }
