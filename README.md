@@ -194,15 +194,19 @@ npm run sync-schema --prefix internal/e2e/testdata/ca
 
 ## Configuration
 
-The client requires the IdP and CA details set as follows:
+The client requires the IdP and CA details. `issuer`, `client_id`, `ca_url` and
+`trusted_ca` are required, and `scopes` and `redirect_url` are optional. The
+optional ones are shown with their defaults:
 
 ```yaml
-issuer: OIDC Issuer
+# Required
+issuer: https://idp.example.com/
 client_id: OIDC Client ID
-scopes: ["openid", "email", "profile"]
-redirect_url: http://localhost:3000/auth/callback
 ca_url: https://ca.example.com/
 trusted_ca: ecdsa-sha2-nistp256 AAAAE2VjZ...
+# Optional, shown with their defaults
+scopes: ["openid", "email", "profile"]
+redirect_url: http://localhost:3000/auth/callback
 ```
 
 On Linux/BSD/Darwin this is a YAML file, by default
@@ -246,9 +250,10 @@ registry or Group Policy.
 The `redirect_url` must use `http` as the client listens on this address during
 an interactive login.
 
-If one of the requested scopes is `offline_access` and this is supported by the
-OIDC IdP then the client can use the provided refresh token for subsequent
-certificate renewals.
+Add `offline_access` to `scopes` if your IdP issues refresh tokens for it, as
+most do. With a refresh token the client can refresh certificates without a
+login, and the GUI refreshes them in the background. Without one, each new
+certificate needs a login.
 
 On Windows these system level options can be set using Group Policy via the
 ADMX/ADML files in the `policy` sub-directory of this repository. These files
@@ -282,7 +287,7 @@ The snap is configured with snap options, set with `snap set`, which is the
 only supported way to configure it:
 
 ```sh
-sudo snap set ssh-ca-client issuer="OIDC Issuer"
+sudo snap set ssh-ca-client issuer=https://idp.example.com/
 sudo snap set ssh-ca-client client-id="OIDC Client ID"
 sudo snap set ssh-ca-client ca-url=https://ca.example.com/
 sudo snap set ssh-ca-client trusted-ca="ecdsa-sha2-nistp256 AAAAE2VjZ..."
@@ -329,6 +334,17 @@ certificate.
 The deb, snap and MSI are the recommended ways to install the client. The
 release archives are supported on the same platforms, but do not include the
 systemd units or the Group Policy templates.
+
+On Windows, the `.zip` doesn't register the Event Log source that the GUI logs
+to by default. Without it, the events are still written, but Event Viewer can't
+show their descriptions. Either run the GUI with `--log-file` to log to a file
+instead, or register the source once, as an administrator, with the same values
+the MSI uses:
+
+```bat
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client" /v EventMessageFile /t REG_EXPAND_SZ /d "%SystemRoot%\System32\EventCreate.exe" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Application\Serverless SSH CA Client" /v TypesSupported /t REG_DWORD /d 7 /f
+```
 
 macOS and BSD: the CLI can be built from source but is untested, and the GUI
 is not available. Bug reports are welcome, but no support is promised.

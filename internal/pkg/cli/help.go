@@ -17,18 +17,26 @@ this is the registry hive to load the configuration from, either HKLM
 (HKEY_LOCAL_MACHINE) or HKCU (HKEY_CURRENT_USER), and the default is HKLM. Any
 configuration set via Group Policy is applied over this.
 
-The following configuration options must be set:
+The issuer, client_id, ca_url and trusted_ca options are required, and scopes
+and redirect_url are optional. The optional ones are shown with their defaults:
 
-    # The issuer, client_id, scopes and redirect_url must match your OIDC IdP
+    # Required
+    # The issuer and client_id must match your OIDC IdP
     issuer: https://idp.example.com/
     client_id: OIDC Client ID
-    scopes: ["openid", "email", "profile", "offline_access"]
-    # The redirect_url must use http as the client listens on this address during login
-    redirect_url: http://localhost:3000/auth/callback
     # The CA URL must match the route the Worker CA is deployed to
     ca_url: https://ca.example.com/
     # The SSH public key of the CA, used to validate issued certificates are from the expected CA
     trusted_ca: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMgJTsYW+tHl0lz/rnO8djbwq0B3uZ5sGugXU6Ha5S2rTdzMDgit2DO+hoivdT4I07rMrRtmFI179wUY06gIf00=
+    # Optional, shown with their defaults
+    # The scopes and redirect_url must be allowed by your OIDC IdP
+    scopes: ["openid", "email", "profile"]
+    # The redirect_url must use http as the client listens on this address during login
+    redirect_url: http://localhost:3000/auth/callback
+
+Add offline_access to scopes if your IdP issues refresh tokens for it, as most
+do. Without a refresh token, the GUI can't refresh certificates in the
+background, and each new certificate needs a login.
 
 Keys must be spelt exactly as shown (registry value names on Windows are case
 insensitive), and an unknown key is an error. ca_url and issuer must use https
