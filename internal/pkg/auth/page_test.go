@@ -51,6 +51,13 @@ func TestWriteResult(t *testing.T) {
 			wantContains: []string{`<body class="error">`, "<h1>Login failed</h1>", "<p>State mismatch.</p>", "try logging in again"},
 		},
 		{
+			name:         "stray callback",
+			code:         http.StatusBadRequest,
+			page:         strayPage,
+			wantContains: []string{`<body class="error">`, "<h1>Login not completed</h1>", "so it was ignored.", "most recent sign-in window"},
+			wantMissing:  []string{"try logging in again"},
+		},
+		{
 			name:         "message is escaped",
 			code:         http.StatusInternalServerError,
 			page:         errorPage(`<script>alert("x")</script>`),

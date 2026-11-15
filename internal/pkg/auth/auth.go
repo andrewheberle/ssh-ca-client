@@ -246,9 +246,12 @@ func (h *OidcHandler) Login(w http.ResponseWriter, r *http.Request) {
 // the callback URL of the OIDC auth flow process as part of the Serverless
 // SSH CA
 //
-// The result of the callback, whether successful or not, is passed to the
-// waiting GetTokensContext call. Callbacks received when no interactive
-// login is in progress are rejected.
+// Only a callback whose state matches the session ends the login in progress:
+// its result, whether successful or not, is passed to the waiting
+// GetTokensContext call. Any other callback, such as one with no session, from
+// an earlier login, or from another web page, is answered with an error page
+// and the login keeps waiting. Callbacks received when no interactive login is
+// in progress are rejected.
 func (h *OidcHandler) Callback(w http.ResponseWriter, r *http.Request) {
 	ctx := oidc.ClientContext(r.Context(), h.httpClient)
 	code := r.URL.Query().Get("code")
@@ -267,13 +270,26 @@ func (h *OidcHandler) Callback(w http.ResponseWriter, r *http.Request) {
 	// get state value
 	expectedState, ok := session.Values["state"].(string)
 	if !ok {
-		h.callbackError(w, "Missing state in session", http.StatusBadRequest, nil)
+		h.strayCallback(w, "no session")
 		return
 	}
 
 	// verify state
 	if expectedState != r.FormValue("state") {
-		h.callbackError(w, "State mismatch", http.StatusBadRequest, nil)
+		h.strayCallback(w, "state mismatch")
+		return
+	}
+
+	// from here the callback belongs to the login in progress, so its result
+	// ends the login
+
+	// the IdP redirects with an error, and no code, when the login fails
+	// there, such as when the user cancels it
+	if idpErr := r.FormValue("error"); idpErr != "" {
+		if desc := r.FormValue("error_description"); desc != "" {
+			idpErr += ": " + desc
+		}
+		h.callbackError(w, "The identity provider returned an error", http.StatusBadRequest, errors.New(idpErr))
 		return
 	}
 
@@ -336,6 +352,14 @@ func (h *OidcHandler) callbackError(w http.ResponseWriter, msg string, code int,
 
 	h.logger.Error(msg)
 	h.deliver(loginResult{err: fmt.Errorf("%w: %s", ErrLoginFailed, msg)})
+}
+
+// strayCallback answers a callback that does not belong to the login in
+// progress, without ending it. Only the reason is logged, as the request
+// comes from outside the client.
+func (h *OidcHandler) strayCallback(w http.ResponseWriter, reason string) {
+	h.writeResult(w, http.StatusBadRequest, strayPage)
+	h.logger.Warn("ignored a callback that does not belong to the login in progress", "reason", reason)
 }
 
 // writeResult writes the result page shown in the browser, logging any error
