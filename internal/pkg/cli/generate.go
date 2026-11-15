@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -67,19 +68,21 @@ func (c *generateCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 	return nil
 }
 
+// errKeyExists is returned when a private key exists and --force is not set
+var errKeyExists = errors.New("not overwriting existing private key without force option set")
+
 func (c *generateCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args []string) error {
 	if c.store.HasPrivateKey() && !c.force {
+		// a dry run fails the same way, so it predicts the real run
 		if c.dryrun {
-			fmt.Printf("dry run: not overwriting existing private key without force option set")
-
-			return nil
+			fmt.Printf("dry run: %s\n", errKeyExists)
 		}
 
-		return fmt.Errorf("not overwriting existing private key without force option set")
+		return errKeyExists
 	}
 
 	if c.dryrun {
-		fmt.Printf("dry run: generating SSH private key")
+		fmt.Println("dry run: generating SSH private key")
 
 		return nil
 	}

@@ -52,7 +52,10 @@ user data is no longer stored in a user configuration file.`
 
 	generateLong = `Generate a private key or overwrite an existing private key and store the
 resulting key in the users keyring. Overwriting a private key also removes any
-existing certificate, as it is not valid for the new key.`
+existing certificate, as it is not valid for the new key.
+
+With --dry-run nothing is changed, but the command fails in the same way as
+without it, such as when a private key exists and --force is not given.`
 
 	generateExample = `# Generate a new private key overwriting any existing key
 ssh-ca-client-cli generate --force
