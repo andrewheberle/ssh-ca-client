@@ -50,14 +50,6 @@ func (c *rootCommand) Init(cd *simplecobra.Commandeer) error {
 	return nil
 }
 
-func (c *rootCommand) PreRun(this, runner *simplecobra.Commandeer) error {
-	if err := c.Command.PreRun(this, runner); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // newRootCommand returns the root command with all sub-commands
 func newRootCommand() *rootCommand {
 	return &rootCommand{
