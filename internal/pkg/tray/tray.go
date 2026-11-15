@@ -8,11 +8,10 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"sync"
-	"sync/atomic"
 	"time"
 
 	"fyne.io/systray"
+	"github.com/andrewheberle/ssh-ca-client/internal/pkg/auth"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/cert"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/config"
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/identity"
@@ -21,15 +20,19 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// appState is what the application shows for the user identity. It is worked
+// out from what can be seen each time the event loop runs, by [deriveState],
+// rather than changed by transitions, so a key or certificate added or removed
+// elsewhere, such as by the CLI, is picked up.
 type appState string
 
 const (
 	// states
 	stateInit               appState = "Init"
 	stateKeyMissing         appState = "KeyMissing"
-	stateKeyOK              appState = "KeyOK"
-	stateCertificateOK      appState = "CertificateOK"
 	stateCertificateMissing appState = "CertificateMissing"
+	stateCertificateOK      appState = "CertificateOK"
+	stateCertificateDue     appState = "CertificateDue"
 	stateCertificateExpired appState = "CertificateExpired"
 
 	defaultIcon = okIcon
@@ -37,6 +40,20 @@ const (
 	okIcon      = "ok"
 	warningIcon = "warning"
 	errorIcon   = "error"
+
+	// menu item titles
+	refreshTitle = "Refresh"
+	loginTitle   = "Log in"
+
+	// tickInterval is how often the event loop checks the certificate
+	tickInterval = time.Minute
+
+	// maxBackoff is the longest wait between automatic refreshes that fail
+	maxBackoff = 30 * time.Minute
+
+	// defaultQuitWait is how long quitting waits for an operation to stop, so
+	// a certificate being saved is not cut off
+	defaultQuitWait = 5 * time.Second
 )
 
 // Identity is the user identity managed by the application, such as a
@@ -55,6 +72,34 @@ type menuItem interface {
 	Disable()
 }
 
+// opKind is the kind of operation that obtains a certificate
+type opKind int
+
+const (
+	// opRefresh is an automatic refresh, which never starts a login
+	opRefresh opKind = iota
+
+	// opLogin is started from the menu, and is a refresh that falls back to a
+	// login
+	opLogin
+)
+
+// operation is a running request for a certificate. Only one is current at a
+// time, see [Application.start].
+type operation struct {
+	kind   opKind
+	cancel context.CancelFunc
+
+	// finished is closed once the request has returned
+	finished chan struct{}
+}
+
+// opResult is the result of an operation, sent to the event loop
+type opResult struct {
+	op  *operation
+	err error
+}
+
 type Application struct {
 	identity Identity
 	config   *config.ClientConfig
@@ -63,53 +108,63 @@ type Application struct {
 	renewAt  time.Duration
 
 	// ctx is cancelled when the application quits, which aborts any
-	// interactive login in progress
+	// operation in progress
 	ctx    context.Context
 	cancel context.CancelFunc
 
 	trayIcons         map[string][]byte
 	notificationIcons map[string][]byte
-	state             appState
 
 	mExpiry   menuItem
 	mGenerate menuItem
-	mRenew    menuItem
+	mRefresh  menuItem
 
 	// channels notified when the menu items are clicked
-	renewClicked    <-chan struct{}
+	refreshClicked  <-chan struct{}
 	generateClicked <-chan struct{}
 	quitClicked     <-chan struct{}
 
-	// these update the system tray and send desktop notifications, which are
-	// replaced in tests
+	// these update the system tray, send desktop notifications, quit the
+	// system tray and tell the time, which are replaced in tests
 	setIcon    func(icon []byte)
 	setTooltip func(tooltip string)
 	notifier   func(title, message string, icon any) error
+	quitTray   func()
+	now        func() time.Time
 
-	// mu is held by a refresh or renewal, which may include an interactive
-	// login lasting minutes
-	mu sync.Mutex
+	// quitWait is how long quitting waits for an operation to stop
+	quitWait time.Duration
 
-	// refreshFailure counts failed automatic refreshes in a row, and
-	// refreshBackOff how many more attempts to skip. They are written while
-	// mu is held, but are also read for logging while a renewal from the menu
-	// may hold it, so they are atomic.
-	refreshBackOff atomic.Int64
-	refreshFailure atomic.Int64
+	// opDone receives the result of each operation
+	opDone chan opResult
 
-	// renewing is set by the event loop while a renewal started from the
-	// menu is running, so no automatic refresh competes with it for mu. It is
-	// only used by the event loop, which is the only caller of setState once
-	// it has started.
-	renewing bool
+	// The rest is only used by the event loop, which runs a single goroutine,
+	// so needs no lock.
+
+	// state is the state shown as of the last update
+	state appState
+
+	// op is the current operation, if any
+	op *operation
+
+	// failures counts failed automatic refreshes in a row, and nextRefresh is
+	// when the next may start
+	failures    int
+	nextRefresh time.Time
+
+	// loginRequired is set when a refresh failed because a login is needed,
+	// and cleared once a certificate is obtained
+	loginRequired bool
+
+	// expiredNotified is set once the user is told the certificate expired,
+	// until it is no longer expired
+	expiredNotified bool
+
+	// lastTick is when the event loop last ticked, to notice a suspend
+	lastTick time.Time
 
 	logger *slog.Logger
 }
-
-var (
-	ErrRenewSkipped = errors.New("renew skipped")
-	ErrRenewRunning = errors.New("a renew was already in progress")
-)
 
 func New(title string, fs embed.FS, id Identity, conf *config.ClientConfig, renewAt time.Duration) (*Application, error) {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -123,6 +178,10 @@ func New(title string, fs embed.FS, id Identity, conf *config.ClientConfig, rene
 		logger:            slog.New(slog.DiscardHandler),
 		notificationIcons: make(map[string][]byte),
 		notifier:          beeep.Notify,
+		now:               time.Now,
+		opDone:            make(chan opResult, 2),
+		quitTray:          systray.Quit,
+		quitWait:          defaultQuitWait,
 		renewAt:           renewAt,
 		setIcon:           systray.SetIcon,
 		setTooltip:        systray.SetTooltip,
@@ -188,12 +247,14 @@ func (app *Application) RunLogged(logger *slog.Logger) {
 	systray.Run(app.onReady, app.cancel)
 }
 
+// onReady builds the menu and starts the event loop. It does nothing that may
+// block, as on Linux the menu can't be shown until it returns.
 func (app *Application) onReady() {
 	// set title and icon
 	systray.SetTitle(app.title)
 
 	// build menu
-	mRenew := systray.AddMenuItem("Renew", "Renew certificate")
+	mRefresh := systray.AddMenuItem(refreshTitle, "Get a new certificate")
 	mGenerate := systray.AddMenuItem("Generate", "Generate private key")
 	systray.AddSeparator()
 	mExpiry := systray.AddMenuItem("Unknown", "Current expiry unknown")
@@ -201,13 +262,10 @@ func (app *Application) onReady() {
 	systray.AddSeparator()
 	mQuit := systray.AddMenuItem("Quit", "Close application")
 
-	app.mRenew, app.renewClicked = mRenew, mRenew.ClickedCh
+	app.mRefresh, app.refreshClicked = mRefresh, mRefresh.ClickedCh
 	app.mGenerate, app.generateClicked = mGenerate, mGenerate.ClickedCh
 	app.mExpiry = mExpiry
 	app.quitClicked = mQuit.ClickedCh
-
-	// set initial state
-	app.setState()
 
 	// send some status
 	app.logger.Info("tray application started",
@@ -219,30 +277,57 @@ func (app *Application) onReady() {
 		"trusted_ca", app.config.TrustedCertificateAuthority,
 	)
 
-	// handle clicks
-	go app.eventloop()
+	// handle clicks, starting with the current state
+	go func() {
+		t := time.NewTicker(tickInterval)
+		defer t.Stop()
+
+		app.eventloop(t.C)
+	}()
 }
 
-// hasPrivateKey reports whether a private key is stored
-func (app *Application) hasPrivateKey() bool {
-	return app.identity.HasPrivateKey()
+// observation is what the application can see of the user identity
+type observation struct {
+	hasKey bool
+
+	// cert is nil when there is no certificate
+	cert *ssh.Certificate
+
+	now time.Time
 }
 
-// hasCertificate reports whether a certificate is stored
-func (app *Application) hasCertificate() bool {
-	_, err := app.identity.Certificate()
-
-	return err == nil
-}
-
-// certificateExpiry returns when the stored certificate expires, or the zero
-// time if there is no certificate
-func (app *Application) certificateExpiry() time.Time {
-	c, err := app.identity.Certificate()
-	if err != nil {
-		return time.Time{}
+// observe looks at the user identity
+func (app *Application) observe() observation {
+	obs := observation{
+		hasKey: app.identity.HasPrivateKey(),
+		now:    app.now(),
 	}
 
+	if c, err := app.identity.Certificate(); err == nil {
+		obs.cert = c
+	}
+
+	return obs
+}
+
+// deriveState works out the state from what is observed
+func deriveState(obs observation, renewAt time.Duration) appState {
+	switch {
+	case !obs.hasKey:
+		return stateKeyMissing
+	case obs.cert == nil:
+		return stateCertificateMissing
+	case !obs.now.Before(certificateExpiry(obs.cert)):
+		return stateCertificateExpired
+	case refreshDue(obs.cert, obs.now, renewAt):
+		return stateCertificateDue
+	default:
+		return stateCertificateOK
+	}
+}
+
+// certificateExpiry returns when c expires
+func certificateExpiry(c *ssh.Certificate) time.Time {
 	if c.ValidBefore == ssh.CertTimeInfinity {
 		// effectively never expires
 		return time.Unix(1<<62, 0)
@@ -251,316 +336,365 @@ func (app *Application) certificateExpiry() time.Time {
 	return time.Unix(int64(c.ValidBefore), 0)
 }
 
-// certificateValid reports whether a certificate is stored that has not
-// expired
-func (app *Application) certificateValid() bool {
-	return app.certificateExpiry().After(time.Now())
-}
-
-func (app *Application) setState() {
-	switch app.state {
-	case stateInit:
-		// we are starting up
-		app.logger.Info("starting up")
-		if app.hasPrivateKey() {
-			// have a private key
-			app.state = stateKeyOK
-
-			// if we have a certificate but it's expired on start, try to
-			// refresh. A failure counts towards the backoff, so the expired
-			// state below does not try again straight away.
-			if app.hasCertificate() {
-				if !app.certificateValid() {
-					if err := app.refreshWithBackoff(); app.refreshed(err) {
-						app.state = stateCertificateOK
-						app.setState()
-						break
-					} else {
-						app.state = stateCertificateExpired
-						app.logger.Info("refresh of certificate failed", "error", err)
-						app.notify("Certificate Expired", "The current certificate has expired and must be manually renewed", warningIcon)
-						app.setState()
-						break
-					}
-				}
-			}
-		} else {
-			// no private key
-			app.state = stateKeyMissing
-		}
-
-		// re-run to handle change
-		app.setState()
-	case stateKeyMissing:
-		// check a key has not been generated elsewhere, such as by the CLI
-		if app.hasPrivateKey() {
-			app.logger.Info("private key found")
-			app.state = stateKeyOK
-			// re-run to handle change
-			app.setState()
-			// finish now
-			break
-		}
-
-		app.logger.Info("no private key found")
-		app.mGenerate.Enable()
-		app.mRenew.Disable()
-		app.mExpiry.SetTitle("No certificate")
-		app.setStatus("No private key found")
-		app.setIcon(app.trayIcons["error"])
-	case stateKeyOK:
-		// we have a key so check the state of the certificate
-		app.logger.Info("private key found")
-		app.mGenerate.Disable()
-		if !app.hasCertificate() {
-			// no certificate
-			app.state = stateCertificateMissing
-		} else {
-			if app.certificateValid() {
-				// certificate is valid
-				app.state = stateCertificateOK
-			} else {
-				// expired certficate
-				app.state = stateCertificateExpired
-			}
-		}
-
-		// re-run to handle change
-		app.setState()
-	case stateCertificateExpired:
-		// check we haven't renewed
-		if app.certificateValid() {
-			app.logger.Info("certificate renewed")
-			app.state = stateCertificateOK
-			// re-run to handle change
-			app.setState()
-			// finish now
-			break
-		}
-
-		// keep trying to refresh, with the backoff, as an earlier attempt may
-		// have failed only because the network was not up yet, such as after
-		// a resume or at logon
-		if err := app.refreshWithBackoff(); app.refreshed(err) {
-			app.state = stateCertificateOK
-			// re-run to handle change
-			app.setState()
-			// finish now
-			break
-		} else if !errors.Is(err, ErrRenewSkipped) && !errors.Is(err, ErrRenewRunning) {
-			app.logger.Warn("could not refresh expired certificate", "error", err, "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
-		}
-
-		app.mRenew.SetTitle("Renew")
-		app.mRenew.Enable()
-		app.mExpiry.SetTitle("Certificate expired")
-		app.setStatus("Certificate expired")
-		app.setIcon(app.trayIcons["warning"])
-	case stateCertificateMissing:
-		// check we haven't renewed
-		if app.certificateValid() {
-			app.logger.Info("certificate issued")
-			app.state = stateCertificateOK
-			// re-run to handle change
-			app.setState()
-			// finish now
-			break
-		}
-		app.mRenew.SetTitle("Request")
-		app.mRenew.Enable()
-		app.mExpiry.SetTitle("No certificate")
-		app.setStatus("No certificate found")
-		app.setIcon(app.trayIcons["warning"])
-	case stateCertificateOK:
-		// check we haven't expired
-		if !app.certificateValid() {
-			app.logger.Info("current certificate expired")
-
-			// try to refresh
-			if err := app.refreshWithBackoff(); app.refreshed(err) {
-				// re-run to handle change
-				app.setState()
-				// finish now
-				break
-			} else {
-				// return if renewal is in progress
-				if errors.Is(err, ErrRenewRunning) {
-					break
-				}
-
-				if errors.Is(err, ErrRenewSkipped) {
-					app.logger.Error("expired certificate was not renewed due to recent failures", "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
-				} else {
-					app.logger.Error("could not refresh expired certificate", "error", err, "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
-				}
-			}
-
-			app.state = stateCertificateExpired
-			// send notification
-			app.notify("Certificate Expired", "The current certificate has expired and must be manually renewed", warningIcon)
-			// re-run to handle change
-			app.setState()
-			// finish now
-			break
-		}
-
-		// check if the renewAt threshold has been reached
-		if time.Until(app.certificateExpiry()) < app.renewAt {
-			app.logger.Info("current certificate close to expiry")
-
-			// try to refresh. On success the menu below is updated with the new
-			// expiry rather than re-running, so a certificate issued with less
-			// than renewAt validity is not refreshed again immediately.
-			if err := app.refreshWithBackoff(); !app.refreshed(err) {
-				// return if renewal is in progress
-				if errors.Is(err, ErrRenewRunning) {
-					break
-				}
-
-				// just log error
-				if errors.Is(err, ErrRenewSkipped) {
-					app.logger.Error("certificate near expiry was not renewed due to recent failures", "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
-				} else {
-					app.logger.Error("could not refresh certificate close to expiry", "error", err, "failures", app.refreshFailure.Load(), "backoff", app.refreshBackOff.Load())
-				}
-			}
-		}
-
-		app.mRenew.SetTitle("Renew")
-		app.mRenew.Enable()
-		app.mExpiry.SetTitle(fmt.Sprintf("%s left", timeLeft(app.certificateExpiry())))
-		app.setStatus("Current certificate valid")
-		app.setIcon(app.trayIcons[okIcon])
+// refreshDue reports whether c should be refreshed at now, which is once less
+// than renewAt, or half its lifetime if that is less, remains. Half the
+// lifetime is used so that a certificate issued with less than renewAt of
+// lifetime, such as when the CA issues a shorter lifetime than requested, is
+// not due as soon as it is issued.
+func refreshDue(c *ssh.Certificate, now time.Time, renewAt time.Duration) bool {
+	if c.ValidBefore == ssh.CertTimeInfinity {
+		return false
 	}
+
+	expiry := certificateExpiry(c)
+	window := renewAt
+	if lifetime := expiry.Sub(time.Unix(int64(c.ValidAfter), 0)); lifetime > 0 && lifetime/2 < window {
+		window = lifetime / 2
+	}
+
+	return expiry.Sub(now) < window
 }
 
-func (app *Application) eventloop() {
-	t := time.NewTicker(time.Minute * 1)
-	defer t.Stop()
+// backoffDelay is how long to wait after failures automatic refreshes in a
+// row have failed
+func backoffDelay(failures int) time.Duration {
+	return min(time.Duration(failures)*2*time.Minute, maxBackoff)
+}
 
-	// a renewal can include an interactive login so it is run in the
-	// background, with the result received here
-	var renewDone chan error
+// suspended reports whether the system was suspended between the ticks at
+// last and now, as the wall clock moved on much further than a tick
+func suspended(last, now time.Time) bool {
+	return now.Round(0).Sub(last.Round(0)) > 3*tickInterval
+}
 
+// eventloop runs until Quit is clicked. Everything here, apart from the
+// operations it starts, runs on this goroutine and must not block for long,
+// as the system tray drops clicks while it is busy.
+func (app *Application) eventloop(ticks <-chan time.Time) {
 	for {
-		app.setState()
-
-		// prevent overlapping renewals
-		if renewDone != nil {
-			app.mRenew.Disable()
-		}
+		app.update()
 
 		select {
-		case <-t.C:
-			// this is a noop
-			continue
-		case <-app.renewClicked:
-			if renewDone != nil {
-				// a renewal is already in progress
-				continue
-			}
-
-			// start by disabling menu item so we aren't overlapping
-			app.mRenew.Disable()
-
-			renewDone = make(chan error, 1)
-			app.renewing = true
-			go func(done chan<- error) {
-				done <- app.refreshOrRenew()
-			}(renewDone)
-		case err := <-renewDone:
-			renewDone = nil
-			app.renewing = false
-
-			switch {
-			case err == nil:
-				app.notify("Certificate Issued", "A new certificate was issued and added to the local SSH Authentication Agent", okIcon)
-				app.state = stateCertificateOK
-			case errors.Is(err, cert.ErrAddingToAgent):
-				app.logger.Warn("certificate issued but could not add to agent", "error", err)
-				app.notify("Warning", "A new certificate was issued but could not added to the local SSH Authentication Agent", warningIcon)
-				app.state = stateCertificateOK
-			case errors.Is(err, context.Canceled):
-				app.logger.Info("certificate renewal cancelled")
-			default:
-				app.logger.Error("could not renew certificate", "error", err)
-				app.notify("Error", "The certificate renewal failed", errorIcon)
-			}
+		case now := <-ticks:
+			app.tick(now)
+		case res := <-app.opDone:
+			app.finish(res)
+		case <-app.refreshClicked:
+			app.refreshClick()
 		case <-app.generateClicked:
-			// start by disabling menu item so we aren't overlapping
-			app.mGenerate.Disable()
-
-			// do key generation
-			if err := app.generate(); err != nil {
-				app.logger.Error("could not generate private key", "error", err)
-				app.notify("Error", "The generation of a private key failed", errorIcon)
-				break
-			}
-
-			app.notify("Key Generated", "A private key was successfully generated", okIcon)
-			app.state = stateKeyOK
+			app.generateClick()
 		case <-app.quitClicked:
-			app.logger.Info("application shutting down")
-			// abort any interactive login in progress
-			app.cancel()
-			systray.Quit()
+			app.quit()
 			return
 		}
 	}
 }
 
-// refreshOrRenew tries a non-interactive refresh first and falls back to an
-// interactive renewal. If the certificate was issued but could not be added to
-// the SSH agent, the error wraps [cert.ErrAddingToAgent] and no interactive
-// renewal is attempted.
-func (app *Application) refreshOrRenew() error {
-	err := app.refresh()
-	if obtained(err) {
-		return err
+// update works out the current state, starts an automatic refresh if one is
+// due, and shows the state
+func (app *Application) update() {
+	obs := app.observe()
+	state := deriveState(obs, app.renewAt)
+
+	if state != app.state {
+		app.logger.Info("state changed", "from", app.state, "to", state)
+		app.state = state
 	}
 
-	app.logger.Warn("could not perform a refresh, running renew", "error", err)
+	if state != stateCertificateExpired {
+		app.expiredNotified = false
+	}
 
-	return app.renew()
+	// refresh in the background, unless another operation is running or
+	// recent refreshes failed
+	if (state == stateCertificateDue || state == stateCertificateExpired) && app.op == nil && !obs.now.Before(app.nextRefresh) {
+		app.logger.Info("attempting a refresh", "state", state)
+		app.start(opRefresh)
+	}
+
+	// tell the user once the certificate expired and no operation is running
+	// that may get a new one
+	if state == stateCertificateExpired && app.op == nil && !app.expiredNotified {
+		app.expiredNotified = true
+		app.notify("Certificate Expired", "The current certificate has expired and could not be refreshed. Select \""+app.refreshTitle(state)+"\" from the menu to get a new one.", warningIcon)
+	}
+
+	app.render(state, obs)
 }
 
-// refreshWithBackoff is the automatic refresh, run by setState. It is skipped
-// while a renewal from the menu is running, and after failures, which back off
-// for twice the number of failures in a row.
-func (app *Application) refreshWithBackoff() error {
-	// a renewal from the menu holds the lock, possibly for an interactive
-	// login. Leave it alone rather than racing it for the lock, which would
-	// fail whichever starts second.
-	if app.renewing {
-		return ErrRenewRunning
+// refreshTitle is the title of the menu item that gets a new certificate,
+// which says when a login is needed
+func (app *Application) refreshTitle(state appState) string {
+	if state == stateCertificateMissing || app.loginRequired {
+		return loginTitle
 	}
 
-	// try to take lock and error immediately if we cant
-	if !app.mu.TryLock() {
-		return ErrRenewRunning
+	return refreshTitle
+}
+
+// render shows state in the system tray
+func (app *Application) render(state appState, obs observation) {
+	app.mRefresh.SetTitle(app.refreshTitle(state))
+
+	// a login from the menu is running until it finishes, while an automatic
+	// refresh is replaced by a click
+	if state == stateKeyMissing || (app.op != nil && app.op.kind == opLogin) {
+		app.mRefresh.Disable()
+	} else {
+		app.mRefresh.Enable()
 	}
-	defer app.mu.Unlock()
 
-	if app.refreshBackOff.Load() > 0 {
-		// reduce our backoff counter
-		app.refreshBackOff.Add(-1)
-
-		// exit
-		return ErrRenewSkipped
+	if state == stateKeyMissing {
+		app.mGenerate.Enable()
+	} else {
+		app.mGenerate.Disable()
 	}
 
-	// we are ok to attempt a refresh
-	err := app.identity.Obtain(app.ctx, identity.WithoutInteractiveLogin)
-	if obtained(err) {
+	switch state {
+	case stateKeyMissing:
+		app.mExpiry.SetTitle("No certificate")
+		app.setStatus("No private key found")
+		app.setIcon(app.trayIcons[errorIcon])
+	case stateCertificateMissing:
+		app.mExpiry.SetTitle("No certificate")
+		app.setStatus("No certificate found")
+		app.setIcon(app.trayIcons[warningIcon])
+	case stateCertificateExpired:
+		app.mExpiry.SetTitle("Certificate expired")
+		app.setStatus("Certificate expired")
+		app.setIcon(app.trayIcons[warningIcon])
+	default:
+		app.mExpiry.SetTitle(fmt.Sprintf("%s left", timeLeft(certificateExpiry(obs.cert), obs.now)))
+		app.setStatus("Current certificate valid")
+		app.setIcon(app.trayIcons[okIcon])
+	}
+}
+
+// tick resets the backoff after a suspend, as the network may have been down
+// only until the resume
+func (app *Application) tick(now time.Time) {
+	if !app.lastTick.IsZero() && suspended(app.lastTick, now) {
+		app.logger.Info("resumed after a suspend", "last_tick", app.lastTick, "now", now)
 		app.resetBackoff()
+	}
 
+	app.lastTick = now
+}
+
+// start starts an operation of kind in the background, which replaces any
+// running one. The replaced operation is cancelled and the new one waits for
+// it to return, so only one request is made at a time.
+func (app *Application) start(kind opKind) {
+	prev := app.op
+	if prev != nil {
+		prev.cancel()
+	}
+
+	ctx, cancel := context.WithCancel(app.ctx)
+	op := &operation{kind: kind, cancel: cancel, finished: make(chan struct{})}
+	app.op = op
+
+	go func() {
+		defer cancel()
+
+		if prev != nil {
+			<-prev.finished
+		}
+
+		var err error
+		switch kind {
+		case opRefresh:
+			err = app.identity.Obtain(ctx, identity.WithoutInteractiveLogin)
+		case opLogin:
+			err = app.refreshOrLogin(ctx)
+		}
+
+		close(op.finished)
+		app.opDone <- opResult{op: op, err: err}
+	}()
+}
+
+// finish handles the result of an operation
+func (app *Application) finish(res opResult) {
+	if res.op != app.op {
+		// it was replaced, and its result is not wanted
+		return
+	}
+	app.op = nil
+
+	switch res.op.kind {
+	case opRefresh:
+		app.refreshDone(res.err)
+	case opLogin:
+		app.loginDone(res.err)
+	}
+}
+
+// refreshDone handles the result of an automatic refresh
+func (app *Application) refreshDone(err error) {
+	switch {
+	case errors.Is(err, context.Canceled):
+		// quitting
+		return
+	case !obtained(err):
+		if errors.Is(err, auth.ErrInteractiveLoginRequired) {
+			app.loginRequired = true
+		}
+		app.backOff()
+		app.logger.Warn("could not refresh certificate", "error", err, "failures", app.failures, "next_attempt", app.nextRefresh)
+
+		return
+	case !app.usable():
+		app.backOff()
+
+		return
+	}
+
+	app.obtainedCertificate()
+
+	if err != nil {
+		app.logger.Warn("certificate refreshed but could not be added to the SSH agent", "error", err)
+		app.notify("Warning", "The certificate was refreshed but could not be added to the local SSH Authentication Agent", warningIcon)
+
+		return
+	}
+
+	app.logger.Info("refresh of certificate succeeded")
+	app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
+}
+
+// loginDone handles the result of a refresh or login from the menu
+func (app *Application) loginDone(err error) {
+	switch {
+	case errors.Is(err, context.Canceled):
+		app.logger.Info("getting a certificate was cancelled")
+
+		return
+	case !obtained(err):
+		app.logger.Error("could not get a certificate", "error", err)
+		app.notify("Error", "Getting a new certificate failed", errorIcon)
+
+		return
+	case !app.usable():
+		app.backOff()
+		app.notify("Warning", "A new certificate was issued but it has expired or is about to. Check the system clock is correct.", warningIcon)
+
+		return
+	}
+
+	app.obtainedCertificate()
+
+	if err != nil {
+		app.logger.Warn("certificate issued but could not add to agent", "error", err)
+		app.notify("Warning", "A new certificate was issued but could not added to the local SSH Authentication Agent", warningIcon)
+
+		return
+	}
+
+	app.notify("Certificate Issued", "A new certificate was issued and added to the local SSH Authentication Agent", okIcon)
+}
+
+// usable reports whether the certificate just obtained can be used, which it
+// can't be if it has expired or a refresh is already due by the local clock,
+// such as when the clock is ahead of the CA's. This is logged, and the caller
+// treats it as a failure, so it is not refreshed again straight away.
+func (app *Application) usable() bool {
+	obs := app.observe()
+	if state := deriveState(obs, app.renewAt); state == stateCertificateOK {
+		return true
+	}
+
+	attrs := []any{"now", obs.now}
+	if obs.cert != nil {
+		attrs = append(attrs,
+			"valid_after", time.Unix(int64(obs.cert.ValidAfter), 0),
+			"valid_before", certificateExpiry(obs.cert),
+		)
+	}
+	app.logger.Warn("a certificate was issued but has expired or is due to be refreshed by the local clock, which may be wrong", attrs...)
+
+	return false
+}
+
+// obtainedCertificate clears the failures once a certificate is obtained
+func (app *Application) obtainedCertificate() {
+	app.loginRequired = false
+	app.resetBackoff()
+}
+
+// backOff counts a failure and delays the next automatic refresh
+func (app *Application) backOff() {
+	app.failures++
+	app.nextRefresh = app.now().Add(backoffDelay(app.failures))
+}
+
+// resetBackoff clears the failures so the next automatic refresh can start
+// straight away
+func (app *Application) resetBackoff() {
+	app.failures = 0
+	app.nextRefresh = time.Time{}
+}
+
+// refreshClick starts a refresh or login from the menu, replacing an
+// automatic refresh
+func (app *Application) refreshClick() {
+	if app.state == stateKeyMissing || (app.op != nil && app.op.kind == opLogin) {
+		// the menu item was disabled
+		return
+	}
+
+	app.logger.Info("getting a certificate from the menu")
+	app.start(opLogin)
+}
+
+// generateClick generates a private key
+func (app *Application) generateClick() {
+	if app.state != stateKeyMissing {
+		// the menu item was disabled
+		return
+	}
+
+	app.mGenerate.Disable()
+
+	if err := app.identity.GeneratePrivateKey(); err != nil {
+		app.logger.Error("could not generate private key", "error", err)
+		app.notify("Error", "The generation of a private key failed", errorIcon)
+
+		return
+	}
+
+	app.notify("Key Generated", "A private key was successfully generated", okIcon)
+}
+
+// quit cancels any operation, waits a short time for it to stop, and quits
+// the system tray
+func (app *Application) quit() {
+	app.logger.Info("application shutting down")
+	app.cancel()
+
+	if app.op != nil {
+		select {
+		case <-app.op.finished:
+		case <-time.After(app.quitWait):
+			app.logger.Warn("quitting before the current operation stopped")
+		}
+	}
+
+	app.quitTray()
+}
+
+// refreshOrLogin tries a refresh first and falls back to a login. If the
+// certificate was issued but could not be added to the SSH agent, the error
+// wraps [cert.ErrAddingToAgent] and no login is started.
+func (app *Application) refreshOrLogin(ctx context.Context) error {
+	err := app.identity.Obtain(ctx, identity.WithoutInteractiveLogin)
+	if obtained(err) || errors.Is(err, context.Canceled) {
 		return err
 	}
 
-	// increment our failure count and set a backoff of double our failure count
-	app.refreshBackOff.Store(app.refreshFailure.Add(1) * 2)
+	app.logger.Warn("could not perform a refresh, starting a login", "error", err)
 
-	return err
+	return app.identity.Obtain(ctx)
 }
 
 // obtained reports whether err, from obtaining a certificate, means a new
@@ -568,71 +702,6 @@ func (app *Application) refreshWithBackoff() error {
 // agent was still issued, and the error wraps [cert.ErrAddingToAgent].
 func obtained(err error) bool {
 	return err == nil || errors.Is(err, cert.ErrAddingToAgent)
-}
-
-// refreshed reports whether err, from an automatic refresh, means a new
-// certificate was issued, and tells the user. A certificate that could not be
-// added to the SSH agent is still valid, so the user is warned rather than
-// told it expired.
-func (app *Application) refreshed(err error) bool {
-	switch {
-	case err == nil:
-		app.logger.Info("refresh of certificate succeeded")
-		app.notify("Certificate Refreshed", "The current certificate was successfully refreshed", okIcon)
-	case errors.Is(err, cert.ErrAddingToAgent):
-		app.logger.Warn("certificate refreshed but could not be added to the SSH agent", "error", err)
-		app.notify("Warning", "The certificate was refreshed but could not be added to the local SSH Authentication Agent", warningIcon)
-	default:
-		return false
-	}
-
-	return true
-}
-
-// resetBackoff clears the failures after a certificate was obtained
-func (app *Application) resetBackoff() {
-	app.refreshFailure.Store(0)
-	app.refreshBackOff.Store(0)
-}
-
-// refresh requests a new certificate without an interactive login, so only
-// cached tokens or a refresh token are used
-func (app *Application) refresh() error {
-	// try to take lock and error immediately if we cant
-	if !app.mu.TryLock() {
-		return ErrRenewRunning
-	}
-	defer app.mu.Unlock()
-
-	app.logger.Info("attempting a refresh")
-
-	err := app.identity.Obtain(app.ctx, identity.WithoutInteractiveLogin)
-	if obtained(err) {
-		app.resetBackoff()
-	}
-
-	return err
-}
-
-// renew requests a new certificate, running an interactive login if required.
-// This is aborted if the application quits.
-func (app *Application) renew() error {
-	// try to take lock and error immediately if we cant
-	if !app.mu.TryLock() {
-		return ErrRenewRunning
-	}
-	defer app.mu.Unlock()
-
-	err := app.identity.Obtain(app.ctx)
-	if obtained(err) {
-		app.resetBackoff()
-	}
-
-	return err
-}
-
-func (app *Application) generate() error {
-	return app.identity.GeneratePrivateKey()
 }
 
 func (app *Application) getIcon(icon string) []byte {
@@ -645,8 +714,8 @@ func (app *Application) getIcon(icon string) []byte {
 	return b
 }
 
-func timeLeft(t time.Time) string {
-	timeLeft := time.Until(t)
+func timeLeft(t, now time.Time) string {
+	timeLeft := t.Sub(now)
 	return fmt.Sprintf("%02dh%02dm", int(timeLeft.Hours()), int(timeLeft.Minutes())%60)
 }
 
