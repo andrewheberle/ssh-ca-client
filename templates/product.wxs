@@ -102,18 +102,19 @@
             <Directory Id="INSTALLDIR" Name="$(var.Product)">
                <!--
                  The key path is ssh-ca-client.exe. wixl doesn't read a
-                 file's version into the File table, so it is given with
-                 DefaultVersion: without it the exe is unversioned to Windows
-                 Installer, an installed exe, which has a version resource,
-                 always counts as newer, and an upgrade skips the component
-                 and then removes both programs with the old version.
-                 go generate stamps the same version into the exe, from the
-                 tag, or in CI from the build version. 1.0.1 used a registry
-                 value as the key path and REINSTALLMODE=emus instead.
+                 file's version into the File table, so each exe is given its
+                 version with DefaultVersion: without it the exe is
+                 unversioned to Windows Installer, an installed exe, which has
+                 a version resource, always counts as newer, and an upgrade
+                 skips it and then removes it with the old version.
+                 go generate stamps the same version into each exe, from the
+                 tag, or in CI from the build version, and build-msi.sh checks
+                 they match. 1.0.1 used a registry value as the key path and
+                 REINSTALLMODE=emus instead.
                -->
                <Component Id="ApplicationFiles" Guid="66807fd7-177d-4462-822a-24211b9fb0f1">
                   <File Id="ApplicationFile0" Source="$(var.DistDir)/gui_windows_amd64_v1/ssh-ca-client.exe" KeyPath="yes" DefaultVersion="$(var.Version).0"/>
-                  <File Id="ApplicationFile1" Source="$(var.DistDir)/cli_windows_amd64_v1/ssh-ca-client-cli.exe"/>
+                  <File Id="ApplicationFile1" Source="$(var.DistDir)/cli_windows_amd64_v1/ssh-ca-client-cli.exe" DefaultVersion="$(var.Version).0"/>
                </Component>
 
                <!--
