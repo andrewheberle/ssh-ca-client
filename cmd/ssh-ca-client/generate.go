@@ -2,4 +2,4 @@
 
 package main
 
-//go:generate go tool go-winres make --product-version=git-tag --file-version=git-tag
+//go:generate go tool go-winres make --arch amd64,386,arm64 --product-version=git-tag --file-version=git-tag

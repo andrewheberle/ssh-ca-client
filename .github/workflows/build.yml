@@ -64,7 +64,7 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          (cd cmd/ssh-ca-client && go tool go-winres make --product-version="$VERSION" --file-version="$VERSION")
+          (cd cmd/ssh-ca-client && go tool go-winres make --arch amd64,386,arm64 --product-version="$VERSION" --file-version="$VERSION")
           (cd cmd/ssh-ca-client-cli && go tool go-winres simply --arch amd64,arm64 --manifest none --product-version="$VERSION" --file-version="$VERSION")
       # macOS and BSD aren't supported platforms, but the CLI is meant to
       # build from source there, and the GUI to be left out
