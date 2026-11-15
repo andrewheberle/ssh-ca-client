@@ -1,3 +1,5 @@
+//go:build windows || linux
+
 package main
 
 // The Windows version resource, with no icon or manifest. The MSI gives the
