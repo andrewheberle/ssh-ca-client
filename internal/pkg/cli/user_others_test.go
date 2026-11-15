@@ -43,6 +43,11 @@ func publicKey(t *testing.T, store *store.Store) []byte {
 }
 
 func TestExecute_Generate(t *testing.T) {
+	const (
+		dryRunGenerate = "dry run: generating SSH private key\n"
+		dryRunKeyKept  = "dry run: not overwriting existing private key without force option set\n"
+	)
+
 	tests := []struct {
 		name        string
 		existing    bool
@@ -50,14 +55,15 @@ func TestExecute_Generate(t *testing.T) {
 		wantErr     bool
 		wantKey     bool
 		wantReplace bool
+		wantOutput  string
 	}{
 		{name: "new key", args: nil, wantKey: true},
-		{name: "new key dry run", args: []string{"--dry-run"}},
+		{name: "new key dry run", args: []string{"--dry-run"}, wantOutput: dryRunGenerate},
 		{name: "existing key is kept", existing: true, wantErr: true, wantKey: true},
 		{name: "existing key replaced with force", existing: true, args: []string{"--force"}, wantKey: true, wantReplace: true},
-		{name: "existing key dry run", existing: true, args: []string{"--dry-run"}, wantKey: true},
-		{name: "new key deprecated dryrun", args: []string{"--dryrun"}},
-		{name: "existing key dry run with force", existing: true, args: []string{"--dry-run", "--force"}, wantKey: true},
+		{name: "existing key dry run", existing: true, args: []string{"--dry-run"}, wantErr: true, wantKey: true, wantOutput: dryRunKeyKept},
+		{name: "new key deprecated dryrun", args: []string{"--dryrun"}, wantOutput: dryRunGenerate},
+		{name: "existing key dry run with force", existing: true, args: []string{"--dry-run", "--force"}, wantKey: true, wantOutput: dryRunGenerate},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -70,9 +76,12 @@ func TestExecute_Generate(t *testing.T) {
 			}
 			before := publicKey(t, store)
 
-			err := execute(t, append([]string{"--config", ca.config, "generate"}, tt.args...)...)
+			out, err := executeOutput(t, append([]string{"--config", ca.config, "generate"}, tt.args...)...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Execute() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if out != tt.wantOutput {
+				t.Errorf("output = %q, want %q", out, tt.wantOutput)
 			}
 
 			after := publicKey(t, store)
@@ -83,6 +92,44 @@ func TestExecute_Generate(t *testing.T) {
 				if replaced := !bytes.Equal(before, after); replaced != tt.wantReplace {
 					t.Errorf("private key replaced = %v, want %v", replaced, tt.wantReplace)
 				}
+			}
+		})
+	}
+}
+
+// TestExecute_GenerateDryRunPredicts checks a dry run fails exactly when the
+// real run would, so a script can check with --dry-run first (#214)
+func TestExecute_GenerateDryRunPredicts(t *testing.T) {
+	tests := []struct {
+		name     string
+		existing bool
+		force    bool
+	}{
+		{"new key", false, false},
+		{"new key with force", false, true},
+		{"existing key", true, false},
+		{"existing key with force", true, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ca := revokeCA(t, 0)
+			store := userStore(t, ca)
+			if tt.existing {
+				if err := store.GeneratePrivateKey(); err != nil {
+					t.Fatalf("generating key: %v", err)
+				}
+			}
+
+			args := []string{"--config", ca.config, "generate"}
+			if tt.force {
+				args = append(args, "--force")
+			}
+
+			dryRunErr := execute(t, append(args, "--dry-run")...)
+			realErr := execute(t, args...)
+
+			if (dryRunErr != nil) != (realErr != nil) {
+				t.Errorf("dry run error = %v, real run error = %v, want both or neither", dryRunErr, realErr)
 			}
 		})
 	}
