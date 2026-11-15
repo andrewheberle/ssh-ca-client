@@ -239,9 +239,15 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 
 // browser controls how the simulated browser behaves during the login flow
 type browser struct {
-	badState  bool // return a state that does not match the session
-	badCode   bool // return an authorization code the IdP did not issue
-	noCookies bool // do not send the session cookie to the callback
+	badState      bool   // return a state that does not match the session
+	badCode       bool   // return an authorization code the IdP did not issue
+	noCookies     bool   // do not send the session cookie to the callback
+	otherCookie   bool   // send a session cookie from another login process
+	idpError      string // redirect with this error, and no code, as the IdP does when a login fails there
+	idpErrorDescr string // the error_description sent with idpError
+
+	// stray is a callback sent before this one, which must not end the login
+	stray *browser
 }
 
 // browserResult is the outcome of a simulated browser login
@@ -252,6 +258,8 @@ type browserResult struct {
 	Err    error       // set if the browser could not complete the flow
 
 	LoginURL string // the login URL the browser was opened at
+
+	Stray *browserResult // the response to the stray callback, if any
 }
 
 // completeLogin simulates the user's browser completing the login flow over
@@ -284,14 +292,40 @@ func (b browser) completeLogin(idp *fakeIdP, loginURL string) *browserResult {
 		return &browserResult{Err: err}
 	}
 
-	code := idp.issueCode(loc.Query().Get("code_challenge"))
-	if b.badCode {
-		code = "not-issued"
+	state := loc.Query().Get("state")
+	challenge := loc.Query().Get("code_challenge")
+
+	var stray *browserResult
+	if b.stray != nil {
+		stray = b.stray.callback(client, idp, loginURL, state, challenge)
+		if stray.Err != nil {
+			return stray
+		}
 	}
 
+	res2 := b.callback(client, idp, loginURL, state, challenge)
+	res2.LoginURL = loginURL
+	res2.Stray = stray
+
+	return res2
+}
+
+// callback has the IdP redirect the browser to the callback for the login
+// with state and challenge, as b describes
+func (b browser) callback(client *http.Client, idp *fakeIdP, loginURL, state, challenge string) *browserResult {
 	q := url.Values{}
-	q.Set("code", code)
-	q.Set("state", loc.Query().Get("state"))
+	switch {
+	case b.idpError != "":
+		q.Set("error", b.idpError)
+		if b.idpErrorDescr != "" {
+			q.Set("error_description", b.idpErrorDescr)
+		}
+	case b.badCode:
+		q.Set("code", "not-issued")
+	default:
+		q.Set("code", idp.issueCode(challenge))
+	}
+	q.Set("state", state)
 	if b.badState {
 		q.Set("state", "wrong")
 	}
@@ -301,11 +335,22 @@ func (b browser) completeLogin(idp *fakeIdP, loginURL string) *browserResult {
 	callbackURL.Path = "/auth/callback"
 	callbackURL.RawQuery = q.Encode()
 
-	if b.noCookies {
-		client.Jar = nil
+	req, err := http.NewRequest(http.MethodGet, callbackURL.String(), nil)
+	if err != nil {
+		return &browserResult{Err: err}
 	}
 
-	res, err = client.Get(callbackURL.String())
+	c := *client
+	switch {
+	case b.noCookies:
+		c.Jar = nil
+	case b.otherCookie:
+		// a cookie set by another process can't be decoded with this one's key
+		c.Jar = nil
+		req.AddCookie(&http.Cookie{Name: "auth-session", Value: "MTcwMDAwMDAwMHxvdGhlci1wcm9jZXNzfGJhZA=="})
+	}
+
+	res, err := c.Do(req)
 	if err != nil {
 		return &browserResult{Err: fmt.Errorf("callback request failed: %w", err)}
 	}
@@ -313,7 +358,7 @@ func (b browser) completeLogin(idp *fakeIdP, loginURL string) *browserResult {
 
 	body, _ := io.ReadAll(res.Body)
 
-	return &browserResult{Code: res.StatusCode, Header: res.Header, Body: string(body), LoginURL: loginURL}
+	return &browserResult{Code: res.StatusCode, Header: res.Header, Body: string(body)}
 }
 
 // callback calls Callback directly without first calling Login
@@ -661,8 +706,7 @@ func TestOidcHandler_GetTokensContext_CallbackFailure(t *testing.T) {
 		code       grant
 		wantStatus int
 	}{
-		{"state mismatch", browser{badState: true}, grant{}, http.StatusBadRequest},
-		{"missing session", browser{noCookies: true}, grant{}, http.StatusBadRequest},
+		{"identity provider error", browser{idpError: "access_denied", idpErrorDescr: "The user cancelled the login"}, grant{}, http.StatusBadRequest},
 		{"invalid authorization code", browser{badCode: true}, grant{}, http.StatusInternalServerError},
 		{"token endpoint error", browser{}, grant{status: http.StatusInternalServerError}, http.StatusInternalServerError},
 		{"no id token", browser{}, grant{omitIDToken: true}, http.StatusInternalServerError},
@@ -694,6 +738,80 @@ func TestOidcHandler_GetTokensContext_CallbackFailure(t *testing.T) {
 				t.Errorf("callback status = %d, want %d", res.Code, tt.wantStatus)
 			}
 			checkResultPage(t, res.Header, res.Body, "Login failed")
+		})
+	}
+}
+
+// TestOidcHandler_GetTokensContext_IdPError checks that an error from the IdP
+// ends the login with that error, without a token request
+func TestOidcHandler_GetTokensContext_IdPError(t *testing.T) {
+	idp := newFakeIdP(t)
+	h := newHandler(t, idp, WithLoginTimeout(10*time.Second))
+	callbacks := stubBrowser(t, idp, browser{idpError: "access_denied", idpErrorDescr: "The user cancelled the login"}, nil)
+
+	_, err := h.GetTokensContext(context.Background())
+	if !errors.Is(err, ErrLoginFailed) {
+		t.Fatalf("GetTokensContext() error = %v, want %v", err, ErrLoginFailed)
+	}
+	if want := "access_denied: The user cancelled the login"; !strings.Contains(err.Error(), want) {
+		t.Errorf("GetTokensContext() error = %q, want it to contain %q", err, want)
+	}
+	if idp.tokenRequests != 0 {
+		t.Errorf("token endpoint called %d times, want 0", idp.tokenRequests)
+	}
+
+	res := awaitBrowser(t, callbacks)
+	if strings.Contains(res.Body, "cancelled") {
+		t.Errorf("result page shows the IdP's error description:\n%s", res.Body)
+	}
+}
+
+// TestOidcHandler_GetTokensContext_StrayCallback checks that a callback that
+// does not belong to the login in progress gets an error page but does not end
+// the login, which completes with the callback that does (#220)
+func TestOidcHandler_GetTokensContext_StrayCallback(t *testing.T) {
+	tests := []struct {
+		name  string
+		stray browser
+	}{
+		{"state mismatch", browser{badState: true}},
+		{"no session", browser{noCookies: true}},
+		{"session from another login", browser{otherCookie: true}},
+		{"identity provider error with another state", browser{badState: true, idpError: "access_denied"}},
+		{"another state with an invalid code", browser{badState: true, badCode: true}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			idp := newFakeIdP(t)
+			idp.code.refreshToken = "refresh-1"
+
+			// a long timeout ensures the stray callback would end the wait early
+			h := newHandler(t, idp, WithLoginTimeout(10*time.Second))
+			stray := tt.stray
+			callbacks := stubBrowser(t, idp, browser{stray: &stray}, nil)
+
+			tokens, err := h.GetTokensContext(context.Background())
+			if err != nil {
+				t.Fatalf("GetTokensContext() error = %v", err)
+			}
+			if want := idp.lastIssued(); *tokens != want {
+				t.Errorf("GetTokensContext() = %+v, want %+v", *tokens, want)
+			}
+
+			res := awaitBrowser(t, callbacks)
+			if res.Stray.Code != http.StatusBadRequest {
+				t.Errorf("stray callback status = %d, want %d", res.Stray.Code, http.StatusBadRequest)
+			}
+			checkResultPage(t, res.Stray.Header, res.Stray.Body, strayPage.Title)
+			if res.Code != http.StatusOK {
+				t.Errorf("callback status = %d, want %d", res.Code, http.StatusOK)
+			}
+			checkResultPage(t, res.Header, res.Body, successPage.Title)
+
+			// only the callback that belongs to the login exchanges its code
+			if idp.tokenRequests != 1 {
+				t.Errorf("token endpoint called %d times, want 1", idp.tokenRequests)
+			}
 		})
 	}
 }
@@ -1060,7 +1178,7 @@ func TestOidcHandler_GetTokensContext_Cache(t *testing.T) {
 	t.Run("failed login is not cached", func(t *testing.T) {
 		idp := newFakeIdP(t)
 		h := newHandler(t, idp)
-		callbacks := stubBrowser(t, idp, browser{badState: true}, nil)
+		callbacks := stubBrowser(t, idp, browser{badCode: true}, nil)
 
 		if _, err := h.GetTokensContext(context.Background()); !errors.Is(err, ErrLoginFailed) {
 			t.Fatalf("GetTokensContext() error = %v, want %v", err, ErrLoginFailed)

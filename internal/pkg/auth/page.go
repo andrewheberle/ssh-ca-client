@@ -49,6 +49,17 @@ var successPage = resultPage{
 	Messages: []string{"Your SSH certificate request will continue in the background. You can close this window."},
 }
 
+// strayPage is shown for a callback that does not belong to the login in
+// progress, which keeps waiting
+var strayPage = resultPage{
+	Title: "Login not completed",
+	Messages: []string{
+		"This response doesn't belong to the sign-in in progress, so it was ignored.",
+		"Finish signing in from the most recent sign-in window, or close this one.",
+	},
+	Error: true,
+}
+
 // errorPage returns the page shown when the login flow fails with msg
 func errorPage(msg string) resultPage {
 	return resultPage{
