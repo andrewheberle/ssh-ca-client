@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/andrewheberle/ssh-ca-client/compare/v1.0.1...v1.0.2) (2026-11-15)
+
+
+### Bug Fixes
+
+* **msi:** record the exe's version so upgrades replace the programs ([#273](https://github.com/andrewheberle/ssh-ca-client/issues/273)) ([9c55f29](https://github.com/andrewheberle/ssh-ca-client/commit/9c55f293827a8315b83c1a5f9748049dafac438c))
+
 ## [1.0.1](https://github.com/andrewheberle/ssh-ca-client/compare/v1.0.0...v1.0.1) (2026-11-15)
 
 
