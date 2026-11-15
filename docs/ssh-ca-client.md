@@ -10,14 +10,24 @@ ssh-ca-client [options]
 
 ## Description
 
-Runs as a system tray application that requests, renews and adds user SSH
-certificates to the local SSH Agent.
+Runs as a system tray application that requests and refreshes user SSH
+certificates and adds them to the local SSH Agent.
 
 Certificates are refreshed in the background using a refresh token from the OIDC
-IdP (if available) once less than `--refresh-before` of their validity remains.
-If a refresh is not possible, the certificate can be renewed from the tray menu,
-which opens a browser for an interactive login. During an interactive login a
+IdP (if available) once less than `--refresh-before`, or half their lifetime if
+that is less, remains. Failed refreshes are retried after twice the number of
+failures in a row in minutes, up to 30 minutes, and straight away after a resume
+from suspend.
+
+A new certificate can also be requested from the tray menu. The menu item reads
+"Refresh", or "Log in" when there is no certificate or a refresh failed because
+a login is needed. Either way it tries a refresh first, and if that is not
+possible opens a browser for an interactive login. During an interactive login a
 local web server is run on the host and port of the configured `redirect_url`.
+
+A certificate that has already expired, or is due to be refreshed, by the local
+clock as soon as it is issued is treated as a failed refresh and logged, as the
+clock is probably wrong.
 
 Each time a certificate is added to the SSH agent, any expired user certificates
 issued by the configured CA are removed from the agent, so on Windows the
@@ -99,8 +109,8 @@ standard error, such as errors from the Pageant proxy, is logged as a warning
 instead.
 
 `--refresh-before <duration>`
-Refresh the certificate once less than this remains of its lifetime (default
-1h0m0s). This cannot be larger than `--life`.
+Refresh the certificate once less than this, or half its lifetime if that is
+less, remains (default 1h0m0s). This cannot be larger than `--life`.
 
 `--version`
 Show version and exit.

@@ -696,7 +696,7 @@ all options.
 
 ## As a GUI
 
-The GUI requests and renews user certificates. Revoking a certificate is only
+The GUI requests and refreshes user certificates. Revoking a certificate is only
 available via the CLI (see [Revoking Certificates](#revoking-certificates)).
 
 The GUI supports the following command line flags:
@@ -704,7 +704,7 @@ The GUI supports the following command line flags:
 | Flag              | Type            | Description                                                                 |
 |-------------------|-----------------|-----------------------------------------------------------------------------|
 | `--life`          | `time.Duration` | Lifetime of SSH certificate                                                 |
-| `--refresh-before` | `time.Duration` | Refresh the certificate once less than this remains of its lifetime        |
+| `--refresh-before` | `time.Duration` | Refresh the certificate once less than this, or half its lifetime, remains |
 | `--config`        | `string`        | Configuration file (Linux) or registry hive, `HKLM` or `HKCU` (Windows)     |
 | `--log`           | `string`        | Log directory, which contains `tray.log` and `crash.log`                    |
 | `--log-file`      | `bool`          | Log to a file instead of the Windows Event Log (Windows only)               |
