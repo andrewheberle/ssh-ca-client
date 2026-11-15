@@ -59,3 +59,7 @@ _Avoid_: Revocation list, CRL, blocklist
 **Rollback**:
 Installing a KRL older than the one already in place, which would un-revoke certificates; it is always refused.
 _Avoid_: Downgrade
+
+**Supported platform**:
+A platform the client is released and tested for, where support is promised. The CLI may build from source elsewhere, without that promise.
+_Avoid_: Target, compatible platform
