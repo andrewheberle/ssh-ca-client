@@ -34,6 +34,34 @@ fi
 templates=$(dirname "$0")
 root=$(cd "$templates/.." && pwd)
 
+# file_version prints the file version in an exe's version resource, as
+# a.b.c.d. It finds the VS_FIXEDFILEINFO by its signature and structure
+# version, and reads dwFileVersionMS and dwFileVersionLS, which hold the four
+# parts as little-endian 16-bit values in the order b, a, d, c.
+file_version() {
+	offset=$(LC_ALL=C grep -obUaP '\xbd\x04\xef\xfe\x00\x00\x01\x00' "$1" | head -n 1 | cut -d: -f1)
+	if [ -z "$offset" ]; then
+		return 1
+	fi
+	od -A n -j $((offset + 8)) -N 8 -t u2 --endian=little "$1" |
+		awk '{ printf "%d.%d.%d.%d\n", $2, $1, $4, $3 }'
+}
+
+# product.wxs gives each exe the version $version.0 with DefaultVersion, as
+# wixl doesn't read it from the file. Windows Installer compares that against
+# the installed exe on upgrade, so it must be the version go generate stamped
+# into the exe.
+for exe in gui_windows_amd64_v1/ssh-ca-client.exe cli_windows_amd64_v1/ssh-ca-client-cli.exe; do
+	got=$(file_version "$root/dist/$exe") || {
+		echo "$exe has no version resource" >&2
+		exit 1
+	}
+	if [ "$got" != "$version.0" ]; then
+		echo "$exe has file version $got, but the MSI gives it $version.0" >&2
+		exit 1
+	fi
+done
+
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 

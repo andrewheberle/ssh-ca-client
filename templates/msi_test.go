@@ -81,3 +81,60 @@ func TestProductGUIDs(t *testing.T) {
 		}
 	}
 }
+
+// TestExecutableVersions checks that every exe in product.wxs is given the
+// MSI's version with DefaultVersion. wixl doesn't read a file's version into
+// the File table, so without it the exe is unversioned to Windows Installer,
+// an installed exe always counts as newer, and an upgrade skips it and then
+// removes it with the old version. build-msi.sh checks the exes carry the
+// same version.
+func TestExecutableVersions(t *testing.T) {
+	data, err := os.ReadFile("product.wxs")
+	if err != nil {
+		t.Fatalf("reading product.wxs: %v", err)
+	}
+
+	const want = "$(var.Version).0"
+	d := xml.NewDecoder(strings.NewReader(string(data)))
+	exes := 0
+	for {
+		tok, err := d.Token()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			t.Fatalf("parsing product.wxs: %v", err)
+		}
+
+		start, ok := tok.(xml.StartElement)
+		if !ok || start.Name.Local != "File" {
+			continue
+		}
+
+		var id, source, version string
+		for _, a := range start.Attr {
+			switch a.Name.Local {
+			case "Id":
+				id = a.Value
+			case "Source":
+				source = a.Value
+			case "DefaultVersion":
+				version = a.Value
+			}
+		}
+		if !strings.HasSuffix(strings.ToLower(source), ".exe") {
+			continue
+		}
+		exes++
+
+		t.Run(id, func(t *testing.T) {
+			if version != want {
+				t.Errorf("file %s (%s) has DefaultVersion %q, want %q", id, source, version, want)
+			}
+		})
+	}
+
+	if exes == 0 {
+		t.Fatal("no exe files found in product.wxs")
+	}
+}
