@@ -1,42 +1,10 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": [
-		"config:recommended",
+		"github>andrewheberle/renovate-config#v1.0.1",
 		"customManagers:githubActionsVersions"
 	],
-	"postUpdateOptions": [
-		"gomodTidy"
-	],
 	"packageRules": [
-		{
-			"description": "Go toolchain updates ship as releases; see docs/adr/0001",
-			"matchManagers": [
-				"gomod"
-			],
-			"matchDepTypes": [
-				"toolchain"
-			],
-			"matchPackageNames": [
-				"go"
-			],
-			"semanticCommitType": "fix"
-		},
-		{
-			"description": "Go toolchain patch updates carry security fixes, so they automerge once the required checks pass; see docs/adr/0001",
-			"matchManagers": [
-				"gomod"
-			],
-			"matchDepTypes": [
-				"toolchain"
-			],
-			"matchPackageNames": [
-				"go"
-			],
-			"matchUpdateTypes": [
-				"patch"
-			],
-			"automerge": true
-		},
 		{
 			"matchPackageNames": [
 				"@andrewheberle/serverless-ssh-ca",
@@ -46,7 +14,12 @@
 			"prBodyNotes": [
 				"If the \"schema\" job fails, run `npm run sync-schema --prefix internal/e2e/testdata/ca` on this branch and commit the changes."
 			]
-		}
+		},
+		{
+      "description": "E2E tests are not shipped, so their updates must not trigger a release",
+      "matchFileNames": ["internal/e2e/**"],
+      "semanticCommitType": "chore"
+    }
 	],
 	"customManagers": [
 		{

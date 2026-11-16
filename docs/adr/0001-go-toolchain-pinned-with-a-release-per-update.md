@@ -15,7 +15,7 @@ Lint runs on the pinned toolchain only, once per OS. Vet's `stdversion` check re
 
 ## Consequences
 
-About one toolchain update a month, plus a minor update every six months. The `fix` override in `renovate.json` is load-bearing: by default a toolchain update would be a `chore(deps)` commit, which never triggers a release, and the pinned toolchain would fall behind Go's security fixes, which is worse than `stable`.
+About one toolchain update a month, plus a minor update every six months. The `fix` override is load-bearing: by default a toolchain update would be a `chore(deps)` commit, which never triggers a release, and the pinned toolchain would fall behind Go's security fixes, which is worse than `stable`. It now lives in the shared preset `github>andrewheberle/renovate-config`, which this repository extends at a pinned tag; the Renovate side of this decision is recorded there in [ADR 0001](https://github.com/andrewheberle/renovate-config/blob/main/docs/adr/0001-shipping-updates-are-fix-commits.md).
 
 The e2e workflow reads `go.mod` from the client it checks out, so an older release tested with `client-ref: latest` that has no `toolchain` line is tested with the Go version on its `go` line.
 
