@@ -167,7 +167,7 @@ jobs:
       # in front of an entry does not disable it, so delete the line instead.
       - name: Check CA schema for breaking changes
         if: ${{ !cancelled() && inputs.ca-ref && runner.os == 'Linux' }}
-        uses: oasdiff/oasdiff-action/breaking@0b95859a27abaed7445bb05c18a39f1a6610a9a4 # v0.1.24
+        uses: oasdiff/oasdiff-action/breaking@14ca7009a63c417dfe27b7c44359c4bcccaf8eee # v0.2.1
         with:
           base: internal/pkg/api/openapi.json
           revision: _ca/packages/core/openapi.json
