@@ -151,13 +151,56 @@ jobs:
         working-directory: _ca
         run: npm run schema -w packages/core
 
+      # oasdiff reports only ERR and WARN changes, and leaves several that
+      # break clients at INFO, so they would never be reported. These are
+      # raised to ERR here, rather than in a file in the client tree, so the
+      # checks also apply when client-ref is "latest", as this workflow
+      # always runs from main. The config is written inside the workspace,
+      # as the action runs in a container that only mounts the workspace.
+      # Raised:
+      # - default values changed or removed, as a client leaving the
+      #   property out silently gets a different result, such as other
+      #   certificate extensions
+      # - error statuses added or removed on an existing operation
+      # - optional response properties removed
+      # - operation IDs and component schemas removed, which renames the
+      #   client's generated code (also raised by the CA's own check)
+      - name: Write oasdiff config
+        if: ${{ !cancelled() && inputs.ca-ref && runner.os == 'Linux' }}
+        shell: bash
+        run: |
+          mkdir -p _oasdiff
+          cat > _oasdiff/severity-levels <<'LEVELS'
+          api-operation-id-removed err
+          api-schema-removed err
+          request-body-default-value-changed err
+          request-body-default-value-removed err
+          request-parameter-default-value-changed err
+          request-parameter-default-value-removed err
+          request-property-default-value-changed err
+          request-property-default-value-removed err
+          response-body-default-value-changed err
+          response-body-default-value-removed err
+          response-property-default-value-changed err
+          response-property-default-value-removed err
+          response-non-success-status-added err
+          response-non-success-status-removed err
+          response-optional-property-removed err
+          LEVELS
+          # relative to this file
+          echo 'severity-levels: severity-levels' > _oasdiff/oasdiff.yaml
+
       # review is disabled so the schemas are not uploaded to oasdiff.com,
       # and no token is passed as there is no PR comment to post.
+      # The check fails on WARN as well as ERR, as WARN changes such as a
+      # removed request property are silently ignored by the CA, so a
+      # client's setting would stop having any effect.
       # A CA change can accept specific breaking changes, such as ones that
       # are compatible on the wire or that clients are being updated for, by
       # listing them in packages/core/.oasdiff-err-ignore, so the
-      # acknowledgement is reviewed with the change. The file is optional and
-      # the input is empty when it is absent.
+      # acknowledgement is reviewed with the change. The same file is used
+      # for ERR and WARN changes, as the CA's own check does. The file is
+      # optional and the inputs are empty when it is absent.
       # Each entry is a line of the reported change, such as "GET /api/v3/x
       # api path removed without deprecation". oasdiff has no comment syntax,
       # but ignores lines without a matching method, path and message, so
@@ -171,8 +214,10 @@ jobs:
         with:
           base: internal/pkg/api/openapi.json
           revision: _ca/packages/core/openapi.json
-          fail-on: ERR
+          config: _oasdiff/oasdiff.yaml
+          fail-on: WARN
           err-ignore: ${{ hashFiles('_ca/packages/core/.oasdiff-err-ignore') != '' && '_ca/packages/core/.oasdiff-err-ignore' || '' }}
+          warn-ignore: ${{ hashFiles('_ca/packages/core/.oasdiff-err-ignore') != '' && '_ca/packages/core/.oasdiff-err-ignore' || '' }}
           review: 'false'
           github-token: ''
 
