@@ -77,6 +77,21 @@ func (e IssueHostCertificate403JSONResponseBodySuccess) Valid() bool {
 	}
 }
 
+// Defines values for IssueHostCertificate413JSONResponseBodySuccess.
+const (
+	IssueHostCertificate413JSONResponseBodySuccessFalse IssueHostCertificate413JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueHostCertificate413JSONResponseBodySuccess enum.
+func (e IssueHostCertificate413JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueHostCertificate413JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for IssueHostCertificate422JSONResponseBodySuccess.
 const (
 	IssueHostCertificate422JSONResponseBodySuccessFalse IssueHostCertificate422JSONResponseBodySuccess = false
@@ -212,6 +227,21 @@ func (e RenewHostCertificate400JSONResponseBodySuccess) Valid() bool {
 	}
 }
 
+// Defines values for RenewHostCertificate413JSONResponseBodySuccess.
+const (
+	RenewHostCertificate413JSONResponseBodySuccessFalse RenewHostCertificate413JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the RenewHostCertificate413JSONResponseBodySuccess enum.
+func (e RenewHostCertificate413JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case RenewHostCertificate413JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for RenewHostCertificate422JSONResponseBodySuccess.
 const (
 	RenewHostCertificate422JSONResponseBodySuccessFalse RenewHostCertificate422JSONResponseBodySuccess = false
@@ -296,6 +326,21 @@ const (
 func (e IssueUserCertificate403JSONResponseBodySuccess) Valid() bool {
 	switch e {
 	case IssueUserCertificate403JSONResponseBodySuccessFalse:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IssueUserCertificate413JSONResponseBodySuccess.
+const (
+	IssueUserCertificate413JSONResponseBodySuccessFalse IssueUserCertificate413JSONResponseBodySuccess = false
+)
+
+// Valid indicates whether the value is a known member of the IssueUserCertificate413JSONResponseBodySuccess enum.
+func (e IssueUserCertificate413JSONResponseBodySuccess) Valid() bool {
+	switch e {
+	case IssueUserCertificate413JSONResponseBodySuccessFalse:
 		return true
 	default:
 		return false
@@ -439,7 +484,7 @@ func (e GetUserRevocationList500JSONResponseBodySuccess) Valid() bool {
 
 // CertificateResponse defines model for Certificate Response.
 type CertificateResponse struct {
-	// Certificate Issued Certificate
+	// Certificate Issued certificate, as the BASE64 encoding of its OpenSSH text form (such as `ecdsa-sha2-nistp256-cert-v01@openssh.com AAAA...`), not of the binary certificate
 	Certificate []byte `json:"certificate"`
 }
 
@@ -448,49 +493,52 @@ type HostCertificateIssueRequest struct {
 	// Identity Identity Token JWT from OIDC IdP
 	Identity string `json:"identity"`
 
-	// Lifetime Lifetime of issued Host SSH certificate
+	// Lifetime Lifetime of the issued host SSH certificate, in seconds. Defaults to, and may not exceed, the lifetime the CA is configured with (`SSH_HOST_CERTIFICATE_LIFETIME`)
 	Lifetime *int `json:"lifetime,omitempty"`
 
-	// Principals List of principals to include on the issued certificate
+	// Principals List of principals to include on the issued certificate, at most 256 as OpenSSH cannot read a certificate with more. Duplicates are removed
 	Principals []string `json:"principals"`
 
-	// PublicKey SSH public key to sign
+	// PublicKey SSH public key to sign, as the BASE64 encoding of its OpenSSH text form (such as `ecdsa-sha2-nistp256 AAAA... comment`), not of the binary key
 	PublicKey []byte `json:"public_key"`
 }
 
 // HostCertificateRenewalRequest defines model for Host Certificate Renewal Request.
 type HostCertificateRenewalRequest struct {
-	// Certificate SSH certificate to renew, which must have the serial number in the path
+	// Certificate SSH certificate to renew, which must have the serial number in the path, as the BASE64 encoding of its OpenSSH text form (such as `ecdsa-sha2-nistp256-cert-v01@openssh.com AAAA...`), not of the binary certificate
 	Certificate []byte `json:"certificate"`
 
-	// Lifetime Lifetime of renewed Host SSH certificate
+	// Lifetime Lifetime of the renewed host SSH certificate, in seconds. May not exceed the lifetime the CA is configured with (`SSH_HOST_CERTIFICATE_LIFETIME`). Defaults to the lifetime of the certificate renewed, and is never longer than it or the configured lifetime
 	Lifetime *int `json:"lifetime,omitempty"`
 }
 
 // KeyRevocationListResponse defines model for Key Revocation List Response.
 type KeyRevocationListResponse struct {
-	// Krl Key Revocation List
-	Krl       []byte `json:"krl"`
+	// Krl The OpenSSH Key Revocation List in its binary format, BASE64 encoded
+	Krl []byte `json:"krl"`
+
+	// Signature Armored SSHSIG signature (`-----BEGIN SSH SIGNATURE-----`) made by the CA key over the decoded KRL bytes, with the SHA-512 hash and the `krl@com.github.serverless-ssh-ca.andrewheberle` namespace. It is not BASE64 encoded again
 	Signature string `json:"signature"`
 }
 
 // RevocationResponse defines model for Revocation Response.
 type RevocationResponse struct {
+	// RevokedAt When the certificate was revoked
 	RevokedAt time.Time `json:"revoked_at"`
 }
 
 // UserCertificateIssueRequest defines model for User Certificate Issue Request.
 type UserCertificateIssueRequest struct {
-	// Extensions Extensions to include in the issued SSH certificate
+	// Extensions Extensions to include in the issued SSH certificate, which must be among those the CA is configured with (`SSH_CERTIFICATE_EXTENSIONS`). All of those are included when this is not given
 	Extensions *[]string `json:"extensions,omitempty"`
 
 	// Identity Identity Token JWT from OIDC IdP
 	Identity string `json:"identity"`
 
-	// Lifetime Lifetime of issued SSH certificate
+	// Lifetime Lifetime of the issued SSH certificate, in seconds. Defaults to, and may not exceed, the lifetime the CA is configured with (`SSH_CERTIFICATE_LIFETIME`)
 	Lifetime *int `json:"lifetime,omitempty"`
 
-	// PublicKey SSH public key to sign
+	// PublicKey SSH public key to sign, as the BASE64 encoding of its OpenSSH text form (such as `ecdsa-sha2-nistp256 AAAA... comment`), not of the binary key
 	PublicKey []byte `json:"public_key"`
 }
 
@@ -499,7 +547,7 @@ type GetCaPublicKey500JSONResponseBodySuccess bool
 
 // IssueHostCertificateParams defines parameters for IssueHostCertificate.
 type IssueHostCertificateParams struct {
-	// Authorization Access Token JWT from OIDC IdP
+	// Authorization Bearer access token from the OIDC IdP, as `Bearer <token>`. This is the same header as the `oidcAuth` security scheme, and is also declared here for generated clients
 	Authorization string `json:"Authorization"`
 
 	// ProofOfPossession Proof of possession of the private key comprising of `${timestamp}.${fingerprint}.${signature}`. The signature is a BASE64 encoded armored SSHSIG signature, made with the `request-proof-of-possession@com.github.serverless-ssh-ca.andrewheberle` namespace, of `${timestamp}.${fingerprint}.${METHOD} ${path}` where `${METHOD} ${path}` is the request the proof is for, for example `DELETE /api/v4/user/certificates/12345678901234567890`. The timestamp is in milliseconds since the Unix epoch.
@@ -514,6 +562,9 @@ type IssueHostCertificate401JSONResponseBodySuccess bool
 
 // IssueHostCertificate403JSONResponseBodySuccess defines parameters for IssueHostCertificate.
 type IssueHostCertificate403JSONResponseBodySuccess bool
+
+// IssueHostCertificate413JSONResponseBodySuccess defines parameters for IssueHostCertificate.
+type IssueHostCertificate413JSONResponseBodySuccess bool
 
 // IssueHostCertificate422JSONResponseBodySuccess defines parameters for IssueHostCertificate.
 type IssueHostCertificate422JSONResponseBodySuccess bool
@@ -554,6 +605,9 @@ type RenewHostCertificateParams struct {
 // RenewHostCertificate400JSONResponseBodySuccess defines parameters for RenewHostCertificate.
 type RenewHostCertificate400JSONResponseBodySuccess bool
 
+// RenewHostCertificate413JSONResponseBodySuccess defines parameters for RenewHostCertificate.
+type RenewHostCertificate413JSONResponseBodySuccess bool
+
 // RenewHostCertificate422JSONResponseBodySuccess defines parameters for RenewHostCertificate.
 type RenewHostCertificate422JSONResponseBodySuccess bool
 
@@ -568,7 +622,7 @@ type GetHostRevocationList500JSONResponseBodySuccess bool
 
 // IssueUserCertificateParams defines parameters for IssueUserCertificate.
 type IssueUserCertificateParams struct {
-	// Authorization Access Token JWT from OIDC IdP
+	// Authorization Bearer access token from the OIDC IdP, as `Bearer <token>`. This is the same header as the `oidcAuth` security scheme, and is also declared here for generated clients
 	Authorization string `json:"Authorization"`
 
 	// ProofOfPossession Proof of possession of the private key comprising of `${timestamp}.${fingerprint}.${signature}`. The signature is a BASE64 encoded armored SSHSIG signature, made with the `request-proof-of-possession@com.github.serverless-ssh-ca.andrewheberle` namespace, of `${timestamp}.${fingerprint}.${METHOD} ${path}` where `${METHOD} ${path}` is the request the proof is for, for example `DELETE /api/v4/user/certificates/12345678901234567890`. The timestamp is in milliseconds since the Unix epoch.
@@ -580,6 +634,9 @@ type IssueUserCertificate400JSONResponseBodySuccess bool
 
 // IssueUserCertificate403JSONResponseBodySuccess defines parameters for IssueUserCertificate.
 type IssueUserCertificate403JSONResponseBodySuccess bool
+
+// IssueUserCertificate413JSONResponseBodySuccess defines parameters for IssueUserCertificate.
+type IssueUserCertificate413JSONResponseBodySuccess bool
 
 // IssueUserCertificate422JSONResponseBodySuccess defines parameters for IssueUserCertificate.
 type IssueUserCertificate422JSONResponseBodySuccess bool
@@ -1572,6 +1629,14 @@ type IssueHostCertificateResponse struct {
 		} `json:"errors"`
 		Success IssueHostCertificate403JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON413 the response for an HTTP 413 `application/json` response
+	JSON413 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success IssueHostCertificate413JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *struct {
 		Errors []struct {
@@ -1636,6 +1701,17 @@ func (r IssueHostCertificateResponse) GetJSON403() *struct {
 	Success IssueHostCertificate403JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON403
+}
+
+// GetJSON413 returns the response for an HTTP 413 `application/json` response
+func (r IssueHostCertificateResponse) GetJSON413() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success IssueHostCertificate413JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON413
 }
 
 // GetJSON422 returns the response for an HTTP 422 `application/json` response
@@ -1853,6 +1929,14 @@ type RenewHostCertificateResponse struct {
 		} `json:"errors"`
 		Success RenewHostCertificate400JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON413 the response for an HTTP 413 `application/json` response
+	JSON413 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success RenewHostCertificate413JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *struct {
 		Errors []struct {
@@ -1895,6 +1979,17 @@ func (r RenewHostCertificateResponse) GetJSON400() *struct {
 	Success RenewHostCertificate400JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON400
+}
+
+// GetJSON413 returns the response for an HTTP 413 `application/json` response
+func (r RenewHostCertificateResponse) GetJSON413() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success RenewHostCertificate413JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON413
 }
 
 // GetJSON422 returns the response for an HTTP 422 `application/json` response
@@ -2042,6 +2137,14 @@ type IssueUserCertificateResponse struct {
 		} `json:"errors"`
 		Success IssueUserCertificate403JSONResponseBodySuccess `json:"success"`
 	}
+	// JSON413 the response for an HTTP 413 `application/json` response
+	JSON413 *struct {
+		Errors []struct {
+			Code    float32 `json:"code"`
+			Message string  `json:"message"`
+		} `json:"errors"`
+		Success IssueUserCertificate413JSONResponseBodySuccess `json:"success"`
+	}
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *struct {
 		Errors []struct {
@@ -2095,6 +2198,17 @@ func (r IssueUserCertificateResponse) GetJSON403() *struct {
 	Success IssueUserCertificate403JSONResponseBodySuccess `json:"success"`
 } {
 	return r.JSON403
+}
+
+// GetJSON413 returns the response for an HTTP 413 `application/json` response
+func (r IssueUserCertificateResponse) GetJSON413() *struct {
+	Errors []struct {
+		Code    float32 `json:"code"`
+		Message string  `json:"message"`
+	} `json:"errors"`
+	Success IssueUserCertificate413JSONResponseBodySuccess `json:"success"`
+} {
+	return r.JSON413
 }
 
 // GetJSON422 returns the response for an HTTP 422 `application/json` response
@@ -2616,6 +2730,19 @@ func ParseIssueHostCertificateResponse(rsp *http.Response) (*IssueHostCertificat
 		}
 		response.JSON403 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success IssueHostCertificate413JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
 		var dest struct {
 			Errors []struct {
@@ -2788,6 +2915,19 @@ func ParseRenewHostCertificateResponse(rsp *http.Response) (*RenewHostCertificat
 		}
 		response.JSON400 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success RenewHostCertificate413JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
 		var dest struct {
 			Errors []struct {
@@ -2919,6 +3059,19 @@ func ParseIssueUserCertificateResponse(rsp *http.Response) (*IssueUserCertificat
 			return nil, err
 		}
 		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 413:
+		var dest struct {
+			Errors []struct {
+				Code    float32 `json:"code"`
+				Message string  `json:"message"`
+			} `json:"errors"`
+			Success IssueUserCertificate413JSONResponseBodySuccess `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON413 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
 		var dest struct {
