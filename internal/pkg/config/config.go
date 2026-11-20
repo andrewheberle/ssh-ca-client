@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/url"
 	"reflect"
@@ -41,14 +42,37 @@ type ClientConfig struct {
 	ca ssh.PublicKey
 }
 
+// Option sets an optional setting for [LoadClientConfig]
+type Option func(*options)
+
+type options struct {
+	logger *slog.Logger
+}
+
+// WithLogger sets the logger used to report configuration that is ignored
+// while loading, such as values left in the Policy key by old Group Policy
+// templates on Windows. By default nothing is logged.
+func WithLogger(logger *slog.Logger) Option {
+	return func(o *options) {
+		if logger != nil {
+			o.logger = logger
+		}
+	}
+}
+
 // Loads client config from the following sources on Windows:
 //   - Registry (HKCU or HKLM - defaults to HKLM)
 //   - Policy ("HKLM\Software\Policies\Serverless SSH CA Client")
 //
 // And the following on non-Windows platforms:
 //   - YAML based configuration file
-func LoadClientConfig(configpath string) (*ClientConfig, error) {
-	k, err := loadClientConfig(configpath)
+func LoadClientConfig(configpath string, opts ...Option) (*ClientConfig, error) {
+	o := options{logger: slog.New(slog.DiscardHandler)}
+	for _, opt := range opts {
+		opt(&o)
+	}
+
+	k, err := loadClientConfig(configpath, o.logger)
 	if err != nil {
 		return nil, err
 	}

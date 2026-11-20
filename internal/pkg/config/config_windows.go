@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
-	"slices"
+	"log/slog"
 	"strings"
 
 	"github.com/knadh/koanf/v2"
@@ -38,92 +38,90 @@ func configRegistryKey(configpath string) (registry.Key, error) {
 
 // Loading config on Windows is from the registry so configpath denotes
 // must be either HKLM or HKCU.
-func loadClientConfig(configpath string) (*koanf.Koanf, error) {
+func loadClientConfig(configpath string, logger *slog.Logger) (*koanf.Koanf, error) {
 	key, err := configRegistryKey(configpath)
 	if err != nil {
 		return nil, err
 	}
 
-	return loadRegistryConfig(key, configRegistryPath, winreg.LOCAL_MACHINE, policyRegistryPath)
+	return loadRegistryConfig(key, configRegistryPath, winreg.LOCAL_MACHINE, policyRegistryPath, logger)
 }
 
 // loadRegistryConfig loads the config from path under key, then the policy
 // from policyPath under policyKey over it. Either key may be absent, which
-// leaves any required settings to be reported missing by validation.
-func loadRegistryConfig(key registry.Key, path string, policyKey registry.Key, policyPath string) (*koanf.Koanf, error) {
+// leaves any required settings to be reported missing by validation. Values
+// left in the policy by old Group Policy templates are ignored, with a
+// warning to logger.
+func loadRegistryConfig(key registry.Key, path string, policyKey registry.Key, policyPath string, logger *slog.Logger) (*koanf.Koanf, error) {
 	k := koanf.New(".")
-	if err := loadRegistryKey(k, key, path); err != nil {
+	if _, err := loadRegistryKey(k, key, path, false); err != nil {
 		return nil, fmt.Errorf("could not load config: %w", err)
 	}
 
 	// Load policy second
-	if err := loadRegistryKey(k, policyKey, policyPath); err != nil {
+	ignored, err := loadRegistryKey(k, policyKey, policyPath, true)
+	if err != nil {
 		return nil, fmt.Errorf("could not load policy: %w", err)
+	}
+	if len(ignored) > 0 {
+		logger.Warn("ignoring values left by old Group Policy templates, which no release reads; remove them from the GPO or Intune profile that sets them",
+			"key", registryKeyPath(policyKey, policyPath),
+			"values", ignored,
+		)
 	}
 
 	return k, nil
 }
 
 // loadRegistryKey loads the values under path into k, skipping it if the key
-// does not exist. The provider does not wrap the error from opening the key,
-// so it is opened here first to tell a missing key apart from other errors.
-func loadRegistryKey(k *koanf.Koanf, key registry.Key, path string) error {
+// does not exist, and returns the names of any values ignored as being left
+// by old Group Policy templates when policy is set. The provider does not
+// wrap the error from opening the key, so it is opened here first to tell a
+// missing key apart from other errors.
+func loadRegistryKey(k *koanf.Koanf, key registry.Key, path string, policy bool) ([]string, error) {
 	rk, err := registry.OpenKey(key, path, registry.READ)
 	if errors.Is(err, registry.ErrNotExist) {
-		return nil
+		return nil, nil
 	}
 	if err != nil {
-		return fmt.Errorf("opening %s: %w", path, err)
+		return nil, fmt.Errorf("opening %s: %w", registryKeyPath(key, path), err)
 	}
 	_ = rk.Close()
 
 	raw := koanf.New(".")
 	if err := raw.Load(winreg.Provider(winreg.Config{Key: key, Path: path, MaxDepth: 2}), nil); err != nil {
-		return err
+		return nil, err
 	}
 
-	// registry names are case insensitive, so they are lower-cased to match
-	// the configuration keys, and a policy value replaces the config value
-	// however either is written
-	values := koanf.New(".")
-	for name, value := range raw.All() {
-		name = strings.ToLower(name)
+	// checked per key, so an unknown value is reported with the key it is
+	// in
+	values, ignored, err := registryValues(raw.All(), policy)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", registryKeyPath(key, path), err)
+	}
 
-		// the MSI writes values to the config key that are not
-		// configuration, and existing installs keep them, so they are
-		// ignored
-		if slices.Contains(ignoredRegistryValues, name) || ignoredRegistrySubkey(name) {
-			continue
-		}
-
-		// an empty value, such as a Policy enabled but left empty, is
-		// treated as not set
-		if emptyValue(value) {
-			continue
-		}
-
-		if err := values.Set(name, value); err != nil {
-			return fmt.Errorf("reading %s: %w", name, err)
+	// a policy value replaces the config value however either is written,
+	// as the names are lower-cased
+	for name, value := range values {
+		if err := k.Set(name, value); err != nil {
+			return nil, fmt.Errorf("reading %s: %w", name, err)
 		}
 	}
 
-	return k.Merge(values)
+	return ignored, nil
 }
 
-// ignoredRegistryValues are values in the config key that are not
-// configuration. installed0 is the per-user marker for the Start menu
-// shortcut that the MSI writes under HKCU (templates/product.wxs).
-var ignoredRegistryValues = []string{"installed0"}
-
-// installerSubkey is the subkey of the HKLM config key where the MSI keeps
-// the properties it was installed with, so an upgrade can reuse them
-// (templates/product.wxs). Any other subkey is still an unknown key.
-const installerSubkey = "installer"
-
-// ignoredRegistrySubkey reports whether name, lower-cased, is a value in the
-// installer subkey. The provider names a value in a subkey <subkey>.<value>.
-func ignoredRegistrySubkey(name string) bool {
-	return strings.HasPrefix(name, installerSubkey+".")
+// registryKeyPath returns path under key as an admin would find it in the
+// Registry Editor, such as HKLM\SOFTWARE\Policies\Serverless SSH CA Client
+func registryKeyPath(key registry.Key, path string) string {
+	switch key {
+	case winreg.LOCAL_MACHINE:
+		return configHiveMachine + `\` + path
+	case winreg.CURRENT_USER:
+		return configHiveUser + `\` + path
+	default:
+		return path
+	}
 }
 
 // ConfigPath returns the default config location, which on Windows is the

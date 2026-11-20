@@ -122,7 +122,7 @@ func (c *hostCommand) PreRun(this, runner *simplecobra.Commandeer) error {
 
 	c.logger.Debug("attempting load config", "command", this.CobraCommand.Name())
 
-	config, err := loadconfig(this)
+	config, err := loadconfig(this, logger)
 	if err != nil {
 		return err
 	}

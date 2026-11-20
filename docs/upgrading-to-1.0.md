@@ -148,6 +148,16 @@ The ADMX and ADML templates changed in 1.0.0:
 The Policy registry key and value names did not change, so settings already
 applied keep working.
 
+Values set by the templates before v0.26.0 (`ClientID`, `RedirectURL`,
+`CertificateAuthorityURL` and `TrustedCertificateAuthority`) can be left in
+the Policy key, as a GPO keeps applying them after its templates are
+replaced. The client ignores them there and logs a warning naming them. 1.0.0
+to 1.0.2 refused them as unknown keys, so the client would not start. Remove
+them from the GPO or Intune profile as described in
+[Values left by old Group Policy templates](../README.md#values-left-by-old-group-policy-templates).
+An unknown value under the Policy key or the configuration key is reported with
+the key it is in.
+
 **Intune** can't import a changed template under a namespace it already has.
 Import the new templates as a new template, move your settings to profiles
 that use it, then delete the profiles that use the old one and the old

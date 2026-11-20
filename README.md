@@ -239,9 +239,11 @@ The registry value names match the YAML keys above:
 Either the registry key or the Group Policy may be absent, as long as all
 required settings are set by one of them.
 
-**Note:** Previous versions of the ADMX/ADML files set values with different
-names (such as `ClientID`), which are no longer read. Import the current
-ADMX/ADML files and configure the policies again.
+**Note:** The ADMX/ADML files before v0.26.0 set values with different names
+(such as `ClientID`), which are not read. Import the current ADMX/ADML files
+and configure the policies again. See
+[Values left by old Group Policy templates](#values-left-by-old-group-policy-templates)
+to remove the old values.
 
 **Note:** Previous versions of the GUI read a YAML configuration file on
 Windows. This file is no longer used, so its settings must be moved to the
@@ -280,6 +282,44 @@ generated or certificate requested by one is available to the other.
 
 This allows the use of a shared/system configuration that defines the OIDC and
 SSH CA configuration with user specific data kept seperate.
+
+### Values left by old Group Policy templates
+
+Replacing the ADMX/ADML files doesn't remove what the old ones set. A GPO
+keeps the old values (shown as "Extra Registry Settings" in a Group Policy
+Management report) and applies them again at every refresh, so deleting them
+from a machine's registry doesn't last.
+
+The client ignores these values under
+`HKLM\SOFTWARE\Policies\Serverless SSH CA Client`, which the ADMX before
+v0.26.0 set, and logs a warning naming them each time it loads its
+configuration (the GUI logs to the Windows Event Log by default):
+
+- `ClientID`
+- `RedirectURL`
+- `CertificateAuthorityURL`
+- `TrustedCertificateAuthority`
+
+The old `Issuer` and `Scopes` values have the same names as current ones, so
+they are still read. Any other unknown value under the Policy key is an error,
+which names the key it is in.
+
+To remove the old values from a GPO, run this on a machine with the Group
+Policy Management tools, then refresh Group Policy on the clients
+(`gpupdate`), which removes them from the registry:
+
+```powershell
+Remove-GPRegistryValue -Name "<GPO name>" `
+    -Key "HKLM\Software\Policies\Serverless SSH CA Client" `
+    -ValueName ClientID, RedirectURL, CertificateAuthorityURL, TrustedCertificateAuthority
+```
+
+Check the old `Issuer` and `Scopes` values too: if the GPO still sets them,
+they apply over the configuration like any other policy.
+
+In Intune, delete the profiles that use the old imported template. If the
+values are still on a device afterwards, delete them from the registry there,
+as nothing applies them any more.
 
 ### As A Snap
 
