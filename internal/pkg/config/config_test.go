@@ -2,9 +2,12 @@ package config
 
 import (
 	"bytes"
+	"context"
 	"crypto/ed25519"
 	"crypto/rand"
 	"errors"
+	"io"
+	"log/slog"
 	"net/url"
 	"reflect"
 	"testing"
@@ -448,4 +451,44 @@ func TestNewClientConfig(t *testing.T) {
 func base64Key(pub ssh.PublicKey) string {
 	b := ssh.MarshalAuthorizedKey(pub)
 	return string(bytes.TrimSuffix(bytes.SplitN(b, []byte(" "), 2)[1], []byte("\n")))
+}
+
+func TestNewOptions(t *testing.T) {
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+
+	tests := []struct {
+		name string
+		opts []Option
+		want *slog.Logger // nil for the default, which logs nothing
+	}{
+		{name: "no options"},
+		{
+			// a nil logger would otherwise panic, but only once the
+			// Policy key holds old values, so it would go unnoticed
+			name: "nil logger",
+			opts: []Option{WithLogger(nil)},
+		},
+		{
+			name: "logger",
+			opts: []Option{WithLogger(logger)},
+			want: logger,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := newOptions(tt.opts...)
+			if got.logger == nil {
+				t.Fatal("logger = nil, want a logger")
+			}
+			if tt.want == nil {
+				if got.logger.Enabled(context.Background(), slog.LevelError) {
+					t.Error("default logger is enabled, want it to log nothing")
+				}
+				return
+			}
+			if got.logger != tt.want {
+				t.Errorf("logger = %p, want %p", got.logger, tt.want)
+			}
+		})
+	}
 }

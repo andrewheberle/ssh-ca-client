@@ -60,6 +60,16 @@ func WithLogger(logger *slog.Logger) Option {
 	}
 }
 
+// newOptions returns the options set by opts, over the defaults
+func newOptions(opts ...Option) options {
+	o := options{logger: slog.New(slog.DiscardHandler)}
+	for _, opt := range opts {
+		opt(&o)
+	}
+
+	return o
+}
+
 // Loads client config from the following sources on Windows:
 //   - Registry (HKCU or HKLM - defaults to HKLM)
 //   - Policy ("HKLM\Software\Policies\Serverless SSH CA Client")
@@ -67,10 +77,7 @@ func WithLogger(logger *slog.Logger) Option {
 // And the following on non-Windows platforms:
 //   - YAML based configuration file
 func LoadClientConfig(configpath string, opts ...Option) (*ClientConfig, error) {
-	o := options{logger: slog.New(slog.DiscardHandler)}
-	for _, opt := range opts {
-		opt(&o)
-	}
+	o := newOptions(opts...)
 
 	k, err := loadClientConfig(configpath, o.logger)
 	if err != nil {

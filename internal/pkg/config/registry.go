@@ -3,8 +3,8 @@ package config
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"slices"
-	"sort"
 	"strings"
 )
 
@@ -42,11 +42,13 @@ var oldPolicyValues = []string{
 // registry names are case insensitive. Values that are not configuration and
 // empty values are left out. For the Policy key, values with the names in
 // oldPolicyValues are also left out and their names, as written, returned in
-// ignored. Any other name that is not a configuration key is an error.
+// ignored. Any other value whose name is not a configuration key is an error.
+// Names are read in order, so ignored and any error are the same every time.
 func registryValues(raw map[string]any, policy bool) (values map[string]any, ignored []string, err error) {
 	values = make(map[string]any)
 	errs := make([]error, 0)
-	for name, value := range raw {
+	for _, name := range slices.Sorted(maps.Keys(raw)) {
+		value := raw[name]
 		key := strings.ToLower(name)
 
 		// the MSI writes values to the config key that are not
@@ -79,8 +81,6 @@ func registryValues(raw map[string]any, policy bool) (values map[string]any, ign
 	if err := errors.Join(errs...); err != nil {
 		return nil, nil, err
 	}
-
-	sort.Strings(ignored)
 
 	return values, ignored, nil
 }

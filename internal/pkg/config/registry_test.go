@@ -141,3 +141,25 @@ func TestRegistryValues(t *testing.T) {
 		})
 	}
 }
+
+// TestRegistryValuesErrorOrder checks that unknown values are reported in the
+// same order every time, though registry values are read into a map, so the
+// message an admin sees doesn't change between runs
+func TestRegistryValuesErrorOrder(t *testing.T) {
+	raw := map[string]any{"foo": "1", "Bar": "2", "baz": "3", "qux": "4", "client_id": "client"}
+	want := `unknown configuration key: "Bar"` + "\n" +
+		`unknown configuration key: "baz"` + "\n" +
+		`unknown configuration key: "foo"` + "\n" +
+		`unknown configuration key: "qux"`
+
+	// map iteration order is random, so one pass could match by chance
+	for range 20 {
+		_, _, err := registryValues(raw, false)
+		if err == nil {
+			t.Fatal("registryValues() error = nil, want error")
+		}
+		if err.Error() != want {
+			t.Fatalf("registryValues() error = %q, want %q", err, want)
+		}
+	}
+}

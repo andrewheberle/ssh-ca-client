@@ -296,3 +296,26 @@ func TestLoadRegistryConfig_OldPolicyValues(t *testing.T) {
 		})
 	}
 }
+
+// TestRegistryKeyPath checks the key named in errors and warnings, which an
+// admin looks for in the Registry Editor or a GPO
+func TestRegistryKeyPath(t *testing.T) {
+	tests := []struct {
+		key  registry.Key
+		path string
+		want string
+	}{
+		{registry.LOCAL_MACHINE, policyRegistryPath, `HKLM\SOFTWARE\Policies\Serverless SSH CA Client`},
+		{registry.LOCAL_MACHINE, configRegistryPath, `HKLM\SOFTWARE\Andrew Heberle\Serverless SSH CA Client`},
+		{registry.CURRENT_USER, configRegistryPath, `HKCU\SOFTWARE\Andrew Heberle\Serverless SSH CA Client`},
+		// no other hive is read, so the path is left as it is
+		{registry.USERS, configRegistryPath, configRegistryPath},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want, func(t *testing.T) {
+			if got := registryKeyPath(tt.key, tt.path); got != tt.want {
+				t.Errorf("registryKeyPath() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
