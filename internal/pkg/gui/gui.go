@@ -158,7 +158,7 @@ func Execute(ctx context.Context, args []string) error {
 	}()
 
 	// load config
-	conf, err := config.LoadClientConfig(configLocation)
+	conf, err := config.LoadClientConfig(configLocation, config.WithLogger(logger))
 	if err != nil {
 		logger.Error("could not load config", "config", configLocation, "error", err)
 		return err

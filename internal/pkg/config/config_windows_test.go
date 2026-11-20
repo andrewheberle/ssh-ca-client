@@ -1,9 +1,13 @@
 package config
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -58,7 +62,7 @@ func Test_configRegistryKey(t *testing.T) {
 	}
 
 	t.Run("invalid location is rejected before loading", func(t *testing.T) {
-		if _, err := loadClientConfig("HLKM"); err == nil {
+		if _, err := loadClientConfig("HLKM", slog.New(slog.DiscardHandler)); err == nil {
 			t.Errorf("loadClientConfig() error = nil, want error")
 		}
 	})
@@ -160,7 +164,7 @@ func Test_loadRegistryConfig(t *testing.T) {
 				createTestKey(t, policyPath, tt.policy)
 			}
 
-			k, err := loadRegistryConfig(registry.CURRENT_USER, configPath, registry.CURRENT_USER, policyPath)
+			k, err := loadRegistryConfig(registry.CURRENT_USER, configPath, registry.CURRENT_USER, policyPath, slog.New(slog.DiscardHandler))
 			if err != nil {
 				t.Fatalf("loadRegistryConfig() error = %v", err)
 			}
@@ -175,6 +179,142 @@ func Test_loadRegistryConfig(t *testing.T) {
 			}
 			if err := checkKeys(k.Keys()); err != nil {
 				t.Errorf("checkKeys() error = %v, want nil", err)
+			}
+		})
+	}
+}
+
+// TestLoadRegistryConfig_OldPolicyValues checks that values left in the
+// Policy key by the ADMX before v0.26.0 are ignored with a warning, as Group
+// Policy keeps applying them, and that anything else unknown is reported with
+// the key it is in.
+func TestLoadRegistryConfig_OldPolicyValues(t *testing.T) {
+	old := map[string]any{
+		"ClientID":                    "old",
+		"RedirectURL":                 "http://localhost:3000/auth/callback",
+		"CertificateAuthorityURL":     "https://ca.example.com/",
+		"TrustedCertificateAuthority": "ssh-ed25519 AAAA",
+	}
+
+	tests := []struct {
+		name       string
+		config     map[string]any
+		policy     map[string]any
+		wantClient string
+		wantWarn   []string // values named in the warning; none if empty
+		wantErrIn  string   // "config" or "policy", for an unknown value
+	}{
+		{
+			name:       "old values in the policy",
+			config:     map[string]any{"client_id": "config"},
+			policy:     old,
+			wantClient: "config",
+			wantWarn:   []string{"CertificateAuthorityURL", "ClientID", "RedirectURL", "TrustedCertificateAuthority"},
+		},
+		{
+			name:       "old values with current values in the policy",
+			policy:     map[string]any{"client_id": "policy", "ClientID": "old"},
+			wantClient: "policy",
+			wantWarn:   []string{"ClientID"},
+		},
+		{
+			name:       "no old values",
+			policy:     map[string]any{"client_id": "policy"},
+			wantClient: "policy",
+		},
+		{
+			name:      "old values in the config",
+			config:    map[string]any{"ClientID": "old"},
+			wantErrIn: "config",
+		},
+		{
+			name:      "unknown value in the policy",
+			policy:    map[string]any{"ClientID": "old", "client-id": "policy"},
+			wantErrIn: "policy",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			base := fmt.Sprintf(`SOFTWARE\ssh-ca-client-test-%d`, time.Now().UnixNano())
+			configPath := base + `-config`
+			policyPath := base + `-policy`
+			if tt.config != nil {
+				createTestKey(t, configPath, tt.config)
+			}
+			if tt.policy != nil {
+				createTestKey(t, policyPath, tt.policy)
+			}
+
+			var logs bytes.Buffer
+			logger := slog.New(slog.NewJSONHandler(&logs, nil))
+
+			k, err := loadRegistryConfig(registry.CURRENT_USER, configPath, registry.CURRENT_USER, policyPath, logger)
+			if tt.wantErrIn != "" {
+				path := map[string]string{"config": configPath, "policy": policyPath}[tt.wantErrIn]
+				if !errors.Is(err, ErrUnknownKey) {
+					t.Fatalf("loadRegistryConfig() error = %v, want %v", err, ErrUnknownKey)
+				}
+				if !strings.Contains(err.Error(), `HKCU\`+path+`:`) {
+					t.Errorf("loadRegistryConfig() error = %v, want it to name HKCU\\%s", err, path)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("loadRegistryConfig() error = %v", err)
+			}
+			if got := k.String("client_id"); got != tt.wantClient {
+				t.Errorf("client_id = %q, want %q", got, tt.wantClient)
+			}
+			if err := checkKeys(k.Keys()); err != nil {
+				t.Errorf("checkKeys() error = %v, want nil", err)
+			}
+
+			if len(tt.wantWarn) == 0 {
+				if logs.Len() != 0 {
+					t.Errorf("logged %s, want nothing", logs.String())
+				}
+				return
+			}
+
+			var entry struct {
+				Level  string   `json:"level"`
+				Key    string   `json:"key"`
+				Values []string `json:"values"`
+			}
+			if err := json.Unmarshal(logs.Bytes(), &entry); err != nil {
+				t.Fatalf("decoding log %q: %v", logs.String(), err)
+			}
+			if entry.Level != "WARN" {
+				t.Errorf("level = %q, want WARN", entry.Level)
+			}
+			if want := `HKCU\` + policyPath; entry.Key != want {
+				t.Errorf("key = %q, want %q", entry.Key, want)
+			}
+			if !slices.Equal(entry.Values, tt.wantWarn) {
+				t.Errorf("values = %q, want %q", entry.Values, tt.wantWarn)
+			}
+		})
+	}
+}
+
+// TestRegistryKeyPath checks the key named in errors and warnings, which an
+// admin looks for in the Registry Editor or a GPO
+func TestRegistryKeyPath(t *testing.T) {
+	tests := []struct {
+		key  registry.Key
+		path string
+		want string
+	}{
+		{registry.LOCAL_MACHINE, policyRegistryPath, `HKLM\SOFTWARE\Policies\Serverless SSH CA Client`},
+		{registry.LOCAL_MACHINE, configRegistryPath, `HKLM\SOFTWARE\Andrew Heberle\Serverless SSH CA Client`},
+		{registry.CURRENT_USER, configRegistryPath, `HKCU\SOFTWARE\Andrew Heberle\Serverless SSH CA Client`},
+		// no other hive is read, so the path is left as it is
+		{registry.USERS, configRegistryPath, configRegistryPath},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want, func(t *testing.T) {
+			if got := registryKeyPath(tt.key, tt.path); got != tt.want {
+				t.Errorf("registryKeyPath() = %q, want %q", got, tt.want)
 			}
 		})
 	}

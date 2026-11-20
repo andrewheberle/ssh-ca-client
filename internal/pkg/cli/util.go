@@ -21,15 +21,16 @@ func deprecateRenamed(flags *pflag.FlagSet, old, new string) error {
 	return flags.MarkDeprecated(old, "use --"+new+" instead")
 }
 
-// loadconfig will load the config from the command line options
-func loadconfig(this *simplecobra.Commandeer) (*config.ClientConfig, error) {
+// loadconfig will load the config from the command line options, reporting
+// anything ignored in it to logger
+func loadconfig(this *simplecobra.Commandeer, logger *slog.Logger) (*config.ClientConfig, error) {
 	// get config location
 	configLocation, err := this.CobraCommand.Flags().GetString("config")
 	if err != nil {
 		return nil, fmt.Errorf("problem accessing config flag: %w", err)
 	}
 
-	return config.LoadClientConfig(configLocation)
+	return config.LoadClientConfig(configLocation, config.WithLogger(logger))
 }
 
 func logger(this *simplecobra.Commandeer) (*slog.Logger, error) {

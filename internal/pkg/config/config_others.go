@@ -4,6 +4,7 @@ package config
 
 import (
 	"fmt"
+	"log/slog"
 	"path/filepath"
 
 	"github.com/andrewheberle/ssh-ca-client/internal/pkg/names"
@@ -12,7 +13,9 @@ import (
 	"github.com/knadh/koanf/v2"
 )
 
-func loadClientConfig(configpath string) (*koanf.Koanf, error) {
+// loadClientConfig loads the YAML file at configpath. Nothing in it is
+// ignored, so logger is not used.
+func loadClientConfig(configpath string, _ *slog.Logger) (*koanf.Koanf, error) {
 	k := koanf.New(".")
 	if err := k.Load(file.Provider(configpath), yaml.Parser()); err != nil {
 		return nil, fmt.Errorf("could not load config: %w", err)

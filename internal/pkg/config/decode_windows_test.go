@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+	"log/slog"
 	"reflect"
 	"testing"
 	"time"
@@ -173,6 +174,23 @@ func TestDecodeConfig_Registry(t *testing.T) {
 			wantErr: ErrUnknownKey,
 		},
 		{
+			// the ADMX before v0.26.0 wrote these to the Policy key
+			name:   "old policy values",
+			config: required(nil),
+			policy: map[string]any{
+				"ClientID":                    "old",
+				"RedirectURL":                 "http://localhost:8250/cb",
+				"CertificateAuthorityURL":     "http://old.example.com/",
+				"TrustedCertificateAuthority": "ssh-ed25519 AAAA",
+			},
+			want: want(nil),
+		},
+		{
+			name:    "old policy values in the config",
+			config:  required(map[string]any{"ClientID": "old"}),
+			wantErr: ErrUnknownKey,
+		},
+		{
 			// scopes must be REG_MULTI_SZ, not one string
 			name:    "scopes as REG_SZ",
 			config:  required(map[string]any{"scopes": "openid,offline_access"}),
@@ -211,25 +229,26 @@ func TestDecodeConfig_Registry(t *testing.T) {
 				createTestKey(t, policyPath, tt.policy)
 			}
 
-			k, err := loadRegistryConfig(registry.CURRENT_USER, configPath, registry.CURRENT_USER, policyPath)
-			if err != nil {
-				t.Fatalf("loadRegistryConfig() error = %v", err)
+			// an unknown value is reported while loading, with the key it
+			// is in, and anything else while decoding
+			var got *ClientConfig
+			k, err := loadRegistryConfig(registry.CURRENT_USER, configPath, registry.CURRENT_USER, policyPath, slog.New(slog.DiscardHandler))
+			if err == nil {
+				got, err = decodeConfig(k)
 			}
-
-			got, err := decodeConfig(k)
 			switch {
 			case tt.wantErr == errAny:
 				if err == nil {
-					t.Fatalf("decodeConfig() = %+v, want error", got)
+					t.Fatalf("loading and decoding = %+v, want error", got)
 				}
 				return
 			case tt.wantErr != nil:
 				if !errors.Is(err, tt.wantErr) {
-					t.Fatalf("decodeConfig() error = %v, want %v", err, tt.wantErr)
+					t.Fatalf("loading and decoding error = %v, want %v", err, tt.wantErr)
 				}
 				return
 			case err != nil:
-				t.Fatalf("decodeConfig() error = %v", err)
+				t.Fatalf("loading and decoding error = %v", err)
 			}
 
 			if !bytes.Equal(got.CertificateAuthorityPublicKey().Marshal(), ca.Marshal()) {
