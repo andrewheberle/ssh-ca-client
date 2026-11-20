@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.3](https://github.com/andrewheberle/ssh-ca-client/compare/v1.0.2...v1.0.3) (2026-11-20)
+
+
+### Bug Fixes
+
+* **config:** ignore values left in the Policy key by old Group Policy templates ([#285](https://github.com/andrewheberle/ssh-ca-client/issues/285)) ([661b6b9](https://github.com/andrewheberle/ssh-ca-client/commit/661b6b9747bead24e22e92e0927f5a98732932d1))
+* **deps:** update module github.com/oapi-codegen/runtime to v1.9.1 ([#284](https://github.com/andrewheberle/ssh-ca-client/issues/284)) ([d8ce84c](https://github.com/andrewheberle/ssh-ca-client/commit/d8ce84ca1c82a43323ecf9f687e822a240a5cda1))
+
 ## [1.0.2](https://github.com/andrewheberle/ssh-ca-client/compare/v1.0.1...v1.0.2) (2026-11-15)
 
 
