@@ -9,7 +9,9 @@ revoked host or user certificates respectively.
 
 The downloaded KRL is verified against its SSHSIG signature using the trusted_ca
 public key from the configuration, and must only revoke certificates issued by
-that CA. A KRL that fails verification is not written.
+that CA. The CA signs the certificate type (user or host) into the KRL, so a
+KRL for the other type is refused. A KRL that fails verification is not
+written.
 
 When --out is an existing KRL, the downloaded KRL is only written if it is not
 older than the existing one, comparing the KRL version and then the time it was
@@ -17,6 +19,13 @@ generated. This prevents an older KRL being used to un-revoke certificates. If
 the existing KRL is newer, for example because it was generated while the CA
 clock was wrong, remove the file to replace it. If the existing KRL is the same
 as the downloaded one, the file is left as it is rather than rewritten.
+
+The existing KRL must also be for the same certificate type. CA 1.0.2 and
+earlier don't sign the type, so their KRLs are accepted until a KRL that names
+its type has been written to --out. After that, a KRL that doesn't name its type
+is refused, as it comes from a CA that was downgraded or is an old KRL
+replayed, possibly the other type's. If the CA was downgraded on purpose,
+remove the file to replace it.
 
 To have sshd reject users that present a revoked certificate, write the user KRL
 to a file and add the following to /etc/ssh/sshd_config:

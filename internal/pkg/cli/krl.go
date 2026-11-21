@@ -90,14 +90,25 @@ func (c *krlCommand) Run(ctx context.Context, cd *simplecobra.Commandeer, args [
 		"sections", verified.Sections(),
 	)
 
+	// CA 1.0.2 and earlier don't sign the type into the KRL, which leaves
+	// the type unchecked until the CA is upgraded
+	if !verified.Typed() {
+		c.logger.Debug("krl does not name its certificate type, upgrade the CA to have it checked", "type", c.certificatetype)
+	}
+
 	if c.out == "" {
 		return nil
 	}
 
 	outcome, err := verified.Install(c.out)
 	if err != nil {
-		if errors.Is(err, krl.ErrOlderKRL) {
+		switch {
+		case errors.Is(err, krl.ErrOlderKRL):
 			c.logger.Error("not replacing existing krl with an older krl", "out", c.out, "error", err)
+		case errors.Is(err, krl.ErrUntypedKRL):
+			c.logger.Error("not replacing existing krl with one that does not name its certificate type, remove the existing krl if the CA was downgraded", "out", c.out, "error", err)
+		case errors.Is(err, krl.ErrUnexpectedType):
+			c.logger.Error("not replacing existing krl for another certificate type", "out", c.out, "error", err)
 		}
 		return err
 	}
