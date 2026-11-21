@@ -164,7 +164,10 @@ jobs:
       # - error statuses added or removed on an existing operation
       # - optional response properties removed
       # - operation IDs and component schemas removed, which renames the
-      #   client's generated code (also raised by the CA's own check)
+      #   client's generated code
+      # The CA's own check against its last release raises the same checks,
+      # in packages/core/.oasdiff-severity-levels in
+      # andrewheberle/serverless-ssh-ca, so change both lists together.
       - name: Write oasdiff config
         if: ${{ !cancelled() && inputs.ca-ref && runner.os == 'Linux' }}
         shell: bash
