@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/andrewheberle/ssh-ca-client/compare/v1.0.3...v1.1.0) (2026-11-21)
+
+
+### Features
+
+* **gui:** notify when a login is needed before the certificate expires ([#295](https://github.com/andrewheberle/ssh-ca-client/issues/295)) ([bf92c00](https://github.com/andrewheberle/ssh-ca-client/commit/bf92c008c049c2816c6dd11c938227e9e9d69128))
+
+
+### Bug Fixes
+
+* **krl:** refuse a KRL whose type doesn't match the request ([#290](https://github.com/andrewheberle/ssh-ca-client/issues/290)) ([06b61f8](https://github.com/andrewheberle/ssh-ca-client/commit/06b61f8af2b0b909faca407796186aed8c719405))
+
 ## [1.0.3](https://github.com/andrewheberle/ssh-ca-client/compare/v1.0.2...v1.0.3) (2026-11-20)
 
 
