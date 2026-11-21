@@ -166,6 +166,7 @@ type fakeTray struct {
 	icon          string
 	tooltip       string
 	notifications []string
+	messages      []string
 	quit          bool
 }
 
@@ -206,6 +207,7 @@ func newTestApp(t *testing.T) (*Application, *fakeIdentity, *fakeTray, *testCloc
 		quitTray:          func() { tray.quit = true },
 		notifier: func(title, message string, icon any) error {
 			tray.notifications = append(tray.notifications, title)
+			tray.messages = append(tray.messages, message)
 			return nil
 		},
 	}
@@ -475,15 +477,29 @@ func TestApplication_update(t *testing.T) {
 			wantTooltip:  "Current certificate valid",
 		},
 		{
-			name:         "close to expiry and login required",
-			cert:         expiresIn(30 * time.Minute),
-			refreshErr:   fmt.Errorf("%w: no refresh token available", auth.ErrInteractiveLoginRequired),
-			wantState:    stateCertificateDue,
-			wantRequests: 1,
-			wantIcon:     okIcon,
-			wantRefresh:  fakeMenuItem{loginTitle, true},
-			wantExpiry:   " left",
-			wantTooltip:  "Current certificate valid",
+			// the user is told before the certificate expires (#267)
+			name:              "close to expiry and login required",
+			cert:              expiresIn(30 * time.Minute),
+			refreshErr:        fmt.Errorf("%w: no refresh token available", auth.ErrInteractiveLoginRequired),
+			wantState:         stateCertificateDue,
+			wantRequests:      1,
+			wantNotifications: []string{"Login Needed"},
+			wantIcon:          warningIcon,
+			wantRefresh:       fakeMenuItem{loginTitle, true},
+			wantExpiry:        " left",
+			wantTooltip:       "Login needed",
+		},
+		{
+			name:              "close to expiry and refresh token refused",
+			cert:              expiresIn(30 * time.Minute),
+			refreshErr:        fmt.Errorf("%w: refresh failed: %w", auth.ErrInteractiveLoginRequired, refreshErr),
+			wantState:         stateCertificateDue,
+			wantRequests:      1,
+			wantNotifications: []string{"Login Needed"},
+			wantIcon:          warningIcon,
+			wantRefresh:       fakeMenuItem{loginTitle, true},
+			wantExpiry:        " left",
+			wantTooltip:       "Login needed",
 		},
 	}
 	for _, tt := range tests {
@@ -790,6 +806,56 @@ func TestApplication_expiredNotifiedOnce(t *testing.T) {
 		t.Errorf("%d requests made, want at least 3", got)
 	}
 	if want := []string{"Certificate Expired"}; !slices.Equal(tray.notifications, want) {
+		t.Errorf("notifications = %q, want %q", tray.notifications, want)
+	}
+}
+
+// TestApplication_loginNeededNotifiedOnce checks that the user is told once
+// per certificate that a login is needed before it expires, and then that it
+// expired (#267)
+func TestApplication_loginNeededNotifiedOnce(t *testing.T) {
+	app, c, tray, clock := newTestApp(t)
+	c.cert = expiresIn(50 * time.Minute)
+	c.refreshErr = fmt.Errorf("%w: refresh failed", auth.ErrInteractiveLoginRequired)
+	left := timeLeft(certificateExpiry(c.cert), clock.now())
+
+	// refreshes are retried until the certificate expires
+	for range 49 {
+		settle(t, app)
+		clock.add(time.Minute)
+	}
+
+	if got := len(c.requestKinds()); got < 3 {
+		t.Errorf("%d requests made, want at least 3", got)
+	}
+	if want := []string{"Login Needed"}; !slices.Equal(tray.notifications, want) {
+		t.Fatalf("notifications = %q, want %q", tray.notifications, want)
+	}
+	if msg := tray.messages[0]; !strings.Contains(msg, "expires in "+left) || !strings.Contains(msg, `Select "Log in" from the menu`) {
+		t.Errorf("message = %q, want the time left and the menu item", msg)
+	}
+	if tray.icon != warningIcon || !strings.HasSuffix(tray.tooltip, "Login needed") {
+		t.Errorf("icon = %q, tooltip = %q, want the warning icon and Login needed", tray.icon, tray.tooltip)
+	}
+
+	clock.add(2 * time.Minute)
+	settle(t, app)
+	if want := []string{"Login Needed", "Certificate Expired"}; !slices.Equal(tray.notifications, want) {
+		t.Fatalf("notifications after expiry = %q, want %q", tray.notifications, want)
+	}
+
+	// a login from the menu gets a new certificate, which is told again
+	// once its own refresh needs a login
+	app.refreshClick()
+	wait(t, app)
+	settle(t, app)
+	if app.state != stateCertificateOK || tray.icon != okIcon {
+		t.Fatalf("state = %s, icon = %q after a login, want %s and %q", app.state, tray.icon, stateCertificateOK, okIcon)
+	}
+
+	clock.add(c.validFor - 30*time.Minute)
+	settle(t, app)
+	if want := []string{"Login Needed", "Certificate Expired", "Certificate Issued", "Login Needed"}; !slices.Equal(tray.notifications, want) {
 		t.Errorf("notifications = %q, want %q", tray.notifications, want)
 	}
 }

@@ -160,6 +160,11 @@ type Application struct {
 	// until it is no longer expired
 	expiredNotified bool
 
+	// loginNotified is set once the user is told a login is needed before
+	// the certificate expires, until it is no longer due to be refreshed.
+	// While it is set the tray shows a login is needed.
+	loginNotified bool
+
 	// lastTick is when the event loop last ticked, to notice a suspend
 	lastTick time.Time
 
@@ -404,12 +409,23 @@ func (app *Application) update() {
 	if state != stateCertificateExpired {
 		app.expiredNotified = false
 	}
+	if state != stateCertificateDue {
+		app.loginNotified = false
+	}
 
 	// refresh in the background, unless another operation is running or
 	// recent refreshes failed
 	if (state == stateCertificateDue || state == stateCertificateExpired) && app.op == nil && !obs.now.Before(app.nextRefresh) {
 		app.logger.Info("attempting a refresh", "state", state)
 		app.start(opRefresh)
+	}
+
+	// tell the user once, while the certificate is still valid, that it
+	// can't be refreshed without a login. Once it has expired they are told
+	// that instead
+	if state == stateCertificateDue && app.loginRequired && app.op == nil && !app.loginNotified {
+		app.loginNotified = true
+		app.notify("Login Needed", fmt.Sprintf("The certificate expires in %s and can't be refreshed without logging in. Select \"%s\" from the menu to get a new one.", timeLeft(certificateExpiry(obs.cert), obs.now), app.refreshTitle(state)), warningIcon)
 	}
 
 	// tell the user once the certificate expired and no operation is running
@@ -463,6 +479,17 @@ func (app *Application) render(state appState, obs observation) {
 		app.mExpiry.SetTitle("Certificate expired")
 		app.setStatus("Certificate expired")
 		app.setIcon(app.trayIcons[warningIcon])
+	case stateCertificateDue:
+		app.mExpiry.SetTitle(fmt.Sprintf("%s left", timeLeft(certificateExpiry(obs.cert), obs.now)))
+		if app.loginNotified {
+			// shown until the certificate expires or a new one is obtained,
+			// after the notification is dismissed
+			app.setStatus("Login needed")
+			app.setIcon(app.trayIcons[warningIcon])
+		} else {
+			app.setStatus("Current certificate valid")
+			app.setIcon(app.trayIcons[okIcon])
+		}
 	default:
 		app.mExpiry.SetTitle(fmt.Sprintf("%s left", timeLeft(certificateExpiry(obs.cert), obs.now)))
 		app.setStatus("Current certificate valid")
