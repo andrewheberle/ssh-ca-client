@@ -749,6 +749,15 @@ all options.
 The GUI requests and refreshes user certificates. Revoking a certificate is only
 available via the CLI (see [Revoking Certificates](#revoking-certificates)).
 
+Once less than `--refresh-before` of the certificate's lifetime remains, the
+GUI refreshes it in the background, retrying until it succeeds. If a refresh
+needs a login, for example because the refresh token expired or the identity
+provider doesn't issue one, the GUI sends a "Login Needed" notification once
+for that certificate, saying how long is left. Until the certificate expires
+or a new one is obtained, the tray shows the warning icon and "Login needed",
+and the menu item becomes "Log in". If the certificate expires without being
+refreshed, a "Certificate Expired" notification is sent.
+
 The GUI supports the following command line flags:
 
 | Flag              | Type            | Description                                                                 |
