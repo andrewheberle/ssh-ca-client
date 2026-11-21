@@ -448,8 +448,8 @@ By default the client only displays the users public key, however the
 certificate in a format suitable for signing git commits.
 
 The `--private` option, which displays the users private key, is deprecated
-and will be removed in 2.0, as it makes copying the private key trivial. It
-still works until then, with a warning.
+and will be removed in a future release, as it makes copying the private key
+trivial. It still works until then, with a warning.
 
 #### Requesting a Certificate
 

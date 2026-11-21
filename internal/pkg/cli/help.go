@@ -253,7 +253,7 @@ commits, and implies --certificate:
       defaultKeyCommand = ssh-ca-client-cli show --git
 
 The --private option, which displays the private key, is deprecated and will
-be removed in 2.0, as it makes copying the private key trivial.
+be removed in a future release, as it makes copying the private key trivial.
 
 The --status and --json options from previous versions have been removed.`
 
