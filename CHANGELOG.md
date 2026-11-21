@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/andrewheberle/ssh-ca-client/compare/v1.1.0...v1.2.0) (2026-11-21)
+
+
+### Features
+
+* **cli:** deprecate show --private ([#297](https://github.com/andrewheberle/ssh-ca-client/issues/297)) ([f378b45](https://github.com/andrewheberle/ssh-ca-client/commit/f378b45b08f886d9ca1267f429ed1e0c1b1bb127))
+
 ## [1.1.0](https://github.com/andrewheberle/ssh-ca-client/compare/v1.0.3...v1.1.0) (2026-11-21)
 
 
