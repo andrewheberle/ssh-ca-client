@@ -514,7 +514,7 @@ type HostCertificateRenewalRequest struct {
 
 // KeyRevocationListResponse defines model for Key Revocation List Response.
 type KeyRevocationListResponse struct {
-	// Krl The OpenSSH Key Revocation List in its binary format, BASE64 encoded
+	// Krl The OpenSSH Key Revocation List in its binary format, BASE64 encoded. Its comment is the certificate type it revokes, exactly `user` or `host`, and is covered by the signature, so check it matches the type requested. CAs before API version 4.2.0 leave the comment empty
 	Krl []byte `json:"krl"`
 
 	// Signature Armored SSHSIG signature (`-----BEGIN SSH SIGNATURE-----`) made by the CA key over the decoded KRL bytes, with the SHA-512 hash and the `krl@com.github.serverless-ssh-ca.andrewheberle` namespace. It is not BASE64 encoded again
