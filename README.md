@@ -437,7 +437,7 @@ To generate a new private key, run as follows:
 ssh-ca-client-cli generate
 ```
 
-#### Show Existing Key/Public Key/Certificate
+#### Show Existing Public Key/Certificate
 
 ```sh
 ssh-ca-client-cli show [--certificate [--git]|--public]
