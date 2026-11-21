@@ -114,11 +114,11 @@ func TestExecute_KRL(t *testing.T) {
 
 	const generated = 1_800_000_000
 
-	// existing returns an existing KRL generated at date
-	existing := func(t *testing.T, date uint64) []byte {
+	// existing returns an existing KRL generated at date, with comment
+	existing := func(t *testing.T, date uint64, comment string) []byte {
 		t.Helper()
 
-		b, err := (&sshkrl.KRL{Version: 1, GeneratedDate: date}).Marshal(rand.Reader)
+		b, err := (&sshkrl.KRL{Version: 1, GeneratedDate: date, Comment: comment}).Marshal(rand.Reader)
 		if err != nil {
 			t.Fatalf("marshalling existing krl: %v", err)
 		}
@@ -139,7 +139,12 @@ func TestExecute_KRL(t *testing.T) {
 		{"write host", ca, nil, []string{"--host"}, false, false, true},
 		{"no output file", ca, nil, nil, true, false, false},
 		{"wrong signer", other, nil, nil, false, true, false},
-		{"keep newer", ca, existing(t, generated+1), nil, false, true, false},
+		{"keep newer", ca, existing(t, generated+1, ""), nil, false, true, false},
+		{"replace older", ca, existing(t, generated-1, ""), nil, false, false, true},
+		// the test CA doesn't name the KRL's type, as CA 1.0.2 and earlier
+		{"keep typed", ca, existing(t, generated-1, "user"), nil, false, true, false},
+		{"keep other type", ca, existing(t, generated-1, "host"), nil, false, true, false},
+		{"keep typed host", ca, existing(t, generated-1, "host"), []string{"--host"}, false, true, false},
 	}
 
 	for _, tt := range tests {

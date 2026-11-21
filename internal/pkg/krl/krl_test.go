@@ -17,6 +17,8 @@ import (
 	"math/big"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -104,7 +106,7 @@ func checkErr(t *testing.T, method string, got, want error) {
 			t.Errorf("%s() failed: %v", method, got)
 		}
 	case errParse:
-		for _, err := range []error{krl.ErrInvalidSignature, krl.ErrNoPublicKey, krl.ErrOlderKRL, krl.ErrUnexpectedCA, krl.ErrUnexpectedSection} {
+		for _, err := range []error{krl.ErrInvalidSignature, krl.ErrNoPublicKey, krl.ErrOlderKRL, krl.ErrUnexpectedCA, krl.ErrUnexpectedSection, krl.ErrUnexpectedType, krl.ErrUntypedKRL} {
 			if errors.Is(got, err) {
 				t.Errorf("%s() error = %v, want parse error", method, got)
 				return
@@ -159,11 +161,20 @@ func serve(t *testing.T, b []byte, signature string) *responseClient {
 	return &responseClient{fn: response(http.StatusOK, "application/json", string(body))}
 }
 
-// fetch returns b, signed by ca, after fetching and verifying it
+// fetch returns b, signed by ca, after fetching and verifying it as the user
+// KRL
 func fetch(t *testing.T, ca ssh.Signer, b []byte) *krl.Verified {
 	t.Helper()
 
-	v, err := krl.Fetch(t.Context(), "https://ssh.example.com/", krl.User, ca.PublicKey(), api.WithHTTPClient(serve(t, b, sign(t, b, ca))))
+	return fetchType(t, ca, b, krl.User)
+}
+
+// fetchType returns b, signed by ca, after fetching and verifying it as the
+// KRL for certificateType
+func fetchType(t *testing.T, ca ssh.Signer, b []byte, certificateType krl.CertificateType) *krl.Verified {
+	t.Helper()
+
+	v, err := krl.Fetch(t.Context(), "https://ssh.example.com/", certificateType, ca.PublicKey(), api.WithHTTPClient(serve(t, b, sign(t, b, ca))))
 	if err != nil {
 		t.Fatalf("Fetch() failed: %v", err)
 	}
@@ -172,14 +183,22 @@ func fetch(t *testing.T, ca ssh.Signer, b []byte) *krl.Verified {
 }
 
 // generated returns a KRL revoking a certificate from ca with version and
-// generated date, as the CA sets version 1 and the generated date for every
-// KRL
+// generated date and no comment, as CA 1.0.2 and earlier generate it
 func generated(t *testing.T, ca ssh.Signer, version, date uint64) []byte {
+	t.Helper()
+
+	return typed(t, ca, version, date, "")
+}
+
+// typed returns a KRL as for [generated], with comment, which later CAs set
+// to the certificate type
+func typed(t *testing.T, ca ssh.Signer, version, date uint64, comment string) []byte {
 	t.Helper()
 
 	k := &sshkrl.KRL{
 		Version:       version,
 		GeneratedDate: date,
+		Comment:       comment,
 		Sections:      []sshkrl.KRLSection{certificateSection(ca.PublicKey())},
 	}
 	b, err := k.Marshal(rand.Reader)
@@ -466,6 +485,126 @@ func TestFetchKeyTypes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fetch(t, tt.signer, marshal(t, certificateSection(tt.signer.PublicKey())))
+		})
+	}
+}
+
+// TestFetchType checks the certificate type the CA signs into the KRL's
+// comment is the one requested, so the KRL for one type can't be used as the
+// other (#239). CA 1.0.2 and earlier leave the comment empty.
+func TestFetchType(t *testing.T) {
+	ca := newSigner(t)
+	other := newSigner(t)
+
+	const date = 1_800_000_000
+
+	tests := []struct {
+		name      string
+		requested krl.CertificateType
+		comment   string
+		wantTyped bool
+		wantErr   error
+	}{
+		{"user krl", krl.User, "user", true, nil},
+		{"host krl", krl.Host, "host", true, nil},
+		{"untyped as user", krl.User, "", false, nil},
+		{"untyped as host", krl.Host, "", false, nil},
+
+		{"host krl as user", krl.User, "host", false, krl.ErrUnexpectedType},
+		{"user krl as host", krl.Host, "user", false, krl.ErrUnexpectedType},
+		{"type in another case", krl.User, "User", false, krl.ErrUnexpectedType},
+		{"type with more text", krl.User, "user krl", false, krl.ErrUnexpectedType},
+		{"unknown type", krl.User, "other", false, krl.ErrUnexpectedType},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := typed(t, ca, 1, date, tt.comment)
+
+			got, err := krl.Fetch(t.Context(), "https://ssh.example.com/", tt.requested, ca.PublicKey(), api.WithHTTPClient(serve(t, b, sign(t, b, ca))))
+			checkErr(t, "Fetch", err, tt.wantErr)
+
+			if err == nil && got.Typed() != tt.wantTyped {
+				t.Errorf("Typed() = %v, want %v", got.Typed(), tt.wantTyped)
+			}
+		})
+	}
+
+	// the signature is checked before the type, so an unsigned KRL is
+	// reported as unsigned
+	t.Run("wrong signer and type", func(t *testing.T) {
+		b := typed(t, ca, 1, date, "host")
+
+		_, err := krl.Fetch(t.Context(), "https://ssh.example.com/", krl.User, ca.PublicKey(), api.WithHTTPClient(serve(t, b, sign(t, b, other))))
+		checkErr(t, "Fetch", err, krl.ErrInvalidSignature)
+	})
+}
+
+// TestInstallType checks that once a KRL naming its type is installed, only
+// a KRL of that type replaces it: an untyped KRL then comes from a CA that
+// was downgraded, or is an old KRL replayed, which may be the other type's
+// (#239). File modes are checked by TestInstall.
+func TestInstallType(t *testing.T) {
+	ca := newSigner(t)
+
+	const date = 1_800_000_000
+	malformed := []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}
+
+	tests := []struct {
+		name        string
+		requested   krl.CertificateType
+		krl         []byte
+		existing    []byte
+		wantOutcome krl.Outcome
+		wantErr     error
+	}{
+		{"untyped with no existing krl", krl.User, generated(t, ca, 1, date), nil, krl.Written, nil},
+		{"untyped over untyped", krl.User, generated(t, ca, 1, date+1), generated(t, ca, 1, date), krl.Written, nil},
+		{"untyped over malformed", krl.User, generated(t, ca, 1, date), malformed, krl.ReplacedUnparseable, nil},
+		{"typed with no existing krl", krl.User, typed(t, ca, 1, date, "user"), nil, krl.Written, nil},
+		{"typed over typed", krl.User, typed(t, ca, 1, date+1, "user"), typed(t, ca, 1, date, "user"), krl.Written, nil},
+		{"typed over malformed", krl.Host, typed(t, ca, 1, date, "host"), malformed, krl.ReplacedUnparseable, nil},
+
+		// the CA's version and generated date don't change when it starts
+		// naming the type, so the same KRL replaces its untyped copy
+		{"typed over untyped of the same version", krl.User, typed(t, ca, 1, date, "user"), generated(t, ca, 1, date), krl.Written, nil},
+
+		{"untyped over typed", krl.User, generated(t, ca, 1, date+1), typed(t, ca, 1, date, "user"), krl.Written, krl.ErrUntypedKRL},
+		{"untyped of a higher version over typed", krl.User, generated(t, ca, 9, date+1), typed(t, ca, 1, date, "user"), krl.Written, krl.ErrUntypedKRL},
+		{"over the other type", krl.User, typed(t, ca, 2, date+1, "user"), typed(t, ca, 1, date, "host"), krl.Written, krl.ErrUnexpectedType},
+		{"untyped over the other type", krl.User, generated(t, ca, 2, date+1), typed(t, ca, 1, date, "host"), krl.Written, krl.ErrUnexpectedType},
+
+		// the type is checked before the version
+		{"older over the other type", krl.User, typed(t, ca, 1, date-1, "user"), typed(t, ca, 1, date, "host"), krl.Written, krl.ErrUnexpectedType},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := fetchType(t, ca, tt.krl, tt.requested)
+			path := filepath.Join(t.TempDir(), "revocation_list")
+			if tt.existing != nil {
+				if err := os.WriteFile(path, tt.existing, 0600); err != nil {
+					t.Fatalf("writing existing krl: %v", err)
+				}
+			}
+
+			got, err := v.Install(path)
+			checkErr(t, "Install", err, tt.wantErr)
+
+			want := tt.krl
+			if tt.wantErr != nil {
+				want = tt.existing
+			} else if got != tt.wantOutcome {
+				t.Errorf("Install() = %v, want %v", got, tt.wantOutcome)
+			}
+
+			b, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatalf("reading krl: %v", err)
+			}
+			if !bytes.Equal(b, want) {
+				t.Errorf("krl file = %x, want %x", b, want)
+			}
 		})
 	}
 }

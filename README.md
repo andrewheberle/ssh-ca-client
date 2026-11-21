@@ -630,6 +630,15 @@ its signature using the `trusted_ca` public key and writes it to a file that
 written if it is older than the existing file, and the file is left as it is
 when the KRL has not changed.
 
+The CA signs the certificate type (`user` or `host`) into each KRL, so a KRL
+for the other type is refused rather than un-revoking certificates. CA 1.0.2
+and earlier don't sign the type, so their KRLs are accepted until a KRL that
+names its type has been written to the file. After that, a KRL without a type
+is refused, as it comes from a downgraded CA or is an old KRL replayed (see
+[ADR 0005](docs/adr/0005-an-untyped-krl-is-accepted-only-until-a-typed-one-is-installed.md)).
+If the CA was downgraded on purpose, remove the file so the next KRL replaces
+it.
+
 To have `sshd` reject users that present a revoked certificate, first write the
 user KRL:
 
