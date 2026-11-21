@@ -33,7 +33,7 @@ func commands() []simplecobra.Commander {
 			),
 		},
 		&showCommand{
-			Command: simplecommand.New("show", "Show existing private/public key",
+			Command: simplecommand.New("show", "Show existing public key or certificate",
 				simplecommand.WithLong(showLong),
 				simplecommand.WithExample(showExample),
 				simplecommand.WithArgs(cobra.NoArgs),

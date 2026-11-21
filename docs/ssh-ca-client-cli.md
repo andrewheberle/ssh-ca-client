@@ -67,6 +67,6 @@ ssh-ca-client-cli [command] [flags]
 * [ssh-ca-client-cli krl](ssh-ca-client-cli-krl.md)	 - Download and parse a SSH KRL
 * [ssh-ca-client-cli login](ssh-ca-client-cli-login.md)	 - Login via OIDC and request a certificate from CA
 * [ssh-ca-client-cli revoke](ssh-ca-client-cli-revoke.md)	 - Revoke a certificate
-* [ssh-ca-client-cli show](ssh-ca-client-cli-show.md)	 - Show existing private/public key
+* [ssh-ca-client-cli show](ssh-ca-client-cli-show.md)	 - Show existing public key or certificate
 * [ssh-ca-client-cli version](ssh-ca-client-cli-version.md)	 - Show the current version of the ssh-ca-client-cli
 

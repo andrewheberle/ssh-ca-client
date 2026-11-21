@@ -440,12 +440,16 @@ ssh-ca-client-cli generate
 #### Show Existing Key/Public Key/Certificate
 
 ```sh
-ssh-ca-client-cli show [--private|--certificate [--git]|--public]
+ssh-ca-client-cli show [--certificate [--git]|--public]
 ```
 
 By default the client only displays the users public key, however the
-`--private` and `--certificate` options may be provided. The `--git` option
-outputs the certificate in a format suitable for signing git commits.
+`--certificate` option may be provided. The `--git` option outputs the
+certificate in a format suitable for signing git commits.
+
+The `--private` option, which displays the users private key, is deprecated
+and will be removed in 2.0, as it makes copying the private key trivial. It
+still works until then, with a warning.
 
 #### Requesting a Certificate
 
