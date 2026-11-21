@@ -36,6 +36,12 @@ func (c *showCommand) Init(cd *simplecobra.Commandeer) error {
 	cmd.MarkFlagsMutuallyExclusive("git", "public")
 	cmd.MarkFlagsMutuallyExclusive("git", "private")
 
+	// displaying the private key makes it trivial to copy, so --private is
+	// deprecated and will be removed in a future release
+	if err := cmd.Flags().MarkDeprecated("private", "it will be removed in a future release"); err != nil {
+		return err
+	}
+
 	return nil
 }
 

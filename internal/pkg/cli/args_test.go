@@ -99,3 +99,36 @@ func TestRenamedFlags(t *testing.T) {
 		}
 	})
 }
+
+// TestDeprecatedFlags checks that each flag due to be removed in a future
+// release still works but is deprecated, which also hides it from help and the generated
+// docs.
+func TestDeprecatedFlags(t *testing.T) {
+	root, err := cli.Command()
+	if err != nil {
+		t.Fatalf("Command() error = %v", err)
+	}
+
+	tests := []struct {
+		command string
+		flag    string
+	}{
+		{"show", "private"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.command+" "+tt.flag, func(t *testing.T) {
+			cmd, _, err := root.Find([]string{tt.command})
+			if err != nil || cmd == root {
+				t.Fatalf("%s not found: %v", tt.command, err)
+			}
+
+			f := cmd.Flags().Lookup(tt.flag)
+			if f == nil {
+				t.Fatalf("--%s was removed, want it kept as deprecated until it is removed", tt.flag)
+			}
+			if f.Deprecated == "" || !f.Hidden {
+				t.Errorf("--%s Deprecated = %q, Hidden = %v, want deprecated and hidden", tt.flag, f.Deprecated, f.Hidden)
+			}
+		})
+	}
+}

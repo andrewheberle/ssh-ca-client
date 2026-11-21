@@ -21,6 +21,8 @@ func TestExecute_MutuallyExclusiveFlags(t *testing.T) {
 		{"show private and public", []string{"show", "--private", "--public"}},
 		{"show private and certificate", []string{"show", "--private", "--certificate"}},
 		{"show public and certificate", []string{"show", "--public", "--certificate"}},
+		{"show git and public", []string{"show", "--git", "--public"}},
+		{"show git and private", []string{"show", "--git", "--private"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

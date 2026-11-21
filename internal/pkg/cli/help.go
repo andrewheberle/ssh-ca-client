@@ -242,8 +242,8 @@ ssh-ca-client-cli revoke --host --reload-command "systemctl try-reload-or-restar
 # Revoke a previous certificate for the Ed25519 host key
 ssh-ca-client-cli revoke --host --key /etc/ssh/ssh_host_ed25519_key --serial 12345678901234567890`
 
-	showLong = `Display any existing private key, public key or certificate in OpenSSH format
-from the users keyring.
+	showLong = `Display the existing public key or certificate in OpenSSH format from the
+users keyring.
 
 The --git option outputs the current certificate in a format suitable for use
 via gpg.ssh.defaultKeyCommand to provide a SSH public key for signing git
@@ -252,12 +252,12 @@ commits, and implies --certificate:
     [gpg "ssh"]
       defaultKeyCommand = ssh-ca-client-cli show --git
 
+The --private option, which displays the private key, is deprecated and will
+be removed in a future release, as it makes copying the private key trivial.
+
 The --status and --json options from previous versions have been removed.`
 
-	showExample = `# Display the current private key in OpenSSH format
-ssh-ca-client-cli show --private
-
-# Display the current certificate in OpenSSH format
+	showExample = `# Display the current certificate in OpenSSH format
 ssh-ca-client-cli show --certificate
 
 # Display the current public key
